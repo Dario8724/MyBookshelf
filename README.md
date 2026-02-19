@@ -2,7 +2,7 @@
 
 **Licenciatura em Engenharia Informática | LEIF02 | 24-25**  
 **UC:** Projeto de Desenvolvimento Web  
-**Docente:** Maria Inês Pires 
+**Docente:** Maria Inês Pires
 **Grupo ** **Turma D02**
 
 **Autores:**
