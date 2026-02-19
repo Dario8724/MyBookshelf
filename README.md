@@ -2,8 +2,8 @@
 
 **Licenciatura em Engenharia Informática | LEIF02 | 24-25**  
 **UC:** Projeto de Desenvolvimento Web  
-**Docente:** Maria Inês Pires
-**Grupo ** **Turma D02**
+**Docente:** Maria Inês Pires 
+**Grupo** **Turma D02**
 
 **Autores:**
 - Gabriel Lima Rezende - 20240343  
@@ -12,6 +12,7 @@
 - Francisco Rocha Zolana – 20240801  
 
 **Palavras Chave**
+Livros, Leitura, Biblioteca, Livraria, Feira do Livro
 
 ---
 
@@ -53,5 +54,68 @@ O projeto pretende responder à necessidade de uma ferramenta centralizada que u
 - Privacidade
 - Escalabilidade
 - Permissões de sistema  
+
+---
+
+## Descrição dos Objetivos e da Motivação do Trabalho
+
+A leitura é uma das práticas culturais mais importantes para o desenvolvimento intelectual, emocional e social, contribuindo para o aumento do pensamento crítico, da empatia, da criatividade e da capacidade de aprendizagem contínua. No entanto, muitos leitores enfrentam dificuldades na organização das suas leituras, na gestão de hábitos de leitura, no acompanhamento do seu progresso e no acesso a informação centralizada sobre livros, eventos literários e comunidades de leitores. O projeto MyBookshelf surge como resposta a essa necessidade, propondo uma plataforma digital que permita organizar leituras de forma estruturada, intuitiva e personalizada, promovendo a criação de uma biblioteca digital pessoal e a construção de uma comunidade literária ativa. A plataforma visa facilitar o registo de livros lidos, em leitura e a ler, bem como o acompanhamento da evolução do hábito de leitura ao longo do tempo, permitindo ao utilizador visualizar o seu progresso, histórico e padrões de consumo literário. Adicionalmente, o projeto procura incentivar o envolvimento social e cultural dos utilizadores através da partilha de opiniões, avaliações e reviews, promovendo a interação entre leitores e a criação de redes de afinidade baseadas em interesses literários comuns. A integração de um sistema de informação geográfica (GIS) permite ainda aproximar os utilizadores do ecossistema cultural, através da divulgação e visualização de eventos literários, bibliotecas e livrarias, promovendo a participação ativa na vida cultural local.
+
+---
+
+## Identificação de Público-Alvo
+
+- Leitores
+- Estudantes
+- Comunidade literária
+- Utilizadores digitais
+
+---
+
+## Pesquisa de Mercado
+
+- Goodreads
+- LibraryThing
+- Bookly
+- StoryGraph
+
+---
+
+## Descrição da Solução a Implementar
+
+- Aplicação web para gestão e consulta de uma biblioteca digital de livros
+- Sistema de registo e autenticação de utilizadores (leitores e administradores)
+- Pesquisa avançada de livros por título, autor, género, ano de publicação e palavras-chave
+- Área pessoal com histórico de leituras e lista de favoritos
+- Painel administrativo para gestão de livros, autores, categorias e utilizadores
+- Base de dados relacional (MySQL/PostgreSQL) para armazenamento de livros e utilizadores   
+
+**Áreas curriculares envolvidas:**
+- Programação Web: Desenvolvimento da plataforma web (frontend e backend)
+- Algoritmos e Estruturas de Dados: Organização e otimização da pesquisa e gestão de livros
+- Estatística: Análise de dados e geração de relatórios de utilização
+- Interfaces e Usabilidade: Criação de uma interface intuitiva e responsiva
+- Sistemas de Informação Geográficos: Integração de mapas para localização de bibliotecas ou eventos literários 
+
+**Tecnologias:**
+- IDE: Visual Studio, Intellij
+- Linguagem: Java, HTML, CSS, JavaScript
+- Banco: SQL Workbench
+- UI: Figma
+- Versionamento: GitHub / ClickUp
+
+---
+
+## Planeamento e Calendarização
+- Mockups e Interface (Figma): Protótipos e design da plataforma
+- Base de Dados (SQL Workbench): Estruturação e implementação relacional
+- Backend (HTML, CSS, JavaScript): Desenvolvimento da lógica e páginas interativas
+- Integração com APIs: Conexão com serviços externos para capas, infos e mapas
+- Testes e Validação: Verificação de funcionalidades e usabilidade
+- Poster e Vídeo Promocional: Divulgação e apresentação visual do projeto
+
+---
+
+## Conclusão
 
 ---
