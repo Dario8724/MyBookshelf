@@ -44,9 +44,9 @@ O projeto pretende responder à necessidade de uma ferramenta centralizada que u
 - ⁠Calendário de eventos literários
 - Sistema de pesquisa de livro
 - ⁠Página individual do livro
+- ⁠Sistema de recomendação de livros
 
 **Não Funcionais:**
-- ⁠Sistema de recomendação de livros
 - Botão de redirecionamento para comprar livro
 - Interface responsiva
 - Segurança de dados
