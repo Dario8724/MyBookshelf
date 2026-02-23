@@ -30,36 +30,82 @@ Livros, Leitura, Biblioteca, Livraria, Feira do Livro
 
 ## Descrição da App
 
-O nosso grupo pretende desenvolver uma plataforma web denominada MyBookshelf, com foco na criação de uma biblioteca digital pessoal e de uma rede social literária, destinada a leitores que desejam organizar as suas leituras, partilhar experiências, interagir com outros utilizadores e descobrir novos livros e eventos culturais. A plataforma permitirá aos utilizadores registar os livros que já leram, os que estão a ler e os que pretendem ler, bem como realizar avaliações e reviews, criando um histórico de leitura pessoal. O MyBookshelf integra ainda funcionalidades de descoberta cultural, através da visualização de eventos literários. 
-O projeto pretende responder à necessidade de uma ferramenta centralizada que una organização pessoal de leitura, interação social e acesso à informação cultural, promovendo o hábito da leitura, a participação em eventos literários e a construção de comunidades digitais em torno dos livros.
+O nosso grupo pretende desenvolver uma plataforma web denominada MyBookshelf, concebida como uma biblioteca digital pessoal e uma rede social literária, que transforma a forma como os leitores organizam, vivem e partilham a experiência da leitura. A aplicação permitirá aos utilizadores registar os livros que já leram, os que estão a ler e os que pretendem ler, criando uma estante digital personalizada que reflete os seus gostos, interesses e percurso enquanto leitores. Através do acompanhamento do tempo de leitura, da definição de metas e da atribuição de medalhas e troféus por objetivos alcançados, o MyBookshelf introduz elementos de gamificação que promovem a motivação, a consistência e o desenvolvimento do hábito de leitura de forma contínua e envolvente. Para além da dimensão individual, a plataforma valoriza fortemente a componente social, permitindo a partilha de avaliações, reviews e opiniões, a criação de perfis de leitor e a interação numa comunidade digital centrada nos livros.
+O MyBookshelf integra ainda funcionalidades de descoberta cultural, através de um calendário e visualização de eventos literários, aproximando os utilizadores do ecossistema cultural local e promovendo a participação ativa em feiras do livro, lançamentos, bibliotecas e eventos literários. Adicionalmente, a plataforma facilita o acesso aos livros através de redirecionamento direto para a sua aquisição online, tornando todo o percurso — da descoberta à leitura — simples, fluido e centralizado.
+O projeto surge, assim, como resposta à necessidade de uma ferramenta moderna, intuitiva e centralizada que una organização de leitura, motivação pessoal, interação social e acesso à cultura, promovendo o hábito da leitura, a literacia digital e a construção de comunidades culturais sustentáveis no ambiente digital.
 
 ---
 
 ## Requisitos Funcionais e Não Funcionais
 
-**Funcionais:**
-- Biblioteca pessoal (livros lidos, livros em leitura, livros que quero ler)
-- Avaliação e review de livros
-- Criação de perfil
-- Feed/comunidade
-- ⁠Calendário de eventos literários
-- Sistema de pesquisa de livro
-- ⁠Página individual do livro
-- ⁠Sistema de recomendação de livros
+### Requisitos Funcionais
 
-**Não Funcionais:**
-- Botão de redirecionamento para comprar livro
-- Interface responsiva
-- Segurança de dados
-- Privacidade
-- Escalabilidade
-- Permissões de sistema  
+- **Gestão de biblioteca pessoal**
+  - Registo de livros lidos  
+  - Registo de livros em leitura  
+  - Registo de livros a ler  
+
+- **Sistema de avaliação e reviews**
+  - Avaliação de livros  
+  - Criação de reviews e comentários  
+
+- **Gestão de utilizadores**
+  - Criação de perfil  
+  - Edição de perfil  
+  - Autenticação e registo  
+
+- **Comunidade e interação social**
+  - Feed/comunidade de leitores  
+  - Partilha de leituras e opiniões  
+
+- **Descoberta e organização de conteúdos**
+  - Sistema de pesquisa de livros  
+  - Página individual do livro (detalhes, avaliações, reviews, estado de leitura)  
+  - Sistema de recomendação de livros  
+
+- **Eventos culturais**
+  - Calendário de eventos literários  
+  - Visualização de eventos culturais  
+  - Integração com mapa (GIS)  
+
+---
+
+### Requisitos Não Funcionais
+
+- **Usabilidade e experiência do utilizador**
+  - Interface intuitiva e amigável  
+  - Navegação simples e consistente  
+  - Experiência centrada no utilizador  
+
+- **Desempenho e fiabilidade**
+  - Tempo de resposta adequado  
+  - Disponibilidade do sistema  
+  - Estabilidade da plataforma  
+
+- **Segurança e privacidade**
+  - Proteção de dados pessoais  
+  - Segurança de autenticação  
+  - Controlo de acessos e permissões  
+  - Conformidade com princípios de privacidade  
+
+- **Compatibilidade e acessibilidade**
+  - Interface responsiva (desktop, tablet, mobile)  
+  - Compatibilidade entre navegadores  
+
+- **Escalabilidade e manutenção**
+  - Arquitetura escalável  
+  - Facilidade de manutenção  
+  - Modularidade do sistema  
+
+- **Integrações externas**
+  - Botão de redirecionamento para compra de livros (Amazon)  
 
 ---
 
 ## Descrição dos Objetivos e da Motivação do Trabalho
 
-A leitura é uma das práticas culturais mais importantes para o desenvolvimento intelectual, emocional e social, contribuindo para o aumento do pensamento crítico, da empatia, da criatividade e da capacidade de aprendizagem contínua. No entanto, muitos leitores enfrentam dificuldades na organização das suas leituras, na gestão de hábitos de leitura, no acompanhamento do seu progresso e no acesso a informação centralizada sobre livros, eventos literários e comunidades de leitores. O projeto MyBookshelf surge como resposta a essa necessidade, propondo uma plataforma digital que permita organizar leituras de forma estruturada, intuitiva e personalizada, promovendo a criação de uma biblioteca digital pessoal e a construção de uma comunidade literária ativa. A plataforma visa facilitar o registo de livros lidos, em leitura e a ler, bem como o acompanhamento da evolução do hábito de leitura ao longo do tempo, permitindo ao utilizador visualizar o seu progresso, histórico e padrões de consumo literário. Adicionalmente, o projeto procura incentivar o envolvimento social e cultural dos utilizadores através da partilha de opiniões, avaliações e reviews, promovendo a interação entre leitores e a criação de redes de afinidade baseadas em interesses literários comuns. A integração de um sistema de informação geográfica (GIS) permite ainda aproximar os utilizadores do ecossistema cultural, através da divulgação e visualização de eventos literários, bibliotecas e livrarias, promovendo a participação ativa na vida cultural local.
+A leitura desempenha um papel fundamental no desenvolvimento intelectual, emocional e social, contribuindo para o pensamento crítico, a criatividade e a aprendizagem contínua. No entanto, muitos leitores enfrentam dificuldades na organização das suas leituras, na manutenção de hábitos consistentes e no acesso a informação centralizada sobre livros, eventos culturais e comunidades de leitores.
+O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma plataforma digital que permite organizar a leitura de forma estruturada e personalizada, através da criação de uma biblioteca digital pessoal, do acompanhamento do progresso e da definição de metas de leitura. Paralelamente, a plataforma promove a interação social e a partilha de experiências entre leitores, bem como a descoberta cultural através da divulgação de eventos literários, integrando tecnologia, cultura e comunidade numa única solução digital.
 
 ---
 
@@ -83,12 +129,20 @@ A leitura é uma das práticas culturais mais importantes para o desenvolvimento
 
 ## Descrição da Solução a Implementar
 
-- Aplicação web para gestão e consulta de uma biblioteca digital de livros
-- Sistema de registo e autenticação de utilizadores (leitores e administradores)
-- Pesquisa avançada de livros por título, autor, género, ano de publicação e palavras-chave
-- Área pessoal com histórico de leituras e lista de favoritos
-- Painel administrativo para gestão de livros, autores, categorias e utilizadores
-- Base de dados relacional (MySQL/PostgreSQL) para armazenamento de livros e utilizadores   
+- Desenvolvimento de uma plataforma web para a gestão, organização e consulta de uma biblioteca digital pessoal de livros, integrada numa rede social literária.
+- Implementação de um sistema de registo, autenticação e gestão de utilizadores, com perfis personalizados para leitores e perfis administrativos para gestão da plataforma.
+- Criação de um sistema de pesquisa avançada de livros, permitindo filtros por título, autor, género, ano de publicação, palavras-chave e categorias literárias.
+- Disponibilização de uma área pessoal do utilizador, com:
+  - Biblioteca digital personalizada (livros lidos, em leitura e a ler)
+  - Histórico de leituras
+  - Metas de leitura
+  - Registo de tempo de leitura
+  - Sistema de medalhas e conquistas
+- Implementação de uma componente social e comunitária.
+- Integração de um módulo de descoberta cultural.
+- Implementação de páginas individuais de livros, com informação detalhada, avaliações, reviews, estado de leitura e recomendações relacionadas.
+- Integração de um sistema de redirecionamento para aquisição de livros, através de plataformas externas (ex.: Amazon Portugal).
+- Implementação de uma base de dados relacional (MySQL ou PostgreSQL) para armazenamento estruturado e seguro da informação relativa a utilizadores, livros, eventos, interações sociais e histórico de leitura.
 
 **Áreas curriculares envolvidas:**
 - Programação Web: Desenvolvimento da plataforma web (frontend e backend)
