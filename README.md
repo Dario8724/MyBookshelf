@@ -1,9 +1,9 @@
-# MyBookshelf
+# MyBookshelf/community/events/
 
-**Licenciatura em Engenharia Informática | LEIF02 | 24-25**  
+**Licenciatura em Engenharia Informática | LEIF02 | 25-26**  
 **UC:** Projeto de Desenvolvimento Web  
 **Docente:** Maria Inês Pires 
-**Grupo** **Turma D02**
+**Grupo C** **Turma D02**
 
 **Autores:**
 - Gabriel Lima Rezende - 20240343  
@@ -123,7 +123,7 @@ O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma pla
 - Goodreads
 - LibraryThing
 - Bookly
-- StoryGraph
+- Skoob
 
 ---
 
@@ -154,7 +154,7 @@ O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma pla
 **Tecnologias:**
 - IDE: Visual Studio, Intellij
 - Linguagem: Java, HTML, CSS, JavaScript
-- Banco: SQL Workbench
+- Base de dados: SQL Workbench
 - UI: Figma
 - Versionamento: GitHub / ClickUp
 
