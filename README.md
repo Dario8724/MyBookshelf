@@ -43,25 +43,21 @@ O projeto surge, assim, como resposta à necessidade de uma ferramenta moderna, 
 - **Gestão de biblioteca pessoal**
   - Registo de livros lidos  
   - Registo de livros em leitura  
-  - Registo de livros a ler  
+  - Registo de livros a ler
+  - Metas de leituras
 
 - **Sistema de avaliação e reviews**
   - Avaliação de livros  
-  - Criação de reviews e comentários  
-
-- **Gestão de utilizadores**
-  - Criação de perfil  
-  - Edição de perfil  
-  - Autenticação e registo  
-
-- **Comunidade e interação social**
-  - Feed/comunidade de leitores  
-  - Partilha de leituras e opiniões  
+  - Criação de reviews e comentários
 
 - **Descoberta e organização de conteúdos**
   - Sistema de pesquisa de livros  
   - Página individual do livro (detalhes, avaliações, reviews, estado de leitura)  
   - Sistema de recomendação de livros  
+
+- **Comunidade e interação social**
+  - Feed/comunidade de leitores  
+  - Partilha de leituras e opiniões  
 
 - **Eventos culturais**
   - Calendário de eventos literários  
@@ -120,10 +116,10 @@ O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma pla
 
 ## Pesquisa de Mercado
 
-- Goodreads
-- LibraryThing
-- Bookly
-- Skoob
+- Goodreads = Permite avaliar livros, fazer listas, ver recomendações e acompanhar leituras de amigos.
+- LibraryThing = Plataforma de catalogação de livros, organização de bibliotecas pessoais e comunidade de leitores.
+- Bookly = App de acompanhamento de leitura, controla tempo lido, metas, estatísticas e hábitos de leitura.
+- Skoob = Rede social literária brasileira, permite avaliar livros, trocar, criar estantes virtuais.
 
 ---
 
