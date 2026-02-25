@@ -2,7 +2,7 @@
 
 **Licenciatura em Engenharia Informática | LEIF02 | 25-26**  
 **UC:** Projeto de Desenvolvimento Web  
-**Docente:** Maria Inês Pires 
+**Docente:** Maria Inês Pires   
 **Grupo C** **Turma D02**
 
 **Autores:**
@@ -30,9 +30,9 @@ Livros, Leitura, Biblioteca, Livraria, Feira do Livro
 
 ## Descrição da App
 
-O nosso grupo pretende desenvolver uma plataforma web denominada MyBookshelf, concebida como uma biblioteca digital pessoal e uma rede social literária, que transforma a forma como os leitores organizam, vivem e partilham a experiência da leitura. A aplicação permitirá aos utilizadores registar os livros que já leram, os que estão a ler e os que pretendem ler, criando uma estante digital personalizada que reflete os seus gostos, interesses e percurso enquanto leitores. Através do acompanhamento do tempo de leitura, da definição de metas e da atribuição de medalhas e troféus por objetivos alcançados, o MyBookshelf introduz elementos de gamificação que promovem a motivação, a consistência e o desenvolvimento do hábito de leitura de forma contínua e envolvente. Para além da dimensão individual, a plataforma valoriza fortemente a componente social, permitindo a partilha de avaliações, reviews e opiniões, a criação de perfis de leitor e a interação numa comunidade digital centrada nos livros.
-O MyBookshelf integra ainda funcionalidades de descoberta cultural, através de um calendário e visualização de eventos literários, aproximando os utilizadores do ecossistema cultural local e promovendo a participação ativa em feiras do livro, lançamentos, bibliotecas e eventos literários. Adicionalmente, a plataforma facilita o acesso aos livros através de redirecionamento direto para a sua aquisição online, tornando todo o percurso — da descoberta à leitura — simples, fluido e centralizado.
-O projeto surge, assim, como resposta à necessidade de uma ferramenta moderna, intuitiva e centralizada que una organização de leitura, motivação pessoal, interação social e acesso à cultura, promovendo o hábito da leitura, a literacia digital e a construção de comunidades culturais sustentáveis no ambiente digital.
+O nosso grupo pretende desenvolver uma plataforma web denominada MyBookshelf, concebida como uma biblioteca digital pessoal, uma rede social literária e um sistema de informação cultural georreferenciado. A aplicação permitirá aos utilizadores registar os livros que já leram, os que estão a ler e os que pretendem ler, criando uma estante digital personalizada que reflete os seus gostos, interesses e percurso enquanto leitores. Através do acompanhamento do tempo de leitura, da definição de metas e da atribuição de medalhas e troféus por objetivos alcançados, o MyBookshelf introduz elementos de gamificação que promovem a motivação, a consistência e o desenvolvimento do hábito de leitura de forma contínua e envolvente. 
+Para além da dimensão individual, a plataforma valoriza fortemente a componente social, permitindo a partilha de avaliações, reviews e opiniões, a criação de perfis de leitor e a interação numa comunidade digital centrada nos livros, transformando a leitura numa experiência coletiva e colaborativa.
+A plataforma também terá a funcionalidade de mapear e relacionar espacialmente bibliotecas, livrarias, feiras do livro, eventos literários e espaços culturais, possibilitando a descoberta de atividades culturais com base na localização do utilizador, na proximidade geográfica e na análise territorial da oferta cultural. Desta forma, o MyBookshelf que liga leitores a espaços físicos, eventos e comunidades locais, promovendo a participação ativa na vida cultural, a valorização do património literário e a integração entre o ambiente digital e o espaço geográfico.
 
 ---
 
@@ -44,7 +44,13 @@ O projeto surge, assim, como resposta à necessidade de uma ferramenta moderna, 
   - Registo de livros lidos  
   - Registo de livros em leitura  
   - Registo de livros a ler
-  - Metas de leituras
+  - Organização personalizada da estante digital
+ 
+- **Gestão de metas e gamificação**
+  - Definição de metas de leitura
+  - Medição de tempo de leitura
+  - Sistema de medalhas, troféus e conquistas
+  - Acompanhamento de progresso
 
 - **Sistema de avaliação e reviews**
   - Avaliação de livros  
@@ -57,13 +63,14 @@ O projeto surge, assim, como resposta à necessidade de uma ferramenta moderna, 
 
 - **Comunidade e interação social**
   - Feed/comunidade de leitores  
-  - Partilha de leituras e opiniões  
+  - Partilha de leituras, opiniões e conquistas
+  - Interação entre utilizadores
 
 - **Eventos culturais**
+  - Mapeamento georreferenciado de bibliotecas, livrarias, feiras do livro e etc...
   - Calendário de eventos literários  
   - Visualização de eventos culturais  
-  - Integração com mapa (GIS)  
-
+  
 ---
 
 ### Requisitos Não Funcionais
