@@ -158,4 +158,43 @@ class UserController extends Controller
 
         return ['path' => 'uploads/profiles/' . $filename];
     }
+
+    public function updateProfile(): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+        $userId = $payload['user_id'];
+
+        $name = trim($_POST['name'] ?? '');
+        $bio  = trim($_POST['bio']  ?? '');
+
+        $data = [];
+
+        if (!empty($name)) {
+            $data['name'] = $name;
+        }
+
+        if (isset($_POST['bio'])) {
+            $data['bio'] = $bio;
+        }
+
+        if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $result = $this->handleProfileImageUpload($_FILES['profile_image']);
+
+            if (isset($result['error'])) {
+                $this->error($result['error'], 422);
+            }
+
+            $data['profile_image'] = $result['path'];
+        }
+
+        if (empty($data)) {
+            $this->error('Nenhum dado enviado para atualizar.', 422);
+        }
+
+        $this->userModel->updateProfile($userId, $data);
+
+        $user = $this->userModel->findById($userId);
+
+        $this->success(['user' => $user], 'Perfil atualizado com sucesso.');
+    }
 }
