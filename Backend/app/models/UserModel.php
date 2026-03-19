@@ -14,7 +14,7 @@ class UserModel
     public function create(string $name, string $email, string $hashedPassword, ?string $profileImage): int
     {
         $stmt = $this->db->prepare("
-            INSERT INTO users (name, email, password, profile_image)
+            INSERT INTO user (name, email, password, profile_image)
             VALUES (:name, :email, :password, :profile_image)
         ");
 
@@ -32,7 +32,7 @@ class UserModel
     {
         $stmt = $this->db->prepare("
             SELECT user_id, name, email, password, profile_image
-            FROM users
+            FROM user
             WHERE email = :email
             LIMIT 1
         ");
@@ -47,7 +47,7 @@ class UserModel
     {
         $stmt = $this->db->prepare("
             SELECT user_id, name, email, profile_image
-            FROM users
+            FROM user
             WHERE user_id = :user_id
             LIMIT 1
         ");
@@ -61,7 +61,7 @@ class UserModel
     public function emailExists(string $email): bool
     {
         $stmt = $this->db->prepare("
-            SELECT COUNT(*) FROM users WHERE email = :email
+            SELECT COUNT(*) FROM user WHERE email = :email
         ");
 
         $stmt->execute([':email' => $email]);

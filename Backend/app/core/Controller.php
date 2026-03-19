@@ -31,7 +31,7 @@ class Controller
         return is_array($data) ? $data : [];
     }
 
-    protected function getBearerToken(): ?string
+    public function getBearerToken(): ?string
     {
         $headers = getallheaders();
         $auth = $headers['Authorization'] ?? $headers['authorization'] ?? '';

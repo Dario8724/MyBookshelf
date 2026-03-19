@@ -19,6 +19,9 @@ require_once __DIR__ .'/../app/core/Router.php';
 require_once __DIR__ .'/../app/core/JWT.php';
 
 $router = new Router();
-require_once __DIR__ . '/../app/routes/api.php';
+require_once __DIR__ . '/../routes/api.php';
+
+error_log("URI: " . $_SERVER['REQUEST_URI']);
+error_log("METHOD: " . $_SERVER['REQUEST_METHOD']);
 
 $router->dispatch();

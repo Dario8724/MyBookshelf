@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 class Database
 {
@@ -9,7 +9,7 @@ class Database
 
     private function __construct()
     {
-        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+        $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
 
         $option = [
             PDO::ATTR_ERRMODE                   => PDO::ERRMODE_EXCEPTION,
@@ -17,7 +17,7 @@ class Database
             PDO::ATTR_EMULATE_PREPARES          => false
         ];
 
-        $this->connection = new PDO($dsn, DB_USER, DB_PASSWORD, $option);
+        $this->connection = new PDO($dsn, DB_USER, DB_PASS, $option);
     }
 
     public static function getInstance(): Database

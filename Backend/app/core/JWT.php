@@ -6,7 +6,7 @@ class JWT
 {
     public static function generate(array $payload): string
     {
-        $header = self::base64url(json_decode([
+        $header = self::base64url(json_encode([
             'alg' => 'HS256',
             'typ' => 'JWT'
         ]));
