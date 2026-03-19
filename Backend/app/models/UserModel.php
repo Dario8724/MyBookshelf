@@ -46,7 +46,7 @@ class UserModel
     public function findById(int $userId): ?array
     {
         $stmt = $this->db->prepare("
-            SELECT user_id, name, email, profile_image
+            SELECT user_id, name, email, bio, profile_image
             FROM user
             WHERE user_id = :user_id
             LIMIT 1
@@ -66,5 +66,38 @@ class UserModel
 
         $stmt->execute([':email' => $email]);
         return (int) $stmt->fetchColumn() > 0;
+    }
+
+    public function updateProfile(int $userId, array $data): bool
+    {
+        $fields = [];
+        $params = [':user_id' => $userId];
+
+        if (isset($data['name'])) {
+            $fields[] = 'name = :name';
+            $params[':name'] = $data['name'];
+        }
+
+        if (isset($data['bio'])) {
+            $fields[] = 'bio = :bio';
+            $params[':bio'] = $data['bio'];
+        }
+        
+        if (isset($data['profile_image'])) {
+            $fields[] = 'profile_image = :profile_image';
+            $params[':profile_image'] = $data['profile_image'];
+        }
+
+        if (empty($fields)) {
+            return false; 
+        }
+
+        $stmt = $this->db->prepare("
+            UPDATE user
+            SET " . implode(', ', $fields) . "
+            WHERE user_id = :user_id
+        ");
+
+        return $stmt->execute($params);
     }
 }
