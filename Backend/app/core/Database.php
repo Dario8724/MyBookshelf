@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 class Database
 {
@@ -17,7 +17,7 @@ class Database
             PDO::ATTR_EMULATE_PREPARES          => false
         ];
 
-        $this->connection = new PDO($dsn, DB_USER, DB_PASSWORD, $option);
+        $this->connection = new PDO($dsn, DB_USER, DB_PASS, $option);
     }
 
     public static function getInstance(): Database
