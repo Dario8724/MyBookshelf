@@ -59,4 +59,25 @@ class UserBookModel
         $result = $stmt->fetch();
         return $result ? $result['status'] : null;
     }
+
+    public function getLibrary(int $userId): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT b.book_id, b.title, b.author, b.cover,
+                   b.publication_year, b.publisher,
+                   ub.status, ub.favorite,
+                   GROUP_CONCAT(g.name SEPARATOR ', ') AS genres
+                FROM user_book ub
+                JOIN book b ON ub.book_id = b.book_id
+                LEFT JOIN book_genre bg ON b.book_id = bg.book_id
+                LEFT JOIN genre g ON bg.genre_id = g.genre_id
+                WHERE ub.user_id = :user_id
+                GROUP BY b.book_id, ub.status, ub.favorite
+                ORDER BY ub.status ASC
+            ");
+
+            $stmt->execute([':user_id' => $userId]);
+
+            return $stmt->fetchAll();
+    }
 }

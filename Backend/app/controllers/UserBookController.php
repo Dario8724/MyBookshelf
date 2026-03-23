@@ -22,7 +22,7 @@ class UserBookController extends Controller
         $bookId = (int) ($body['book_id'] ?? 0);
         $status = trim($body['status'] ?? '');
 
-        $validStatuses = ['reading', 'completed', 'want to read'];
+        $validStatuses = ['reading', 'completed', 'want_to_read'];
 
         if (empty($bookId)) {
             $this->error('O book_id é obrigatório.', 422);
@@ -59,6 +59,23 @@ class UserBookController extends Controller
         $status = $this->userBookModel->getStatus($userid, $bookID);
 
         $this->success(['status'=> $status]);
+    }
+
+    public function getLibrary(): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+        $userid = $payload['user_id'];
+
+        $books = $this->userBookModel->getLibrary($userid);
+
+        if (empty($books)) {
+            $this->success([], 'A tua biblioteca está vazia.');
+        }
+
+        $this->success([
+            'total' => count($books),
+            'books' => $books,
+        ], 'Biblioteca carregada com sucesso.');
     }
 
 }
