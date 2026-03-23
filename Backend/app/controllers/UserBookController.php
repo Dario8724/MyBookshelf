@@ -78,4 +78,20 @@ class UserBookController extends Controller
         ], 'Biblioteca carregada com sucesso.');
     }
 
+    public function toggleFavorite(int $bookId): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+        $userid = $payload['user_id'];
+
+        $result = $this->userBookModel->toggleFavorite($userid, $bookId);
+
+        if ($result === null) {
+            $this->error('Livro não encontrado na tua biblioteca', 404);
+        }
+
+        $message = $result ? 'Livro adicionado aos favoritos.' : 'Livro removido dos favoritos.';
+
+        $this->success(['favorite' => $result], $message);
+    }
+
 }

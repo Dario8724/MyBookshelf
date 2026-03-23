@@ -10,3 +10,4 @@ $router->post('/api/library',           'UserBookController@addBook');
 $router->delete('/api/library/{id}',    'UserBookController@removeBook');
 $router->get('/api/library/{id}/status','UserBookController@getStatus');
 $router->get('/api/library',            'UserBookController@getLibrary');
+$router->post('/api/library/{id}/favorite', 'UserBookController@toggleFavorite');

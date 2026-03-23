@@ -80,4 +80,41 @@ class UserBookModel
 
             return $stmt->fetchAll();
     }
+
+    public function toggleFavorite(int $userId, int $bookId): ?bool
+    {
+        $stmt = $this->db->prepare("
+            SELECT favorite FROM user_book
+            WHERE user_id = :user_id
+            AND book_id = :book_id
+        ");
+
+        $stmt->execute([
+            ':user_id' => $userId,
+            ':book_id'=> $bookId
+        ]);
+
+        $result = $stmt->fetch();
+
+        if (!$result) {
+            return null;
+        }
+
+        $newValue = $result['favorite'] ? 0 : 1;
+
+        $stmt = $this->db->prepare("
+            UPDATE user_book
+            SET favorite = :favorite
+            WHERE user_id = :user_id
+            AND book_id = :book_id
+        ");
+
+        $stmt->execute([
+            ':favorite' => $newValue,
+            ':user_id'  => $userId,
+            ':book_id' => $bookId,
+        ]);
+
+        return (bool) $newValue;
+    }
 }
