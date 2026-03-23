@@ -35,4 +35,15 @@ class BookController extends Controller
             'books' => $books,
         ], 'Livros encontrados.');
     }
+
+    public function show(int $bookID): void
+    {
+        $book = $this->bookModel->findById($bookID);
+
+        if (!$book) {
+            $this->error('Livro não encontrado.', 404);
+        }
+
+        $this->success(['book' => $book], 'Livro encontrado.');
+    }
 }
