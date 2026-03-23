@@ -49,7 +49,7 @@ class BookModel
             GROUP BY b.book_id
         ");
 
-        $stmt->execute([':book_id' => $bookId]);
+        $stmt->execute([':bookId' => $bookId]);
         $book = $stmt->fetch();
 
         return $book ?: null;          
