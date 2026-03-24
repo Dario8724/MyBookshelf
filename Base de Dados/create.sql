@@ -68,6 +68,7 @@ CREATE TABLE review (
     user_id INT NOT NULL,
     book_id INT NOT NULL,
     review_text TEXT,
+    has_spoiler BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
