@@ -11,17 +11,18 @@ class ReviewModel
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function create(int $userId, int $bookId, string $reviewText): int
+    public function create(int $userId, int $bookId, string $reviewText, bool $hasSpoiler = false): int
     {
         $stmt = $this->db->prepare("
-            INSERT INTO review (user_id, book_id, review_text)
-            VALUES (:user_id, :book_id, :review_text)
+            INSERT INTO review (user_id, book_id, review_text, has_spoiler)
+            VALUES (:user_id, :book_id, :review_text, :has_spoiler)
         ");
 
         $stmt->execute([
             ':user_id'      => $userId,
             ':book_id'      =>$bookId,
-            ':review_text'  =>$reviewText, 
+            ':review_text'  =>$reviewText,
+            ':has_spoiler'  =>$hasSpoiler,
         ]);
 
         return (int) $this->db->lastInsertId();
@@ -30,7 +31,7 @@ class ReviewModel
     public function getByBook(int $bookId): array
     {
         $stmt = $this->db->prepare("
-            SELECT r.review_id, r.review_text, r.created_at,
+            SELECT r.review_id, r.review_text, r.has_spoiler, r.created_at,
                    u.user_id, u.name, u.profile_image,
                    ra.score
             FROM review r

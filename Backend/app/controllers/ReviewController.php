@@ -25,6 +25,7 @@ class ReviewController extends Controller
         $bookId     = (int)  ($body['book_id'] ?? 0);
         $reviewText = trim( $body['review_text'] ?? '');
         $score      = isset($body['score']) ? (float) $body['score'] :null;
+        $hasSpoiler = (bool) ($body['has_spoiler'] ?? false);
 
         if (empty($bookId)) {
             $this->error('O book_id é obrigatório', 422);
@@ -38,7 +39,7 @@ class ReviewController extends Controller
             $this->error('A nota deve ser entre 1 e 5',422);
         }
 
-        $reviewId = $this->reviewModel->create($userId, $bookId, $reviewText);
+        $reviewId = $this->reviewModel->create($userId, $bookId, $reviewText, $hasSpoiler);
 
         if ($score !== null) {
             $this->ratingModel->rate($userId, $bookId, $score);
