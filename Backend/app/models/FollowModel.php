@@ -15,7 +15,7 @@ class FollowModel
     {
         $stmt = $this->db->prepare("
             INSERT IGNORE INTO follow (follower_id, following_id)
-            VALEUS (:follower_id, :following_id)
+            VALUES (:follower_id, :following_id)
         ");
 
         return $stmt->execute([
