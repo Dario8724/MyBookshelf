@@ -14,8 +14,8 @@ class PostModel
     public function create(int $userId, string $content, ?int $reviewId = null): int
     {
         $stmt = $this->db->prepare("
-            INSERT INTO post (user_id, content, reveiw_id)
-            VALEUS (:user_id, :content, :review_id)
+            INSERT INTO post (user_id, content, review_id)
+            VALUES (:user_id, :content, :review_id)
         ");
 
         $stmt->execute([
@@ -53,6 +53,8 @@ class PostModel
             ':user_id'  => $userId,
             ':user_id2' => $userId,
         ]);
+
+        return $stmt->fetchAll();
     }
 
     public function delete(int $postId, int $userId): bool
@@ -100,7 +102,7 @@ class PostModel
         }else{
             $stmt = $this->db->prepare("
                 INSERT INTO post_like (post_id, user_id)
-                VALEUS (:post_id, :user_id) 
+                VALUES (:post_id, :user_id) 
             ");
             $stmt->execute([
                 ':post_id' => $postId,
@@ -114,7 +116,7 @@ class PostModel
     {
         $stmt = $this->db->prepare("
             INSERT INTO post_comment (post_id, user_id, comment)
-            VALEUS (:post_id, :user_id, :comment) 
+            VALUES (:post_id, :user_id, :comment) 
         ");
 
         $stmt->execute([
