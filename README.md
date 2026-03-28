@@ -1,4 +1,4 @@
-# MyBookshelf/community/events/
+# MyBookshelf
 
 **Licenciatura em Engenharia Informática | LEIF02 | 25-26**  
 **UC:** Projeto de Desenvolvimento Web  
