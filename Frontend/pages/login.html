@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MyBookshelf - Login</title>
+    </head>
+    <body>
+
+        <h1>MyBookshelf</h1>
+        <h2>Entrar</h2>
+
+        <form onsubmit="doLogin(event)">
+            <div>
+                <label>Email</label><br>
+                <input type="email" id="email" placeholder="o_teu@email.com" required />
+            </div>
+            <br>
+            <div>
+                <label>Palavra-passe</label><br>
+                <input type="password" id="password" placeholder="••••••••" required />
+            </div>
+            <br>
+            <button type="submit" id="btn">Entrar</button>
+        </form>
+
+        <p id="msg"></p>
+
+        <p>Não tens conta? <a href="register.html">Registar</a></p>
+
+        <script>
+            const API = 'http://localhost:8888';
+
+            async function doLogin(e) {
+                e.proventDefault();
+
+                const email     = document.getElementById('email').value.trim();
+                const password  = document.getElementById('password').value.trim();
+                const btn       = document.getElementById('btn');
+                const msg       = document.getElementById('msg');
+
+                btn.disabled    = true;
+                btn.textContent  = 'A aguardar...';
+                msg.textContent  = '';
+
+                try {
+                    const res = await fetch(`${API}/api/users/login`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    })
+                    const data = await res.json();
+
+                    if  (data.success) {
+                        localStorage.setItem('token', data.data.token);
+                        localStorage.setItem('user', JSON.stringify(data.data.user));
+                        msg.textContent = 'Login efectuado! A redirecionar...';
+                        setTimeout(() => window.location.href = 'library.html', 1000);
+                    } else {
+                        msg.textContent = data.error || 'Erro ao fazer login.';
+                    }
+                } catch (e) {
+                    msg.textContent = 'Não foi possível ligar ao servidor.';
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Entrar';
+                }
+            }
+        </script>
+    </body>
+</html>
