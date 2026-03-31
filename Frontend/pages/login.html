@@ -4,44 +4,190 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>MyBookshelf - Login</title>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+        <style>
+            * { box-sizing: border-box; margin: 0; padding: 0;}
+
+            body {
+                background: #F5F0E8;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem 1rem;
+                font-family: 'Inter', sans-serif;
+            }
+
+            .inner {
+                width: 100%;
+                max-width: 400px;
+                text-align: center;
+            }
+
+            .logo-text {
+                font-family: 'Playfair Display', Georgia, serif;
+                font-size: 2rem;
+                font-weight: 600;
+                color: #2C2A24;
+                letter-spacing: -0.01em;
+            }
+
+            .logo-det {color: #C07B3A}
+
+            .tagline {
+                font-size: 0.875rem;
+                color: #8a8070;
+                margin-top: 0.3rem;
+                font-weight: 300;
+            }
+
+            .card{
+                background: #EDE8DC;
+                border-radius: 16px;
+                padding: 2rem;
+                margin-top: 1.5rem;
+                text-align: left;
+            }
+
+            .card-title {
+                font-family: 'Playfair Display', Georgia, serif;
+                font-size: 1.5rem;
+                color: #2C2A24;
+                margin-bottom: 0.25rem;
+            }
+
+            .card-sub{
+                font-size: 0.875rem;
+                color: #8a8070;
+                margin-bottom: 1.5rem;
+            }
+
+            .field { margin-bottom: 1rem;}
+
+            .field label {
+                display: block;
+                font-size: 0.8rem;
+                font-weight: 500;
+                color: #6a6358;
+                margin-bottom: 0.35rem;
+                letter-spacing: 0.03em;
+            }
+
+            .field input {
+                width: 100%;
+                background: #F5F0E8;
+                border: 1px solid #D4CBBA;
+                border-radius: 10px;
+                padding: 0.75rem 1rem;
+                font-size: 0.9375rem;
+                font-family: 'Inter', sans-serif;
+                color: #2C2A24;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+            .field input::placeholder { color: #B4A898;}
+            .field input:focus { border-color: #C07B3A;}
+
+            .btn{
+                width: 100%;
+                padding: 0.8rem;
+                background: #C07B3A;
+                color: #fff;
+                font-size: 0.9375rem;
+                font-weight: 500;
+                font-family: 'Inter', sans-serif;
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                margin-top: 0.5rem;
+                transition: background 0.2s;
+            }
+
+            .btn:hover { background: #A87830;}
+            .btn:disabled { opacity: 0.6; cursor: not-allowed;}
+
+            .link-row{
+                text-align: center;
+                margin-top: 1rem;
+                font-size: 0.875rem;
+                color: #8a8070;
+            }
+
+            .link-row a {
+                color: #C07B3A;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .footer-text {
+                font-size: 0.8rem;
+                color: #B4A898;
+                margin-top: 1.5rem;
+            }
+
+            .msg {
+                display: none;
+                padding: 0.65rem 1rem;
+                border-radius: 8px;
+                font-size: 0.875rem;
+                margin-top: 0.75rem;
+            }
+
+            .msg.error { background: rgba(192,60,60,0.1); color: #a83a3a; display: block;}
+            .msg.success { background: rgba(60,140,90,0.1); color: #2e7a50; display: block;}
+        </style>
     </head>
     <body>
+        <div class="inner">
 
-        <h1>MyBookshelf</h1>
-        <h2>Entrar</h2>
-
-        <form onsubmit="doLogin(event)">
             <div>
-                <label>Email</label><br>
-                <input type="email" id="email" placeholder="o_teu@email.com" required />
+                <div class="logo-text">My<span class="logo-det">B</span>ookshelf</div>
+                <div class="tagline">O teu clube literário, sempre contigo.</div>
             </div>
-            <br>
-            <div>
-                <label>Palavra-passe</label><br>
-                <input type="password" id="password" placeholder="••••••••" required />
+
+            <div class="card">
+                <div class="card-title">Entrar</div>
+                <div class="card-sub">Entre com a sua conta para aceder à biblioteca</div>
+
+                <form onsubmit="doLogin(event)">
+                    <div class="field">
+                        <label>Email</label>
+                        <input type="email" id="email" placeholder="o_teu@email.com" required />
+                    </div>
+                    <div class="field">
+                        <label>Palavra-passe</label>
+                        <input type="password" id="password" placeholder="••••••••" required />
+                    </div>
+                    <button type="submit" class="btn" id="btn">Entrar</button>
+                </form>
+
+                <div class="msg" id="msg"></div>
+
+                <div class="link-row">Não tens conta? <a href="register.html">Registar</a></div>
             </div>
-            <br>
-            <button type="submit" id="btn">Entrar</button>
-        </form>
 
-        <p id="msg"></p>
-
-        <p>Não tens conta? <a href="register.html">Registar</a></p>
+            <div class="footer-text">Junta-te a clubes, descobre leituras e conecta-te com outros leitores.</div>
+        </div>
 
         <script>
             const API = 'http://localhost:8888';
 
+            function showMsg(text, type) {
+                const el = document.getElementById('msg');
+                el.textContent = text;
+                el.className = 'msg ' + type;
+            }
+
             async function doLogin(e) {
-                e.proventDefault();
+                e.preventDefault();
 
                 const email     = document.getElementById('email').value.trim();
                 const password  = document.getElementById('password').value.trim();
                 const btn       = document.getElementById('btn');
-                const msg       = document.getElementById('msg');
 
                 btn.disabled    = true;
                 btn.textContent  = 'A aguardar...';
-                msg.textContent  = '';
 
                 try {
                     const res = await fetch(`${API}/api/users/login`, {
@@ -54,13 +200,13 @@
                     if  (data.success) {
                         localStorage.setItem('token', data.data.token);
                         localStorage.setItem('user', JSON.stringify(data.data.user));
-                        msg.textContent = 'Login efectuado! A redirecionar...';
+                        showMsg('Login efectuado! A redirecionar...', 'success');
                         setTimeout(() => window.location.href = 'library.html', 1000);
                     } else {
-                        msg.textContent = data.error || 'Erro ao fazer login.';
+                        showMsg(data.error || 'Erro ao fazer login.', 'error');
                     }
                 } catch (e) {
-                    msg.textContent = 'Não foi possível ligar ao servidor.';
+                    showMsg('Não foi possível ligar ao servidor.', 'error');
                 } finally {
                     btn.disabled = false;
                     btn.textContent = 'Entrar';

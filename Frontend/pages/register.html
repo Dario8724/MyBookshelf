@@ -4,40 +4,257 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>MyBookshelf - Registar</title>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+        <style>
+            * { box-sizing: border-box; margin: 0; padding: 0;}
+
+            body {
+                background: #F5F0E8;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem 1rem;
+                font-family: 'Inter', sans-serif;
+            }
+
+            .inner{
+                width: 100%;
+                max-width: 400px;
+                text-align: center;
+            }
+
+            .logo-text{
+                font-family: 'Playfair Display', Georgia, serif;
+                font-size: 2rem;
+                font-weight: 600;
+                color: #2C2A24;
+                letter-spacing: -0.01em;
+            }
+
+            .logo-dot {color: #C07B3A;}
+
+            .tagline {
+                font-size: 0.875rem;
+                color: #8a8070;
+                margin-top: 0.3rem;
+                font-weight: 300;
+            }
+
+            .card{
+                background: #EDE8DC;
+                border-radius: 16px;
+                padding: 2rem;
+                margin-top: 1.5rem;
+                text-align: left;
+            }
+
+            .card-title{
+                font-family: 'Playfair Display', Georgia, serif;
+                font-size: 1.5rem;
+                color: #2C2A24;
+                margin-bottom: 0.25rem;
+            }
+
+            .card-sub{
+                font-size: 0.875rem;
+                color: #8a8070;
+                margin-bottom: 1.5rem;
+            }
+
+            .field { margin-bottom: 1rem;}
+
+            .field label {
+                display: block;
+                font-size: 0.8rem;
+                font-weight: 500;
+                color: #6a6358;
+                margin-bottom: 0.35rem;
+                letter-spacing: 0.03em;
+            }
+
+            .field input {
+                width: 100%;
+                background: #F5F0E8;
+                border: 1px solid #D4CBBA;
+                border-radius: 10px;
+                padding: 0.7rem 1rem;
+                font-size: 0.9375rem;
+                font-family: 'Inter', sans-serif;
+                color: #2C2A24;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+            .field input::placeholder { color: #B4A898;}
+            .field input:focus { border-color: #C07B3A;}
+
+            .avatar-upload{
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .avatar-preview {
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background: #F5F0E8;
+                border: 1px solid #D4CBBA;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+
+            .avatar-preview img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: none;
+            }
+
+            .avatar-preview svg{
+                width: 24px;
+                height: 24px;
+                fill: #B4A898;
+            }
+
+            .avatar-btn {
+                font-size: 0.8125rem;
+                color: #C07B3A;
+                cursor: pointer;
+                border: 1px solid #D4CBBA;
+                background: none;
+                padding: 0.4rem 0.75rem;
+                font-family: 'Inter', sans-serif;
+                transition: border-color 0.2s;
+            }
+            .avatar-btn:hover { border-color: #C07B3A;}
+            #avatar-input { display: none;}
+
+            .btn{
+                width: 100%;
+                padding: 0.8rem;
+                background: #C07B3A;
+                color: #fff;
+                font-size: 0.9375rem;
+                font-weight: 500;
+                font-family: 'Inter', sans-serif;
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                margin-top: 0.5rem;
+                transition: background 0.2s;
+            }
+
+            .btn:hover { background: #A86830;}
+            .btn:disabled { opacity: 0.6; cursor: not-allowed;}
+
+            .link-row{
+                text-align: center;
+                margin-top: 1rem;
+                font-size: 0.875rem;
+                color: #8a8070;
+            }
+
+            .link-row a {
+                color: #C07B3A;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .footer-text {
+                font-size: 0.8rem;
+                color: #B4A898;
+                margin-top: 1.5rem;
+            }
+
+            .msg {
+                display: none;
+                padding: 0.65rem 1rem;
+                border-radius: 8px;
+                font-size: 0.875rem;
+                margin-top: 0.75rem;
+            };
+
+            .msg.error { background: rgba(192, 60, 60, 0.1); color: #a88a3a; display: block;}
+            .msg.success { background: rgba(60, 140, 80, 0.1); color: #2e7a50; display: block;}
+        </style>
     </head>
     <body>
+        <div class="inner">
 
-        <h1>MyBookshelf</h1>
-        <h2>Criar conta</h2>
+            <div>
+                <div class="logo-text">My<span class="logo-dot">B</span>ookshelf</div>
+                <div class="tagline">O teu clube literário, sempre contigo.</div>
+            </div>
 
-        <form onsubmit="doRegister(event)">
-            <div>
-                <label>Nome</label><br>
-                <input type="text" id="name" placeholder="O teu nome" required />
-            </div>
-            <br>
-            <div>
-                <label>Email</label><br>
-                <input type="email" id="email" placeholder="o_teu@email.com" required />
-            </div>
-            <br>
-            <div>
-                <label>Palavra-passe</label><br>
-                <input type="password" id="password" placeholder="Mínimo 6 caracteres" required />
-            </div>
-            <br>
-            <div>
-                <label>Foto de perfil (opcional)</label><br>
-                <input type="file" id="avatar" accept="image/jpeg,image/png,image/webp" />
-            </div>
-            <br>
-            <button type="submit" id="btn">Criar conta</button>
-        </form>
+            <div class="card">
+                <div class="card-title">Criar conta</div>
+                <div class="card-sub">Junta-te à comunidade de leitores</div>
 
-        <p id="msg"></p>
+                <form onsubmit="doRegister(event)">
+                    <div class="avatar-upload">
+                        <div class="avatar-preview" id="avatar-preview">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+                            <img id="avatar-img" src="" alt="avatar" />
+                        </div>
+                        <div>
+                            <button type="button" class="avatar-btn" onclick="document.getElementById('avatar-input').click()">Escolher foto</button>
+                            <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/webp" onchange="previewAvatar(event)" />
+                            <p style="font-size:0.75rem; color:#B4A898; margin-top:4px;">Opcional . JPEG, PNG, WebP</p>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Nome</label>
+                        <input type="text" id="name" placeholder="O teu nome" required />
+                    </div>
+                    <div class="field">
+                        <label>Email</label>
+                        <input type="email" id="email" placeholder="o_teu@email.com" required />
+                    </div>
+                    <div class="field">
+                        <label>Palavra-passe</label>
+                        <input type="password" id="password" placeholder="Mínimo 6 caracteres" required />
+                    </div>
+
+                    <button type="submit" class="btn" id="btn">Criar conta</button>
+                </form>
+
+                <div class="msg" id="msg"></div>
+
+                <div class="link-row">Já tens conta? <a href="login.html">Entrar</a></div>
+            </div>
+
+            <div class="footer-text">Junta-te a clubes, descobre leituras e conecta-te com outros leitores.</div>
+        </div>
 
         <script>
             const API = 'http://localhost:8888';
+
+            function showMsg(text, type) {
+                const el = document.getElementById('msg');
+                el.textContent = text;
+                el.className = 'msg ' + type;
+            }
+
+            function previewAvatar(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.getElementById('avatar-img');
+                    const svg = document.querySelector('.avatar-preview svg');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    svg.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
 
             async function doRegister(e) {
                 e.preventDefault();
@@ -47,11 +264,9 @@
                 const password  = document.getElementById('password').value.trim();
                 const avatar    = document.getElementById('avatar').files[0];
                 const btn       = document.getElementById('btn');
-                const msg       = document.getElementById('msg');
 
                 btn.disabled    = true;
                 btn.textContent  = 'A aguardar...';
-                msg.textContent  = '';
 
                 const formData = new FormData();
                 formData.append('name', name);
@@ -69,13 +284,13 @@
                     if  (data.success) {
                         localStorage.setItem('token', data.data.token);
                         localStorage.setItem('user', JSON.stringify(data.data.user));
-                        msg.textContent = 'Conta criada! A redirecionar ...';
+                        showMsg('Conta criada! A redirecionar ...', 'success');
                         setTimeout(() => window.location.href = 'login.html', 1000);
                     } else {
-                        msg.textContent = data.error || 'Erro ao criar conta.';
+                        showMsg(data.error || 'Erro ao criar conta.', 'error');
                     }
                 } catch (e) {
-                    msg.textContent = 'Não foi possível ligar ao servidor.';
+                    showMsg('Não foi possível ligar ao servidor.', 'error');
                 } finally {
                     btn.disabled    = false;
                     btn.textContent  = 'Criar conta';
