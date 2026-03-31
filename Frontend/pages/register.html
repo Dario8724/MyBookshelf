@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MyBookshelf - Registar</title>
+    </head>
+    <body>
+
+        <h1>MyBookshelf</h1>
+        <h2>Criar conta</h2>
+
+        <form onsubmit="doRegister(event)">
+            <div>
+                <label>Nome</label><br>
+                <input type="text" id="name" placeholder="O teu nome" required />
+            </div>
+            <br>
+            <div>
+                <label>Email</label><br>
+                <input type="email" id="email" placeholder="o_teu@email.com" required />
+            </div>
+            <br>
+            <div>
+                <label>Palavra-passe</label><br>
+                <input type="password" id="password" placeholder="Mínimo 6 caracteres" required />
+            </div>
+            <br>
+            <div>
+                <label>Foto de perfil (opcional)</label><br>
+                <input type="file" id="avatar" accept="image/jpeg,image/png,image/webp" />
+            </div>
+            <br>
+            <button type="submit" id="btn">Criar conta</button>
+        </form>
+
+        <p id="msg"></p>
+
+        <script>
+            const API = 'http://localhost:8888';
+
+            async function doRegister(e) {
+                e.preventDefault();
+
+                const name      = document.getElementById('name').value.trim();
+                const email     = document.getElementById('email').value.trim();
+                const password  = document.getElementById('password').value.trim();
+                const avatar    = document.getElementById('avatar').files[0];
+                const btn       = document.getElementById('btn');
+                const msg       = document.getElementById('msg');
+
+                btn.disabled    = true;
+                btn.textContent  = 'A aguardar...';
+                msg.textContent  = '';
+
+                const formData = new FormData();
+                formData.append('name', name);
+                formData.append('email', email);
+                formData.append('password', password);
+                if (avatar) formData.append('profile_image', avatar);
+
+                try {
+                    const res = await fetch(`${API}/api/users/register`, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    const data = await res.json();
+
+                    if  (data.success) {
+                        localStorage.setItem('token', data.data.token);
+                        localStorage.setItem('user', JSON.stringify(data.data.user));
+                        msg.textContent = 'Conta criada! A redirecionar ...';
+                        setTimeout(() => window.location.href = 'login.html', 1000);
+                    } else {
+                        msg.textContent = data.error || 'Erro ao criar conta.';
+                    }
+                } catch (e) {
+                    msg.textContent = 'Não foi possível ligar ao servidor.';
+                } finally {
+                    btn.disabled    = false;
+                    btn.textContent  = 'Criar conta';
+                }
+            }
+        </script>
+
+    </body>
+</html>
