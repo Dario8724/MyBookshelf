@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8">
+        <title>MyBookshelf - Perfil</title>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../css/profile.css">
+    </head>
+    <body>
+
+        <nav>
+            <a href="profile.html" class="logo-text">My<span class="logo-det">Bookshelf</span></a>
+            <div class="nav-links">
+                <a href="library.html">Biblioteca</a>
+                <a href="profile.html" class="active">Perfil</a>
+                <button onclick="logout()" class="btn-logout">Sair</button>
+            </div>
+        </nav>
+
+        <div class="page">
+
+            <!--Cabeçalho perfil-->
+            <div class="card" id="profileCard">
+                <div class="profile-header" id="profileHeader">
+                    <div class="skel-avatar skeleton"></div>
+                    <div style="flex:1">
+                        <div class="skel-line skeleton" style="width:50%;height:20px;margin-bottom:10px;"></div>
+                        <div class="skel-line skeleton" style="width:35%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Biblioteca com tabs-->
+            <div class="tabs" id="librarySection" style="display:none;">
+                <div class="tab list">
+                    <button class="tab-btn active" data-tab="all">Todos <span id="cntAll">(0)</span></button>
+                    <button class="tab-btn" data-tab="reading">A ler <span id="cntReading">(0)</span></button>
+                    <button class="tab-btn" data-tab="completed">Lidos <span id="cntCompleted">(0)</span></button>
+                    <button class="tab-btn" data-tab="want_to_read">Quero ler <span id="cntWant">(0)</span></button>
+                    <button class="tab-btn" data-tab="favorites">Favoritos <span id="cntFav">(0)</span></button>
+                </div>
+
+                <div class="tab-panel active" id="tab-all"></div>
+                <div class="tab-panel" id="tab-reading"></div>
+                <div class="tab-panel" id="tab-completed"></div>
+                <div class="tab-panel" id="tab-want_to_read"></div>
+                <div class="tab-panel" id="tab-favorites">
+            </div>
+
+        </div>
+
+        <!-- Editar perfil-->
+         <div class="overlay" id="editOverlay">
+            <div class="modal">
+                <div class="modal-title">Editar Perfil</div>
+                <div class="modal-sub">Alterar o teu nome, bio ou foto de perfil.</div>
+
+                <div class="field">
+                    <label>Foto de Perfil</label>
+                    <div class="field-avatar-preview">
+                        <div class="preview-img" id="previewAvatar">?</div>
+                        <div>
+                            <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp">
+                            <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">Escolher Imagem</button>
+                            <div class="field-hint">JPEG, PNG ou WebP · máx 2MB</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Nome</label>
+                    <input type="text" id="editName" placeholder="O teu nome" />
+                </div>
+
+                <div class="field">
+                    <label>Bio</label>
+                    <textarea id="editBio" rows="3" placeholder="Conta algo sobre ti..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn btn-outline" onclick="closeEditModal()">Cancelar</button>
+                    <button class="btn btn-primary" id="saveBtn" onclick="saveProfile()">Guardar</button>
+                </div>
+            </div>
+         </div>
+
+        <!-- Notificações -->
+        <div id="toastContainer"></div>
+
+        <script src="../js/config.js"></script>
+        <script src="../js/auth.js"></script>
+        <script src="../js/profile.js"></script>
+    </body>
+</html>
