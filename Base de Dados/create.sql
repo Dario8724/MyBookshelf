@@ -53,6 +53,7 @@ CREATE TABLE user_book (
     book_id INT NOT NULL,
     status ENUM('reading','completed','want_to_read'),
     favorite BOOLEAN DEFAULT FALSE,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     UNIQUE (user_id, book_id),
 
