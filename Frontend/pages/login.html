@@ -201,7 +201,7 @@
                         localStorage.setItem('token', data.data.token);
                         localStorage.setItem('user', JSON.stringify(data.data.user));
                         showMsg('Login efectuado! A redirecionar...', 'success');
-                        setTimeout(() => window.location.href = 'library.html', 1000);
+                        setTimeout(() => window.location.href = 'profile.html', 1000);
                     } else {
                         showMsg(data.error || 'Erro ao fazer login.', 'error');
                     }
