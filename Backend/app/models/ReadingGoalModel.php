@@ -14,7 +14,7 @@ class ReadingGoalModel
     public function create(int $userId, string $goalType, int $targetValue, string $startDate, string $endDate) : int
     {
         $stmt = $this->db->prepare("
-            INSERT INTO reading_goals (user_id, goal_type, target_value, start_date, end_date)
+            INSERT INTO reading_goal (user_id, goal_type, target_value, start_date, end_date)
             VALUES (:user_id, :goal_type, :target_value, :start_date, :end_date)
         ");
 
@@ -39,11 +39,11 @@ class ReadingGoalModel
                 rg.start_date,
                 rg.end_date,
                 COUNT(ub.user_book_id) AS current_value
-            FROM reading_goals rg
+            FROM reading_goal rg
             LEFT JOIN user_book ub
                 ON ub.user_id = rg.user_id
                 AND ub.status = 'completed'
-                AND ub.updated_date BETWEEN rg.start_date AND rg.end_date
+                AND ub.updated_at BETWEEN rg.start_date AND rg.end_date
             WHERE rg.user_id = :user_id
             GROUP BY rg.reading_goal_id
             ORDER BY rg.start_date DESC
@@ -57,7 +57,7 @@ class ReadingGoalModel
     public function delete(int $goalId, int $userId) : bool
     {
         $stmt = $this->db->prepare("
-            DELETE FROM reading_goals 
+            DELETE FROM reading_goal 
             WHERE reading_goal_id = :goal_id 
             AND user_id = :user_id
         ");

@@ -25,3 +25,6 @@ $router->delete('/api/posts/{id}',          'PostController@delete');
 $router->post('/api/posts/{id}/like',       'PostController@toggleLike');
 $router->post('/api/posts/{id}/comments',   'PostController@addComment');
 $router->get('/api/posts/{id}/comments',    'PostController@getComments');
+$router->post('/api/goals',        'ReadingGoalController@create');
+$router->get('/api/goals',         'ReadingGoalController@index');
+$router->delete('/api/goals/{id}', 'ReadingGoalController@delete');

@@ -89,10 +89,10 @@ class ReadingGoalController extends Controller
         $payload = AuthMiddleware::requireAuth();
         $userId  = $payload['user_id'];
 
-        $deleted = $this->goalModel->delete($userId, $goalId);
+        $deleted = $this->goalModel->delete($goalId, $userId);
 
         if (!$deleted) {
-            $this->success('Meta não encontrada ou sem permissão para apagar.', 404);
+            $this->error('Meta não encontrada ou sem permissão para apagar.', 404);
         } 
         
         $this->success(null, 'Meta apagada com sucesso.');
