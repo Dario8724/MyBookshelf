@@ -164,14 +164,12 @@ Focado na catalogação de livros e organização de bibliotecas pessoais, com u
 #### Pontos fortes
 - Excelente para organizar coleções de livros  
 - Dados detalhados (metadados, edições, etc.)  
-- Comunidade com leitores mais experientes  
 - Ferramentas avançadas de catalogação  
 
 #### Pontos fracos
 - Interface pouco moderna  
 - Não é muito intuitivo para iniciantes  
 - Parte social menos desenvolvida  
-- Visual pouco apelativo  
 
 ### Bookly
 
@@ -200,10 +198,9 @@ Rede social literária bastante popular no Brasil.
 - Comunidade ativa em língua portuguesa  
 
 #### Pontos fracos
-- Interface um pouco desatualizada  
 - Funcionalidades limitadas fora do Brasil  
-- Algumas falhas de desempenho  
-- Menor alcance global  
+- Falhas de desempenho  
+- Menor alcance global 
 ---
 
 ## Descrição da Solução a Implementar
