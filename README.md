@@ -48,11 +48,14 @@ A plataforma também terá a funcionalidade de mapear e relacionar espacialmente
   - Listagem dos livros mais lidos no clube  
   - Visualização de clubes disponíveis  
  
-- **Gestão de metas e gamificação**
-  - Definição de metas de leitura
-  - Medição de tempo de leitura
-  - Sistema de medalhas, troféus e conquistas
-  - Acompanhamento de progresso
+- **Biblioteca Pessoal**
+  - Organização de livros em categorias:
+  - Lidos  
+  - Em leitura  
+  - Por ler  
+  - Registo e gestão da estante digital  
+  - Avaliação de livros  
+  - Criação de reviews  
 
 - **Sistema de avaliação e reviews**
   - Avaliação de livros  
