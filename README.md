@@ -244,15 +244,16 @@ Rede social literária bastante popular no Brasil.
 - Testes e Validação: Verificação de funcionalidades e usabilidade
 - Poster e Vídeo Promocional: Divulgação e apresentação visual do projeto
 
-## Gestão e Planeamento – Distribuição de Tarefas
+## Distribuição de Tarefas
 
 ### Gabriel Rezende
-- Base de dados  
-- Back-end  
-- Front-end  
-- Relatórios, apresentações e vídeo  
-
----
+- Revisão e montagem do relatório  
+- Plano de trabalho  
+- Definição de funcionalidades e proposta inicial  
+- Montagem da apresentação  
+- Criação da base de dados  
+- Desenvolvimento do back-end  
+- Desenvolvimento do front-end  
 
 ### Dário Bandanhe
 - Proposta inicial  
@@ -263,30 +264,22 @@ Rede social literária bastante popular no Brasil.
 - Modelo de base de dados  
 - Wireframes  
 - Front-end  
-- Back-end  
-
----
 
 ### Edmilson Tudo
-- Proposta inicial  
+- Proposta inicial
+- Criar logo do Projeto  
 - Nome do projeto  
-- Plano de trabalho  
-- Requisitos funcionais e não funcionais  
+- Plano de trabalho    
 - Atualização da calendarização  
 - Modelo de base de dados  
 - Personas  
 - Arquitetura de informação  
 - Project Charter e WBS  
-- Relatórios  
-- Front-end  
-
----
+- Relatórios   
 
 ### Francisco Zolana
-- Base de dados  
-- Back-end  
-- Front-end  
-- Relatórios, apresentações e vídeo  
+- Wireframes
+  
 
 ---
 
