@@ -114,11 +114,35 @@ O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma pla
 
 ## Identificação de Público-Alvo
 
-- Leitores
-- Estudantes
-- Comunidade literária
-- Utilizadores digitais
+### 1. Leitores
+- **Idade:** 15–60 anos  
+- **Localização:** Principalmente em Portugal (podendo estender-se a países lusófonos)  
+- **Habilitações:** Ensino secundário e superior  
+- **Características:** Interesse por literatura, leitura regular, procura de recomendações e novos autores  
 
+---
+
+### 2. Estudantes
+- **Idade:** 15–25 anos  
+- **Localização:** Escolas e universidades em Portugal  
+- **Habilitações:** Ensino secundário e ensino superior  
+- **Características:** Utilizam a leitura para estudo, trabalhos académicos e desenvolvimento pessoal  
+
+---
+
+### 3. Comunidade literária
+- **Idade:** 18–65 anos  
+- **Localização:** Nacional e internacional (especial foco em comunidades online)  
+- **Habilitações:** Variável (muitos com formação em áreas de letras/comunicação)  
+- **Características:** Inclui escritores, bloggers, críticos e participantes em eventos literários  
+
+---
+
+### 4. Utilizadores digitais
+- **Idade:** 15–45 anos  
+- **Localização:** Predominantemente urbanos  
+- **Habilitações:** Variável  
+- **Características:** Familiaridade com tecnologia, uso frequente de plataformas digitais, consumo de conteúdos online  
 ---
 
 ## Pesquisa de Mercado
