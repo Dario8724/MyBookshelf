@@ -103,9 +103,9 @@ A plataforma também terá a funcionalidade de mapear e relacionar espacialmente
 
 ## Descrição dos Objetivos e da Motivação do Trabalho
 
-A leitura desempenha um papel fundamental no desenvolvimento intelectual, emocional e social, contribuindo para o pensamento crítico, a criatividade e a aprendizagem contínua. No entanto, muitos leitores enfrentam dificuldades na organização das suas leituras, na manutenção de hábitos consistentes e no acesso a informação centralizada sobre livros, eventos culturais e comunidades de leitores.
-O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma plataforma digital que permite organizar a leitura de forma estruturada e personalizada, através da criação de uma biblioteca digital pessoal, do acompanhamento do progresso e da definição de metas de leitura. Paralelamente, a plataforma promove a interação social e a partilha de experiências entre leitores, bem como a descoberta cultural através da divulgação de eventos literários, integrando tecnologia, cultura e comunidade numa única solução digital.
+A leitura desempenha um papel fundamental no desenvolvimento intelectual, emocional e social, contribuindo para o pensamento crítico, a criatividade e a aprendizagem contínua. No entanto, muitos leitores enfrentam dificuldades na organização das suas leituras, na manutenção de hábitos consistentes e, sobretudo, na partilha de experiências com outros leitores de forma estruturada.
 
+O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma plataforma digital centrada na criação e participação em clubes de leitura. Através destes clubes, os utilizadores podem acompanhar leituras conjuntas, partilhar opiniões, avaliar livros e interagir com outros membros, promovendo uma experiência de leitura mais colaborativa e envolvente. Paralelamente, a plataforma permite a organização de uma biblioteca digital pessoal, o acompanhamento do progresso de leitura e a definição de metas, integrando funcionalidades individuais com uma forte componente social. Desta forma, o MyBookshelf posiciona-se como uma solução que combina organização pessoal com interação comunitária, tendo os clubes de leitura como elemento central da experiência.
 ---
 
 ## Identificação de Público-Alvo
