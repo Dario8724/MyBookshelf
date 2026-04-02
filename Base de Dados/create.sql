@@ -110,7 +110,7 @@ CREATE TABLE reading_goal (
 -- =========================
 CREATE TABLE achievement (
     achievement_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
+    name VARCHAR(100) UNIQUE,
     description TEXT,
     icon VARCHAR(255),
     condition_type VARCHAR(50),
