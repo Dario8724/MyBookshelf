@@ -20,6 +20,7 @@ CREATE TABLE book (
     book_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     isbn VARCHAR(20) UNIQUE,
+    google_id VARCHAR(50) UNIQUE,
     description TEXT,
     author VARCHAR(255),
     cover VARCHAR(255),

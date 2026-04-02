@@ -5,6 +5,8 @@ $router->post('/api/users/login',           'UserController@login');
 $router->get('/api/users/me',               'UserController@me');
 $router->post('/api/users/profile',         'UserController@updateProfile');
 $router->get('/api/books/search',           'BookController@search');
+$router->get('/api/books/google/{id}',      'BookController@showByGoogleId');
+$router->post('/api/books/save',            'BookController@saveFromGoogle');
 $router->get('/api/books/{id}',             'BookController@show');
 $router->post('/api/library',               'UserBookController@addBook');
 $router->delete('/api/library/{id}',        'UserBookController@removeBook');
