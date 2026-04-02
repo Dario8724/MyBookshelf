@@ -141,11 +141,69 @@ O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma pla
 
 ## Pesquisa de Mercado
 
-- Goodreads = Permite avaliar livros, fazer listas, ver recomendações e acompanhar leituras de amigos.
-- LibraryThing = Plataforma de catalogação de livros, organização de bibliotecas pessoais e comunidade de leitores.
-- Bookly = App de acompanhamento de leitura, controla tempo lido, metas, estatísticas e hábitos de leitura.
-- Skoob = Rede social literária brasileira, permite avaliar livros, trocar, criar estantes virtuais.
+### Goodreads
 
+Plataforma muito popular que permite aos utilizadores avaliar livros, criar listas, acompanhar leituras e ver o que os amigos estão a ler.
+
+#### Pontos fortes
+- Grande comunidade global  
+- Sistema de avaliações e reviews muito ativo  
+- Recomendações baseadas no histórico de leitura  
+- Integração social (seguir amigos, ver atividades)  
+
+#### Pontos fracos
+- Interface considerada antiga e pouco intuitiva  
+- Recomendações nem sempre são muito precisas  
+- Pouca inovação nos últimos anos  
+- Experiência móvel inferior a apps modernas  
+
+### LibraryThing
+
+Focado na catalogação de livros e organização de bibliotecas pessoais, com uma vertente mais técnica.
+
+#### Pontos fortes
+- Excelente para organizar coleções de livros  
+- Dados detalhados (metadados, edições, etc.)  
+- Comunidade com leitores mais experientes  
+- Ferramentas avançadas de catalogação  
+
+#### Pontos fracos
+- Interface pouco moderna  
+- Não é muito intuitivo para iniciantes  
+- Parte social menos desenvolvida  
+- Visual pouco apelativo  
+
+### Bookly
+
+Aplicação focada no acompanhamento de hábitos de leitura.
+
+#### Pontos fortes
+- Interface moderna e fácil de usar  
+- Estatísticas detalhadas (tempo de leitura, progresso, metas)  
+- Incentiva hábitos de leitura (gamificação)  
+- Experiência mobile muito boa  
+
+#### Pontos fracos
+- Pouco foco social (quase não há comunidade)  
+- Algumas funcionalidades são pagas  
+- Não é ideal para descobrir novos livros  
+- Base de dados limitada comparada a outras plataformas  
+
+### Skoob
+
+Rede social literária bastante popular no Brasil.
+
+#### Pontos fortes
+- Forte componente social  
+- Sistema de estantes virtuais  
+- Possibilidade de troca de livros entre utilizadores  
+- Comunidade ativa em língua portuguesa  
+
+#### Pontos fracos
+- Interface um pouco desatualizada  
+- Funcionalidades limitadas fora do Brasil  
+- Algumas falhas de desempenho  
+- Menor alcance global  
 ---
 
 ## Descrição da Solução a Implementar
