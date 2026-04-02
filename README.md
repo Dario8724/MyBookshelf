@@ -57,9 +57,11 @@ A plataforma também terá a funcionalidade de mapear e relacionar espacialmente
   - Avaliação de livros  
   - Criação de reviews  
 
-- **Sistema de avaliação e reviews**
-  - Avaliação de livros  
-  - Criação de reviews e comentários
+- **Livros**
+  - Consulta de detalhes dos livros (autor, género, descrição)
+  - Sistema de avaliação  
+  - Visualização de reviews de outros utilizadores  
+
 
 - **Descoberta e organização de conteúdos**
   - Sistema de pesquisa de livros  
