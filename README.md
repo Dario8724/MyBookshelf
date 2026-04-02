@@ -248,7 +248,8 @@ Rede social literária bastante popular no Brasil.
 
 ### Gabriel Rezende
 - Revisão e montagem do relatório  
-- Plano de trabalho  
+- Plano de trabalho
+- Atualização da calendarização
 - Definição de funcionalidades e proposta inicial  
 - Montagem da apresentação  
 - Criação da base de dados  
@@ -275,7 +276,7 @@ Rede social literária bastante popular no Brasil.
 - Coluna de Base de Dados
 - Arquitetura de informação  
 - Project Charter e WBS  
-- Relatórios   
+- Relatórios  
 
 ### Francisco Zolana
 - Wireframes
