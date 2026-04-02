@@ -15,7 +15,7 @@ class AchievementModel
     {
         $stmt = $this->db->prepare("
             SELECT
-                a.achivement_id,
+                a.achievement_id,
                 a.name,
                 a.description,
                 a.icon,
@@ -41,8 +41,8 @@ class AchievementModel
         ");
 
         return $stmt->execute([
-            ':user_id'          => $userId,
-            ':achievement_id'   => $achievementId
+            ':user_id' => $userId,
+            ':achievement_id' => $achievementId
         ]);
     }
 
@@ -59,67 +59,67 @@ class AchievementModel
             )
          ");
 
-         $stmt->execute([':user_id' => $userId]);
-         $pending = $stmt->fetchAll();
+        $stmt->execute([':user_id' => $userId]);
+        $pending = $stmt->fetchAll();
 
-         foreach ($pending as $achievement) {
+        foreach ($pending as $achievement) {
             $value = $stats[$achievement['condition_type']] ?? 0;
 
-            if ($value >= $achievement['condition_type']) {
+            if ($value >= $achievement['condition_value']) {
                 $this->award($userId, $achievement['achievement_id']);
                 $awarded[] = $achievement;
             }
-         }
+        }
 
 
-         return $awarded;
+        return $awarded;
     }
 
     private function getUserStats(int $userId): array
     {
         $stats = [];
 
-        //Livros adicionados
+        // Livros adicionados
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM user_book WHERE user_id = :user_id");
         $stmt->execute([':user_id' => $userId]);
         $stats['books_added'] = (int) $stmt->fetchColumn();
 
-        //Livros completados
+        // Livros completados
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM user_book WHERE user_id = :user_id AND status = 'completed'");
         $stmt->execute([':user_id' => $userId]);
         $stats['books_completed'] = (int) $stmt->fetchColumn();
 
-        //Reviews escritas
+        // Reviews escritas
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM review WHERE user_id = :user_id");
+        $stmt->execute([':user_id' => $userId]);
+        $stats['reviews_written'] = (int) $stmt->fetchColumn();
+
+        // A seguir
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM follow WHERE follower_id = :user_id");
         $stmt->execute([':user_id' => $userId]);
         $stats['following'] = (int) $stmt->fetchColumn();
 
-        //A seguir
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM follow WHERE follower_id = :user_id");
-        $stmt->execute([':user_id' => $userId]);
-        $stats['following'] = (int) $stmt->fetchColumn();
-
-        //Seguidores
+        // Seguidores
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM follow WHERE following_id = :user_id");
         $stmt->execute([':user_id' => $userId]);
         $stats['followers'] = (int) $stmt->fetchColumn();
 
-        //Metas criadas
+        // Metas criadas
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM reading_goal WHERE user_id = :user_id");
         $stmt->execute([':user_id' => $userId]);
         $stats['goals_created'] = (int) $stmt->fetchColumn();
 
-        //Metas concluídas
+        // Metas concluídas
         $stmt = $this->db->prepare("
-            SELECT COUNT(*) FROM reading_goal rg
-            WHERE rg.user_id = :user:id
-            AND (
-                SELECT COUNT(*) FROM user_book ub
-                WHERE ub.user_id = rg.user_id
-                AND ub.status = 'completed'
-                AND ub.updated_at BETWEEN rg.start_date AND rg.end_date
-            ) >= rg.target_value
-        ");
+        SELECT COUNT(*) FROM reading_goal rg
+        WHERE rg.user_id = :user_id
+        AND (
+            SELECT COUNT(*) FROM user_book ub
+            WHERE ub.user_id = rg.user_id
+            AND ub.status = 'completed'
+            AND ub.updated_at BETWEEN rg.start_date AND rg.end_date
+        ) >= rg.target_value
+    ");
         $stmt->execute([':user_id' => $userId]);
         $stats['goals_completed'] = (int) $stmt->fetchColumn();
 
