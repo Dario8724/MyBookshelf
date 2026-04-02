@@ -62,21 +62,10 @@ A plataforma também terá a funcionalidade de mapear e relacionar espacialmente
   - Sistema de avaliação  
   - Visualização de reviews de outros utilizadores  
 
-
 - **Feed Social**
   - Visualização de publicações dos utilizadores  
   - Partilha de leituras e opiniões  
   - Interação com publicações (gostos e comentários)
-
-- **Comunidade e interação social**
-  - Feed/comunidade de leitores  
-  - Partilha de leituras, opiniões e conquistas
-  - Interação entre utilizadores
-
-- **Eventos culturais**
-  - Mapeamento georreferenciado de bibliotecas, livrarias, feiras do livro e etc...
-  - Calendário de eventos literários  
-  - Visualização de eventos culturais  
   
 ---
 
