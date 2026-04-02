@@ -63,10 +63,10 @@ A plataforma também terá a funcionalidade de mapear e relacionar espacialmente
   - Visualização de reviews de outros utilizadores  
 
 
-- **Descoberta e organização de conteúdos**
-  - Sistema de pesquisa de livros  
-  - Página individual do livro (detalhes, avaliações, reviews, estado de leitura)  
-  - Sistema de recomendação de livros  
+- **Feed Social**
+  - Visualização de publicações dos utilizadores  
+  - Partilha de leituras e opiniões  
+  - Interação com publicações (gostos e comentários)
 
 - **Comunidade e interação social**
   - Feed/comunidade de leitores  
