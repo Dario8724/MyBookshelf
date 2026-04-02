@@ -269,8 +269,7 @@ Rede social literária bastante popular no Brasil.
 - Proposta inicial
 - Criar logo do Projeto  
 - Nome do projeto  
-- Plano de trabalho    
-- Atualização da calendarização  
+- Plano de trabalho     
 - Modelo de base de dados  
 - Personas
 - Coluna de Base de Dados
