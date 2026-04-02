@@ -41,10 +41,12 @@ A plataforma também terá a funcionalidade de mapear e relacionar espacialmente
 ### Requisitos Funcionais
 
 - **Clubes de Leitura (Funcionalidade Principal)**
-  - Registo de livros lidos  
-  - Registo de livros em leitura  
-  - Registo de livros a ler
-  - Organização personalizada da estante digital
+  - Criação e participação em clubes de leitura  
+  - Biblioteca partilhada do clube  
+  - Definição de leituras conjuntas  
+  - Ranking de participação dos membros  
+  - Listagem dos livros mais lidos no clube  
+  - Visualização de clubes disponíveis  
  
 - **Gestão de metas e gamificação**
   - Definição de metas de leitura
