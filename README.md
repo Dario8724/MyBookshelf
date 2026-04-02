@@ -40,7 +40,7 @@ A plataforma também terá a funcionalidade de mapear e relacionar espacialmente
 
 ### Requisitos Funcionais
 
-- **Gestão de biblioteca pessoal**
+- **Clubes de Leitura (Funcionalidade Principal)**
   - Registo de livros lidos  
   - Registo de livros em leitura  
   - Registo de livros a ler
