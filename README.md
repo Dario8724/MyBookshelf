@@ -272,7 +272,8 @@ Rede social literária bastante popular no Brasil.
 - Plano de trabalho    
 - Atualização da calendarização  
 - Modelo de base de dados  
-- Personas  
+- Personas
+- Coluna de Base de Dados
 - Arquitetura de informação  
 - Project Charter e WBS  
 - Relatórios   
