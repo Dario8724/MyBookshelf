@@ -120,23 +120,17 @@ O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma pla
 - **Habilitações:** Ensino secundário e superior  
 - **Características:** Interesse por literatura, leitura regular, procura de recomendações e novos autores  
 
----
-
 ### 2. Estudantes
 - **Idade:** 15–25 anos  
 - **Localização:** Escolas e universidades em Portugal  
 - **Habilitações:** Ensino secundário e ensino superior  
 - **Características:** Utilizam a leitura para estudo, trabalhos académicos e desenvolvimento pessoal  
 
----
-
 ### 3. Comunidade literária
 - **Idade:** 18–65 anos  
 - **Localização:** Nacional e internacional (especial foco em comunidades online)  
 - **Habilitações:** Variável (muitos com formação em áreas de letras/comunicação)  
 - **Características:** Inclui escritores, bloggers, críticos e participantes em eventos literários  
-
----
 
 ### 4. Utilizadores digitais
 - **Idade:** 15–45 anos  
