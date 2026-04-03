@@ -20,6 +20,7 @@ CREATE TABLE book (
     book_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     isbn VARCHAR(20) UNIQUE,
+    google_id VARCHAR(50) UNIQUE,
     description TEXT,
     author VARCHAR(255),
     cover VARCHAR(255),
@@ -110,7 +111,7 @@ CREATE TABLE reading_goal (
 -- =========================
 CREATE TABLE achievement (
     achievement_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
+    name VARCHAR(100) UNIQUE,
     description TEXT,
     icon VARCHAR(255),
     condition_type VARCHAR(50),
