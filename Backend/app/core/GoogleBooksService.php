@@ -5,7 +5,7 @@ require_once __DIR__ .'/../../config/app.php';
 class GoogleBooksService
 {
     private string $apiKey;
-    private string $baseUrl = 'https://wwww.googleapis.com/books/v1/volumes';
+    private string $baseUrl = 'https://www.googleapis.com/books/v1/volumes';
 
     public function __construct()
     {
@@ -16,7 +16,7 @@ class GoogleBooksService
     public function search(string $query, int $maxResults = 20) : array
     {
         $url = $this->baseUrl . '?' . http_build_query([
-            'q'             => $query,
+            'q'             => 'intitle:' . $query,
             'maxResults'    => $maxResults,
             'key'           => $this->apiKey,
         ]);
@@ -71,13 +71,13 @@ class GoogleBooksService
         }
 
         foreach ($info['industryIdentifiers'] as $identifier) {
-            if ($identifier['type'] === 'ISBN 13') {
+            if ($identifier['type'] === 'ISBN_13') {
                 return $identifier['identifier'];
             }
         }
 
         foreach ($info['industryIdentifiers'] as $identifier) {
-            if ($identifier['type'] === 'ISBN 10') {
+            if ($identifier['type'] === 'ISBN_10') {
                 return $identifier['identifier'];
             }
         }
