@@ -68,7 +68,7 @@ function updateNavAvatar(user) {
     const nav = document.getElementById('navAvatar');
     if (!nav) return;
     if (user.profile_image) {
-        nav.innerHTML = `<img src=${API}/${user.profile_image}" alt="${user.name}>`;
+        nav.innerHTML = `<img src="${API}/${user.profile_image}" alt="${user.name}">`;
     } else {
         nav.textContent = user.name.charAt(0).toUpperCase();
     }
@@ -102,7 +102,7 @@ function renderProfile(user, followersCount, followingCount) {
                 </div>
             </div>
             <div class="profile-actions">
-                <button class="btn btn-outline" onclick="openEditProfile()">Editar perfil</button>
+                <button class="btn btn-outline" onclick="openEditModal()">Editar perfil</button>
             </div>
         </div>
     `;
