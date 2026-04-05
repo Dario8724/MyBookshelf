@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // file input preview
-    document.getElementById('fileInput').addEventListener('change', (e) => {
+    document.getElementById('fileInput').addEventListener('change', e => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     await loadProfile();
-    await loadLibrary();
+    await Promise.all([loadLibrary(), loadAchievements(), loadGoals()]);
 });
 
 // -- carregar perfil ---
@@ -56,9 +56,21 @@ async function loadProfile() {
         const followingCount = fwng.success ? fwng.data.total : 0;
 
         renderProfile(currentUser, followersCount, followingCount);
+        updateNavAvatar(currentUser);
+
     } catch (err) {
         console.error('Erro ao carregar perfil:', err);
         showToast('Erro ao carregar perfil.', 'error');
+    }
+}
+
+function updateNavAvatar(user) {
+    const nav = document.getElementById('navAvatar');
+    if (!nav) return;
+    if (user.profile_image) {
+        nav.innerHTML = `<img src=${API}/${user.profile_image}" alt="${user.name}>`;
+    } else {
+        nav.textContent = user.name.charAt(0).toUpperCase();
     }
 }
 
@@ -66,8 +78,8 @@ function renderProfile(user, followersCount, followingCount) {
     const header = document.getElementById('profileHeader');
 
     const avatar = user.profile_image
-        ? `<img src="${API}/${user.profile_image}" alt="${user.name}" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid var(--border)">`
-        : `<div style="width:110px;height:110px;border-radius:50%;background:var(--surface2);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:2.5rem;color:var(--muted)">${user.name.charAt(0).toUpperCase()}</div>`;
+        ? `<img src="${API}/${user.profile_image}" alt="${user.name}" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid var(--border);flex-sherink:0">`
+        : `<div style="width:110px;height:110px;border-radius:50%;background:var(--surface2);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:2.5rem;color:var(--muted);flex-sherink:0">${user.name.charAt(0).toUpperCase()}</div>`;
 
     header.innerHTML = `
         ${avatar}
@@ -109,7 +121,9 @@ async function loadLibrary() {
         const want      = allBooks.filter(b => b.status === 'want_to_read');
         const favs      = allBooks.filter(b => b.is_favorite == 1);
 
-        document.getElementById('statBooks').textContent    = allBooks.length;
+        const statBooks = document.getElementById('statBooks');
+        if (statBooks) statBooks.textContent = allBooks.length;
+
         document.getElementById('cntAll').textContent       = `(${allBooks.length})`;
         document.getElementById('cntReading').textContent   = `(${reading.length})`;
         document.getElementById('cntCompleted').textContent = `(${completed.length})`;
@@ -144,8 +158,7 @@ function renderGrid(containerId, books) {
             </div>`;
         return;
     }
-
-    const cards = books.map(b => `
+    el.innerHTML = `<div class="book-grid">${books.map(b => `
         <a href="book.html?id=${b.book_id}" class="book-item">
             <div class="book-cover-wrap">
                 ${b.cover
@@ -160,9 +173,74 @@ function renderGrid(containerId, books) {
                 ${b.author ? `<div class="book-author">${b.author}</div>` : ''}
             </div>
         </a>
-    `).join('');
+    `).join('')}</div>`;
+}
 
-    el.innerHTML = `<div class="book-grid">${cards}</div>`;
+// –– CARREGAR CONQUISTAS –––––––––––––––––––––––––––––––––––
+async function loadAchievements(){
+    try{
+        const res = await fetch(`${API}/api/achievements`, { headers: authHeader() });
+        const data = await res.json();
+        
+        if (!data.success) return
+
+        const achievements = data.data.achievements;
+        const grid = document.getElementById('achievementsGrid');
+
+        grid.innerHTML = achievements.map(a => `
+            <div class="achievement-item ${parseInt(a.earned) === 1 ? 'earned' : 'locked'}">
+                <div class="achievement-icon">${a.icon}</div>
+                <div class="achievement-name">${a.name}</div>
+                <div class="achievement-desc">${a.description}</div>
+                <span class="achievement-badge ${parseInt(a.earned) === 1 ? 'badge-earned' : 'badge-locked'}">
+                    ${parseInt(a.earned) === 1 ? 'Conquistado' : 'Bloqueado'}
+                </span>
+            </div>
+        `).join('');
+
+        document.getElementById('achievementsCard').style.display = 'block';
+    
+    } catch (err) {
+        console.error('Erro ao carregar conquistas:', err);
+    }
+}
+
+// ––– CARREGAR METAS –––––––
+async function loadGoals() {
+    try {
+        const res = await fetch(`${API}/api/goals`, { headers: authHeader() });
+        const data = await res.json();
+
+        if (!data.success) return;
+        
+        const goals = data.data.goals;
+        const list = document.getElementById('goalsList');
+
+        if (!goals.length) {
+            list.innerHTML = `<div class="goal-empty">Ainda não tens metas de leitura. Cria uma!</div>`;
+        } else {
+            list.innerHTML = goals.map(g => `
+                <div class="goal-item">
+                    <div class="goal-header">
+                        <div class="goal-title">${g.start_date.substring(0, 4)} - ${g.label}</div>
+                        <span class="goal-label ${g.completed ? 'completed' : ''}">${g.completed ? '✓ Concluída' : 'Em progresso'}</span>
+                        </div>
+                        <div class="goal-progress-bar">
+                            <div class="goal-progress-fill ${g.completed ? 'done' : ''}" style="width:${g.percentage}%"></div>
+                        </div>
+                        <div class="goal-text">
+                            <span>${g.progress} de ${g.target_value} livros</span>
+                            <span>${g.percentage}%</span>
+                        </div>
+                    </div>
+            `).join('');
+        }
+
+        document.getElementById('goalsCard').style.display = 'block';
+
+    } catch (err) {
+        console.error('Erro ao carregar metas:', err);
+    }
 }
 
 // ── MODAL EDITAR PERFIL ───────────────────────────────────
