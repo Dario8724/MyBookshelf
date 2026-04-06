@@ -28,3 +28,6 @@ $router->get('/api/posts/{id}/comments',    'PostController@getComments');
 $router->post('/api/goals',        'ReadingGoalController@create');
 $router->get('/api/goals',         'ReadingGoalController@index');
 $router->delete('/api/goals/{id}', 'ReadingGoalController@delete');
+// new route for clubs 
+// Clubes
+$router->post('/api/clubs', 'ClubController@create');
