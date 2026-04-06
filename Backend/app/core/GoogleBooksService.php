@@ -16,8 +16,10 @@ class GoogleBooksService
     public function search(string $query, int $maxResults = 20) : array
     {
         $url = $this->baseUrl . '?' . http_build_query([
-            'q'             => 'intitle:' . $query,
+            'q'             => 'intitle:' . $query . '"',
             'maxResults'    => $maxResults,
+            'printType'     => 'books',
+            'orderBy'       => 'relevance',
             'key'           => $this->apiKey,
         ]);
 
@@ -27,7 +29,11 @@ class GoogleBooksService
             return [];
         }
 
-        return array_map([$this, 'formatBook'], $response['items']);
+        $books = array_map([$this, 'formatBook'], $response['items']);
+
+        $books = array_filter($books, fn($b) => !empty($b['cover']));
+
+        return array_values($books);
     }
 
     //Busca um livro pelo ID da google
