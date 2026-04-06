@@ -41,3 +41,15 @@ $router->get('/api/clubs/{id}/messages',  'ClubMessageController@index');
 $router->post('/api/clubs/{id}/sessions',          'ClubReadingSessionController@create');
 $router->get('/api/clubs/{id}/sessions',           'ClubReadingSessionController@index');
 $router->post('/api/clubs/sessions/{id}/complete', 'ClubReadingSessionController@complete');
+// Ranking
+$router->get('/api/clubs/{id}/ranking', 'ClubRankingController@index');
+
+// Top Book
+$router->get('/api/clubs/{id}/topbook',  'ClubTopBookController@index');
+$router->post('/api/clubs/{id}/topbook', 'ClubTopBookController@add');
+
+// Votações
+$router->get('/api/clubs/{id}/votes',           'ClubVoteController@index');
+$router->post('/api/clubs/{id}/votes',          'ClubVoteController@create');
+$router->post('/api/clubs/votes/{id}/options',  'ClubVoteController@addOption');
+$router->post('/api/clubs/votes/{id}/cast',     'ClubVoteController@castVote');
