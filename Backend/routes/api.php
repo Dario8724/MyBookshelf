@@ -31,3 +31,6 @@ $router->delete('/api/goals/{id}', 'ReadingGoalController@delete');
 // new route for clubs 
 // Clubes
 $router->post('/api/clubs', 'ClubController@create');
+// Join a club
+$router->post('/api/clubs/{id}/join',    'ClubController@join');
+$router->delete('/api/clubs/{id}/leave', 'ClubController@leave');

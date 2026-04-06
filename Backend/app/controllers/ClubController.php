@@ -37,4 +37,43 @@ class ClubController extends Controller
 
         $this->success(['club' => $club], 'Clube criado com sucesso.', 201);
     }
+    public function join(int $clubId): void
+{
+    $payload = AuthMiddleware::requireAuth();
+    $userId  = $payload['user_id'];
+
+    $club = $this->clubModel->findById($clubId);
+
+    if (!$club) {
+        $this->error('Clube não encontrado.', 404);
+    }
+
+    if ($this->clubModel->isMember($clubId, $userId)) {
+        $this->error('Já és membro deste clube.', 409);
+    }
+
+    $this->clubModel->join($clubId, $userId);
+
+    $this->success(null, 'Entraste no clube com sucesso.', 201);
+}
+
+public function leave(int $clubId): void
+{
+    $payload = AuthMiddleware::requireAuth();
+    $userId  = $payload['user_id'];
+
+    $club = $this->clubModel->findById($clubId);
+
+    if (!$club) {
+        $this->error('Clube não encontrado.', 404);
+    }
+
+    $left = $this->clubModel->leave($clubId, $userId);
+
+    if (!$left) {
+        $this->error('Não és membro deste clube ou és o admin.', 403);
+    }
+
+    $this->success(null, 'Saíste do clube com sucesso.');
+}
 }

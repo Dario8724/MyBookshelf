@@ -40,4 +40,46 @@ class ClubModel
 
         return $club ?: null;
     }
+    // join clubs
+    public function join(int $clubId, int $userId): void{
+    $stmt = $this->db->prepare("
+        INSERT INTO club_member (club_id, user_id, role)
+        VALUES (:club_id, :user_id, 'member')
+    ");
+
+    $stmt->execute([
+        ':club_id' => $clubId,
+        ':user_id' => $userId,
+    ]);
+}
+
+public function isMember(int $clubId, int $userId): bool
+{
+    $stmt = $this->db->prepare("
+        SELECT COUNT(*) FROM club_member
+        WHERE club_id = :club_id AND user_id = :user_id
+    ");
+
+    $stmt->execute([
+        ':club_id' => $clubId,
+        ':user_id' => $userId,
+    ]);
+
+    return (bool) $stmt->fetchColumn();
+}
+// leave clubs 
+public function leave(int $clubId, int $userId): bool
+{
+    $stmt = $this->db->prepare("
+        DELETE FROM club_member
+        WHERE club_id = :club_id AND user_id = :user_id AND role != 'admin'
+    ");
+
+    $stmt->execute([
+        ':club_id' => $clubId,
+        ':user_id' => $userId,
+    ]);
+
+    return $stmt->rowCount() > 0;
+}
 }
