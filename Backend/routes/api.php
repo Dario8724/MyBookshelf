@@ -53,3 +53,7 @@ $router->get('/api/clubs/{id}/votes',           'ClubVoteController@index');
 $router->post('/api/clubs/{id}/votes',          'ClubVoteController@create');
 $router->post('/api/clubs/votes/{id}/options',  'ClubVoteController@addOption');
 $router->post('/api/clubs/votes/{id}/cast',     'ClubVoteController@castVote');
+// Biblioteca do clube
+$router->get('/api/clubs/{id}/library',    'ClubLibraryController@index');
+$router->post('/api/clubs/{id}/library',   'ClubLibraryController@addBook');
+$router->delete('/api/clubs/library/{id}', 'ClubLibraryController@removeBook');
