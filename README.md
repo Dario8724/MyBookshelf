@@ -30,10 +30,16 @@ Livros, Leitura, Biblioteca, Livraria, Feira do Livro
 
 ## Descrição da App
 
-O nosso grupo pretende desenvolver uma plataforma web denominada MyBookshelf, concebida como uma biblioteca digital pessoal, uma rede social literária e um sistema de informação cultural georreferenciado. A aplicação permitirá aos utilizadores registar os livros que já leram, os que estão a ler e os que pretendem ler, criando uma estante digital personalizada que reflete os seus gostos, interesses e percurso enquanto leitores. Através do acompanhamento do tempo de leitura, da definição de metas e da atribuição de medalhas e troféus por objetivos alcançados, o MyBookshelf introduz elementos de gamificação que promovem a motivação, a consistência e o desenvolvimento do hábito de leitura de forma contínua e envolvente. 
-Para além da dimensão individual, a plataforma valoriza fortemente a componente social, permitindo a partilha de avaliações, reviews e opiniões, a criação de perfis de leitor e a interação numa comunidade digital centrada nos livros, transformando a leitura numa experiência coletiva e colaborativa.
-A plataforma também terá a funcionalidade de mapear e relacionar espacialmente bibliotecas, livrarias, feiras do livro, eventos literários e espaços culturais, possibilitando a descoberta de atividades culturais com base na localização do utilizador, na proximidade geográfica e na análise territorial da oferta cultural. Desta forma, o MyBookshelf que liga leitores a espaços físicos, eventos e comunidades locais, promovendo a participação ativa na vida cultural, a valorização do património literário e a integração entre o ambiente digital e o espaço geográfico.
+## Descrição da Aplicação
 
+O MyBookshelf é uma plataforma web desenvolvida pelo grupo, concebida como uma biblioteca digital pessoal e uma rede social literária, centrada na experiência colaborativa de leitura através de clubes de leitura.
+A aplicação permite aos utilizadores registar os livros que já leram, os que estão a ler e os que pretendem ler, criando uma estante digital personalizada que reflete os seus gostos, interesses e percurso enquanto leitores.
+
+A plataforma integra funcionalidades de acompanhamento do progresso de leitura, definição de metas e elementos de gamificação, como medalhas e conquistas, promovendo a motivação, a consistência e o desenvolvimento do hábito de leitura de forma contínua e envolvente.
+
+Para além da dimensão individual, o MyBookshelf valoriza a componente social, permitindo a partilha de avaliações, reviews e opiniões, bem como a interação entre utilizadores numa comunidade digital centrada nos livros.
+
+O elemento central da aplicação são os clubes de leitura, onde os utilizadores participam em leituras conjuntas, acompanham o progresso coletivo, partilham perspetivas e interagem com outros membros. Desta forma, o MyBookshelf transforma a leitura numa experiência mais dinâmica, participativa e colaborativa, combinando organização pessoal com uma forte vertente social.
 ---
 
 ## Requisitos Funcionais e Não Funcionais
