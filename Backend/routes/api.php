@@ -37,3 +37,7 @@ $router->delete('/api/clubs/{id}/leave', 'ClubController@leave');
 // club messages
 $router->post('/api/clubs/{id}/messages', 'ClubMessageController@send');
 $router->get('/api/clubs/{id}/messages',  'ClubMessageController@index');
+// reading sessions 
+$router->post('/api/clubs/{id}/sessions',          'ClubReadingSessionController@create');
+$router->get('/api/clubs/{id}/sessions',           'ClubReadingSessionController@index');
+$router->post('/api/clubs/sessions/{id}/complete', 'ClubReadingSessionController@complete');
