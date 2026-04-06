@@ -34,3 +34,6 @@ $router->post('/api/clubs', 'ClubController@create');
 // Join a club
 $router->post('/api/clubs/{id}/join',    'ClubController@join');
 $router->delete('/api/clubs/{id}/leave', 'ClubController@leave');
+// club messages
+$router->post('/api/clubs/{id}/messages', 'ClubMessageController@send');
+$router->get('/api/clubs/{id}/messages',  'ClubMessageController@index');
