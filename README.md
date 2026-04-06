@@ -28,18 +28,16 @@ Livros, Leitura, Biblioteca, Livraria, Feira do Livro
 
 ---
 
-## Descrição da App
-
 ## Descrição da Aplicação
 
 O MyBookshelf é uma plataforma web desenvolvida pelo grupo, concebida como uma biblioteca digital pessoal e uma rede social literária, centrada na experiência colaborativa de leitura através de clubes de leitura.
 A aplicação permite aos utilizadores registar os livros que já leram, os que estão a ler e os que pretendem ler, criando uma estante digital personalizada que reflete os seus gostos, interesses e percurso enquanto leitores.
 
 A plataforma integra funcionalidades de acompanhamento do progresso de leitura, definição de metas e elementos de gamificação, como medalhas e conquistas, promovendo a motivação, a consistência e o desenvolvimento do hábito de leitura de forma contínua e envolvente.
-
 Para além da dimensão individual, o MyBookshelf valoriza a componente social, permitindo a partilha de avaliações, reviews e opiniões, bem como a interação entre utilizadores numa comunidade digital centrada nos livros.
 
 O elemento central da aplicação são os clubes de leitura, onde os utilizadores participam em leituras conjuntas, acompanham o progresso coletivo, partilham perspetivas e interagem com outros membros. Desta forma, o MyBookshelf transforma a leitura numa experiência mais dinâmica, participativa e colaborativa, combinando organização pessoal com uma forte vertente social.
+
 ---
 
 ## Requisitos Funcionais e Não Funcionais
