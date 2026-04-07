@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyBookshelf — Feed</title>
+</head>
+<body>
+
+    <nav>
+        <a href="profile.html">MyBookshelf</a>
+        &nbsp;|&nbsp;
+        <a href="feed.html">Feed</a>
+        <a href="clubs.html">Clubes</a>
+        <a href="search.html">Buscar</a>
+        <a href="following.html">Seguindo</a>
+        <a href="profile.html">Perfil</a>
+        <button onclick="logout()">Sair</button>
+    </nav>
+
+    <hr>
+
+    <h2>Feed</h2>
+    <p>Posts das pessoas que segues</p>
+
+    <hr>
+
+    <!-- Criar post -->
+    <div>
+        <h3>Criar Post</h3>
+        <textarea id="postContent" rows="3" placeholder="Partilha algo com os teus seguidores..." style="width:100%"></textarea>
+        <br>
+        <button onclick="createPost()">Publicar</button>
+        <p id="postMsg"></p>
+    </div>
+
+    <hr>
+
+    <!-- Lista de posts -->
+    <div id="feedContainer">
+        <p>A carregar posts...</p>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!getToken()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            await loadFeed();
+        });
+
+        async function loadFeed() {
+            try {
+                const res  = await fetch(`${API}/api/posts/feed`, { headers: authHeader() });
+                const data = await res.json();
+                const container = document.getElementById('feedContainer');
+
+                if (!data.success || !data.data.posts.length) {
+                    container.innerHTML = '<p>Ainda não há posts no teu feed. Segue outros utilizadores!</p>';
+                    return;
+                }
+
+                container.innerHTML = data.data.posts.map(p => `
+                    <div style="border:1px solid #ccc; padding:1rem; margin-bottom:1rem;">
+                        <strong>${p.name}</strong>
+                        <small> · ${new Date(p.created_at).toLocaleDateString('pt-PT')}</small>
+                        <p>${p.content}</p>
+                        <small>❤️ ${p.total_likes} likes · 💬 ${p.total_comments} comentários</small>
+                        <br>
+                        <button onclick="toggleLike(${p.post_id})">Like</button>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                document.getElementById('feedContainer').innerHTML = '<p>Erro ao carregar feed.</p>';
+            }
+        }
+
+        async function createPost() {
+            const content = document.getElementById('postContent').value.trim();
+            const msg     = document.getElementById('postMsg');
+
+            if (!content) { msg.textContent = 'Escreve algo primeiro.'; return; }
+
+            const res  = await fetch(`${API}/api/posts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+                body: JSON.stringify({ content }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                document.getElementById('postContent').value = '';
+                msg.textContent = 'Post publicado!';
+                await loadFeed();
+            } else {
+                msg.textContent = data.error || 'Erro ao publicar.';
+            }
+        }
+
+        async function toggleLike(postId) {
+            await fetch(`${API}/api/posts/${postId}/like`, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            });
+            await loadFeed();
+        }
+    </script>
+</body>
+</html>

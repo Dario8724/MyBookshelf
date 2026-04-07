@@ -23,7 +23,7 @@ CREATE TABLE book (
     google_id VARCHAR(50) UNIQUE,
     description TEXT,
     author VARCHAR(255),
-    cover VARCHAR(255),
+    cover TEXT,
     language VARCHAR(50),
     publication_year YEAR,
     publisher VARCHAR(255)
