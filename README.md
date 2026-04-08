@@ -232,7 +232,7 @@ Rede social literária bastante popular no Brasil.
 - IDE: Visual Studio, Intellij
 - Linguagem: Java, HTML, CSS, JavaScript
 - Base de dados: SQL Workbench
-- UI: Figma
+- UI & UX: Figma
 - Versionamento: GitHub / ClickUp
 
 ---
