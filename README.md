@@ -12,7 +12,7 @@
 - Francisco Rocha Zolana – 20240801  
 
 **Palavras Chave**
-Livros, Leitura, Biblioteca, Livraria, Feira do Livro
+Livros, Leitura, Biblioteca, Livraria, Feira do Livro, Literatura
 
 ---
 
