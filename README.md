@@ -8,7 +8,7 @@
 **Autores:**
 - Gabriel Lima Rezende - 20240343  
 - Dário Biaguê Bandanhe – 20241751  
-- Edmilson Alberto Marcos Tudo – 20241542  
+- Edmilson Marcos Tudo – 20241542  
 - Francisco Rocha Zolana – 20240801  
 
 **Palavras Chave**
