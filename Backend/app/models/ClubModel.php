@@ -82,4 +82,19 @@ public function leave(int $clubId, int $userId): bool
 
     return $stmt->rowCount() > 0;
 }
+public function findAll(): array
+{
+    $stmt = $this->db->prepare("
+        SELECT c.*, u.name AS created_by_name,
+               COUNT(cm.club_member_id) AS total_members
+        FROM club c
+        JOIN user u ON c.created_by = u.user_id
+        LEFT JOIN club_member cm ON c.club_id = cm.club_id
+        GROUP BY c.club_id
+        ORDER BY c.club_id DESC
+    ");
+
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }

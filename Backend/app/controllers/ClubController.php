@@ -76,4 +76,27 @@ public function leave(int $clubId): void
 
     $this->success(null, 'Saíste do clube com sucesso.');
 }
+public function show(int $clubId): void
+{
+    $payload = AuthMiddleware::requireAuth();
+
+    $club = $this->clubModel->findById($clubId);
+
+    if (!$club) {
+        $this->error('Clube não encontrado.', 404);
+    }
+
+    $this->success(['club' => $club]);
+}
+
+public function index(): void{
+    $payload = AuthMiddleware::requireAuth();
+
+    $clubs = $this->clubModel->findAll();
+
+    $this->success([
+        'total' => count($clubs),
+        'clubs' => $clubs,
+    ]);
+}
 }
