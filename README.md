@@ -156,7 +156,9 @@ Plataforma muito popular que permite aos utilizadores avaliar livros, criar list
 - Interface considerada antiga e pouco intuitiva  
 - Recomendações nem sempre são muito precisas  
 - Pouca inovação nos últimos anos  
-- Experiência móvel inferior a apps modernas  
+- Experiência móvel inferior a apps modernas
+
+![Autores](./Imagens/Autores.png)
 
 ### LibraryThing
 
