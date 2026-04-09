@@ -27,8 +27,37 @@ $router->delete('/api/posts/{id}',          'PostController@delete');
 $router->post('/api/posts/{id}/like',       'PostController@toggleLike');
 $router->post('/api/posts/{id}/comments',   'PostController@addComment');
 $router->get('/api/posts/{id}/comments',    'PostController@getComments');
-$router->post('/api/goals',                 'ReadingGoalController@create');
-$router->get('/api/goals',                  'ReadingGoalController@index');
-$router->delete('/api/goals/{id}',          'ReadingGoalController@delete');
-$router->get('/api/achievements',           'AchievementController@index');
-$router->post('/api/achievements/check',    'AchievementController@check');
+$router->post('/api/goals',        'ReadingGoalController@create');
+$router->get('/api/goals',         'ReadingGoalController@index');
+$router->delete('/api/goals/{id}', 'ReadingGoalController@delete');
+// new router for clubs 
+// Clubes
+$router->post('/api/clubs', 'ClubController@create');
+$router->get('/api/clubs',       'ClubController@index');
+$router->get('/api/clubs/{id}',  'ClubController@show');
+// Join a club
+$router->post('/api/clubs/{id}/join',    'ClubController@join');
+$router->delete('/api/clubs/{id}/leave', 'ClubController@leave');
+// club messages
+$router->post('/api/clubs/{id}/messages', 'ClubMessageController@send');
+$router->get('/api/clubs/{id}/messages',  'ClubMessageController@index');
+// reading sessions 
+$router->post('/api/clubs/{id}/sessions',          'ClubReadingSessionController@create');
+$router->get('/api/clubs/{id}/sessions',           'ClubReadingSessionController@index');
+$router->post('/api/clubs/sessions/{id}/complete', 'ClubReadingSessionController@complete');
+// Ranking
+$router->get('/api/clubs/{id}/ranking', 'ClubRankingController@index');
+
+// Top Book
+$router->get('/api/clubs/{id}/topbook',  'ClubTopBookController@index');
+$router->post('/api/clubs/{id}/topbook', 'ClubTopBookController@add');
+
+// Votações
+$router->get('/api/clubs/{id}/votes',           'ClubVoteController@index');
+$router->post('/api/clubs/{id}/votes',          'ClubVoteController@create');
+$router->post('/api/clubs/votes/{id}/options',  'ClubVoteController@addOption');
+$router->post('/api/clubs/votes/{id}/cast',     'ClubVoteController@castVote');
+// Biblioteca do clube
+$router->get('/api/clubs/{id}/library',    'ClubLibraryController@index');
+$router->post('/api/clubs/{id}/library',   'ClubLibraryController@addBook');
+$router->delete('/api/clubs/library/{id}', 'ClubLibraryController@removeBook');
