@@ -8,11 +8,11 @@
 **Autores:**
 - Gabriel Lima Rezende - 20240343  
 - Dário Biaguê Bandanhe – 20241751  
-- Edmilson Alberto Marcos Tudo – 20241542  
+- Edmilson Marcos Tudo – 20241542  
 - Francisco Rocha Zolana – 20240801  
 
 **Palavras Chave**
-Livros, Leitura, Biblioteca, Livraria, Feira do Livro
+Livros, Leitura, Biblioteca, Livraria, Feira do Livro, Literatura
 
 ---
 
@@ -28,11 +28,15 @@ Livros, Leitura, Biblioteca, Livraria, Feira do Livro
 
 ---
 
-## Descrição da App
+## Descrição da Aplicação
 
-O nosso grupo pretende desenvolver uma plataforma web denominada MyBookshelf, concebida como uma biblioteca digital pessoal, uma rede social literária e um sistema de informação cultural georreferenciado. A aplicação permitirá aos utilizadores registar os livros que já leram, os que estão a ler e os que pretendem ler, criando uma estante digital personalizada que reflete os seus gostos, interesses e percurso enquanto leitores. Através do acompanhamento do tempo de leitura, da definição de metas e da atribuição de medalhas e troféus por objetivos alcançados, o MyBookshelf introduz elementos de gamificação que promovem a motivação, a consistência e o desenvolvimento do hábito de leitura de forma contínua e envolvente. 
-Para além da dimensão individual, a plataforma valoriza fortemente a componente social, permitindo a partilha de avaliações, reviews e opiniões, a criação de perfis de leitor e a interação numa comunidade digital centrada nos livros, transformando a leitura numa experiência coletiva e colaborativa.
-A plataforma também terá a funcionalidade de mapear e relacionar espacialmente bibliotecas, livrarias, feiras do livro, eventos literários e espaços culturais, possibilitando a descoberta de atividades culturais com base na localização do utilizador, na proximidade geográfica e na análise territorial da oferta cultural. Desta forma, o MyBookshelf que liga leitores a espaços físicos, eventos e comunidades locais, promovendo a participação ativa na vida cultural, a valorização do património literário e a integração entre o ambiente digital e o espaço geográfico.
+O MyBookshelf é uma plataforma web desenvolvida pelo grupo, concebida como uma biblioteca digital pessoal e uma rede social literária, centrada na experiência colaborativa de leitura através de clubes de leitura.
+A aplicação permite aos utilizadores registar os livros que já leram, os que estão a ler e os que pretendem ler, criando uma estante digital personalizada que reflete os seus gostos, interesses e percurso enquanto leitores.
+
+A plataforma integra funcionalidades de acompanhamento do progresso de leitura, definição de metas e elementos de gamificação, como medalhas e conquistas, promovendo a motivação, a consistência e o desenvolvimento do hábito de leitura de forma contínua e envolvente.
+Para além da dimensão individual, o MyBookshelf valoriza a componente social, permitindo a partilha de avaliações, reviews e opiniões, bem como a interação entre utilizadores numa comunidade digital centrada nos livros.
+
+O elemento central da aplicação são os clubes de leitura, onde os utilizadores participam em leituras conjuntas, acompanham o progresso coletivo, partilham perspetivas e interagem com outros membros. Desta forma, o MyBookshelf transforma a leitura numa experiência mais dinâmica, participativa e colaborativa, combinando organização pessoal com uma forte vertente social.
 
 ---
 
@@ -40,36 +44,32 @@ A plataforma também terá a funcionalidade de mapear e relacionar espacialmente
 
 ### Requisitos Funcionais
 
-- **Gestão de biblioteca pessoal**
-  - Registo de livros lidos  
-  - Registo de livros em leitura  
-  - Registo de livros a ler
-  - Organização personalizada da estante digital
+- **Clubes de Leitura (Funcionalidade Principal)**
+  - Criação e participação em clubes de leitura  
+  - Biblioteca partilhada do clube  
+  - Definição de leituras conjuntas  
+  - Ranking de participação dos membros  
+  - Listagem dos livros mais lidos no clube  
+  - Visualização de clubes disponíveis  
  
-- **Gestão de metas e gamificação**
-  - Definição de metas de leitura
-  - Medição de tempo de leitura
-  - Sistema de medalhas, troféus e conquistas
-  - Acompanhamento de progresso
-
-- **Sistema de avaliação e reviews**
+- **Biblioteca Pessoal**
+  - Organização de livros em categorias:
+  - Lidos  
+  - Em leitura  
+  - Por ler  
+  - Registo e gestão da estante digital  
   - Avaliação de livros  
-  - Criação de reviews e comentários
+  - Criação de reviews  
 
-- **Descoberta e organização de conteúdos**
-  - Sistema de pesquisa de livros  
-  - Página individual do livro (detalhes, avaliações, reviews, estado de leitura)  
-  - Sistema de recomendação de livros  
+- **Livros**
+  - Consulta de detalhes dos livros (autor, género, descrição)
+  - Sistema de avaliação  
+  - Visualização de reviews de outros utilizadores  
 
-- **Comunidade e interação social**
-  - Feed/comunidade de leitores  
-  - Partilha de leituras, opiniões e conquistas
-  - Interação entre utilizadores
-
-- **Eventos culturais**
-  - Mapeamento georreferenciado de bibliotecas, livrarias, feiras do livro e etc...
-  - Calendário de eventos literários  
-  - Visualização de eventos culturais  
+- **Feed Social**
+  - Visualização de publicações dos utilizadores  
+  - Partilha de leituras e opiniões  
+  - Interação com publicações (gostos e comentários)
   
 ---
 
@@ -107,27 +107,103 @@ A plataforma também terá a funcionalidade de mapear e relacionar espacialmente
 
 ## Descrição dos Objetivos e da Motivação do Trabalho
 
-A leitura desempenha um papel fundamental no desenvolvimento intelectual, emocional e social, contribuindo para o pensamento crítico, a criatividade e a aprendizagem contínua. No entanto, muitos leitores enfrentam dificuldades na organização das suas leituras, na manutenção de hábitos consistentes e no acesso a informação centralizada sobre livros, eventos culturais e comunidades de leitores.
-O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma plataforma digital que permite organizar a leitura de forma estruturada e personalizada, através da criação de uma biblioteca digital pessoal, do acompanhamento do progresso e da definição de metas de leitura. Paralelamente, a plataforma promove a interação social e a partilha de experiências entre leitores, bem como a descoberta cultural através da divulgação de eventos literários, integrando tecnologia, cultura e comunidade numa única solução digital.
+A leitura desempenha um papel fundamental no desenvolvimento intelectual, emocional e social, contribuindo para o pensamento crítico, a criatividade e a aprendizagem contínua. No entanto, muitos leitores enfrentam dificuldades na organização das suas leituras, na manutenção de hábitos consistentes e, sobretudo, na partilha de experiências com outros leitores de forma estruturada.
+
+O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma plataforma digital centrada na criação e participação em clubes de leitura. Através destes clubes, os utilizadores podem acompanhar leituras conjuntas, partilhar opiniões, avaliar livros e interagir com outros membros, promovendo uma experiência de leitura mais colaborativa e envolvente.Paralelamente, a plataforma permite a organização de uma biblioteca digital pessoal, o acompanhamento do progresso de leitura e a definição de metas, integrando funcionalidades individuais com uma forte componente social. Desta forma, o MyBookshelf posiciona-se como uma solução que combina organização pessoal com interação comunitária, tendo os clubes de leitura como elemento central da experiência.
 
 ---
 
 ## Identificação de Público-Alvo
 
-- Leitores
-- Estudantes
-- Comunidade literária
-- Utilizadores digitais
+### Leitores
+- **Idade:** 15–60 anos  
+- **Localização:** Principalmente em Portugal (podendo estender-se a países lusófonos)  
+- **Habilitações:** Ensino secundário e superior  
+- **Características:** Interesse por literatura, leitura regular, procura de recomendações e novos autores  
 
+### Estudantes
+- **Idade:** 15–25 anos  
+- **Localização:** Escolas e universidades em Portugal  
+- **Habilitações:** Ensino secundário e ensino superior  
+- **Características:** Utilizam a leitura para estudo, trabalhos académicos e desenvolvimento pessoal  
+
+### Comunidade literária
+- **Idade:** 18–65 anos  
+- **Localização:** Nacional e internacional (especial foco em comunidades online)  
+- **Habilitações:** Variável (muitos com formação em áreas de letras/comunicação)  
+- **Características:** Inclui escritores, bloggers, críticos e participantes em eventos literários  
+
+### Utilizadores digitais
+- **Idade:** 15–45 anos  
+- **Localização:** Predominantemente urbanos  
+- **Habilitações:** Variável  
+- **Características:** Familiaridade com tecnologia, uso frequente de plataformas digitais, consumo de conteúdos online  
 ---
 
 ## Pesquisa de Mercado
 
-- Goodreads = Permite avaliar livros, fazer listas, ver recomendações e acompanhar leituras de amigos.
-- LibraryThing = Plataforma de catalogação de livros, organização de bibliotecas pessoais e comunidade de leitores.
-- Bookly = App de acompanhamento de leitura, controla tempo lido, metas, estatísticas e hábitos de leitura.
-- Skoob = Rede social literária brasileira, permite avaliar livros, trocar, criar estantes virtuais.
+### Goodreads
 
+Plataforma muito popular que permite aos utilizadores avaliar livros, criar listas, acompanhar leituras e ver o que os amigos estão a ler.
+
+#### Pontos fortes
+- Grande comunidade global  
+- Sistema de avaliações e reviews muito ativo  
+- Recomendações baseadas no histórico de leitura  
+- Integração social (seguir amigos, ver atividades)  
+
+#### Pontos fracos
+- Interface considerada antiga e pouco intuitiva  
+- Recomendações nem sempre são muito precisas  
+- Pouca inovação nos últimos anos  
+- Experiência móvel inferior a apps modernas
+
+![Autores](./Imagens/Autores.png)
+
+### LibraryThing
+
+Focado na catalogação de livros e organização de bibliotecas pessoais, com uma vertente mais técnica.
+
+#### Pontos fortes
+- Excelente para organizar coleções de livros  
+- Dados detalhados (metadados, edições, etc.)  
+- Ferramentas avançadas de catalogação  
+
+#### Pontos fracos
+- Interface pouco moderna  
+- Não é muito intuitivo para iniciantes  
+- Parte social menos desenvolvida  
+
+### Bookly
+
+Aplicação focada no acompanhamento de hábitos de leitura.
+
+#### Pontos fortes
+- Interface moderna e fácil de usar  
+- Estatísticas detalhadas (tempo de leitura, progresso, metas)  
+- Incentiva hábitos de leitura (gamificação)  
+- Experiência mobile muito boa  
+
+#### Pontos fracos
+- Pouco foco social (quase não há comunidade)  
+- Algumas funcionalidades são pagas  
+- Não é ideal para descobrir novos livros  
+- Base de dados limitada comparada a outras plataformas  
+
+### Skoob
+
+Rede social literária bastante popular no Brasil.
+
+#### Pontos fortes
+- Forte componente social  
+- Sistema de estantes virtuais  
+- Possibilidade de troca de livros entre utilizadores  
+- Comunidade ativa em língua portuguesa  
+
+#### Pontos fracos
+- Funcionalidades limitadas fora do Brasil  
+- Falhas de desempenho  
+- Menor alcance global 
 ---
 
 ## Descrição da Solução a Implementar
@@ -158,7 +234,7 @@ O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma pla
 - IDE: Visual Studio, Intellij
 - Linguagem: Java, HTML, CSS, JavaScript
 - Base de dados: SQL Workbench
-- UI: Figma
+- UI & UX: Figma
 - Versionamento: GitHub / ClickUp
 
 ---
@@ -170,6 +246,44 @@ O projeto MyBookshelf surge como resposta a estas necessidades, propondo uma pla
 - Integração com APIs: Conexão com serviços externos para capas, infos e mapas
 - Testes e Validação: Verificação de funcionalidades e usabilidade
 - Poster e Vídeo Promocional: Divulgação e apresentação visual do projeto
+
+## Distribuição de Tarefas
+
+### Gabriel Rezende
+- Revisão e montagem do relatório  
+- Plano de trabalho
+- Atualização da calendarização
+- Definição de funcionalidades e proposta inicial  
+- Montagem da apresentação  
+- Criação da base de dados  
+- Desenvolvimento do back-end  
+- Desenvolvimento do front-end  
+
+### Dário Bandanhe
+- Proposta inicial  
+- Nome do projeto  
+- Plano de trabalho  
+- Requisitos funcionais e não funcionais  
+- Atualização da calendarização  
+- Modelo de base de dados  
+- Wireframes  
+- Front-end  
+
+### Edmilson Tudo
+- Proposta inicial
+- Criar logo do Projeto  
+- Nome do projeto  
+- Plano de trabalho     
+- Modelo de base de dados  
+- Personas
+- Coluna de Base de Dados
+- Arquitetura de informação  
+- Project Charter e WBS  
+- Relatórios  
+
+### Francisco Zolana
+- Wireframes
+  
 
 ---
 
