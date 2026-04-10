@@ -61,3 +61,8 @@ $router->post('/api/clubs/votes/{id}/cast',     'ClubVoteController@castVote');
 $router->get('/api/clubs/{id}/library',    'ClubLibraryController@index');
 $router->post('/api/clubs/{id}/library',   'ClubLibraryController@addBook');
 $router->delete('/api/clubs/library/{id}', 'ClubLibraryController@removeBook');
+// club seasons
+$router->post('/api/seasons',                  'ClubSeasonController@create');
+$router->get('/api/seasons',                   'ClubSeasonController@index');
+$router->get('/api/seasons/current',           'ClubSeasonController@current');
+$router->get('/api/seasons/{id}/ranking',      'ClubSeasonController@ranking');
