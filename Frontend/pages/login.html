@@ -200,6 +200,12 @@
                     if  (data.success) {
                         localStorage.setItem('token', data.data.token);
                         localStorage.setItem('user', JSON.stringify(data.data.user));
+
+                        await fetch (`${API}/api/achievements/check`, {
+                            method: 'POST',
+                            headers: { 'Authorization': 'Bearer ' + data.data.token }
+                        });
+
                         showMsg('Login efectuado! A redirecionar...', 'success');
                         setTimeout(() => window.location.href = 'profile.html', 1000);
                     } else {
