@@ -43,6 +43,18 @@ class ClubLibraryController extends Controller
 
         $id = $this->libraryModel->addBook($clubId, $bookId, $userId);
 
+        // +5 pontos por adicionar livro á biblioteca do clube
+        require_once __DIR__ . '/../models/ClubRankingModel.php';
+        require_once __DIR__ .'/../models/ClubSeasonModel.php';
+
+        $seasonModel  = new ClubSeasonModel();
+        $rankingModel = new ClubRankingModel();
+
+        $season = $seasonModel->getCurrent();
+        if ($season) {
+            $rankingModel->addPoints($season['season_id'], $clubId, 5);
+        }
+
         $this->success(['club_library_id' => $id], 'Livro adicionado à biblioteca do clube.', 201);
     }
 

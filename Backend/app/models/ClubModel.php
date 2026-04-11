@@ -19,11 +19,11 @@ class ClubModel
         ");
 
         $stmt->execute([
-            ':name'        => $name,
+            ':name' => $name,
             ':description' => $description,
-            ':created_by'  => $createdBy,
-            ':latitude'    => $latitude,
-            ':longitude'   => $longitude,
+            ':created_by' => $createdBy,
+            ':latitude' => $latitude,
+            ':longitude' => $longitude,
         ]);
 
         return (int) $this->db->lastInsertId();
@@ -41,50 +41,74 @@ class ClubModel
         return $club ?: null;
     }
     // join clubs
-    public function join(int $clubId, int $userId): void{
-    $stmt = $this->db->prepare("
+    public function join(int $clubId, int $userId): void
+    {
+        $stmt = $this->db->prepare("
         INSERT INTO club_member (club_id, user_id, role)
         VALUES (:club_id, :user_id, 'member')
     ");
 
-    $stmt->execute([
-        ':club_id' => $clubId,
-        ':user_id' => $userId,
-    ]);
-}
+        $stmt->execute([
+            ':club_id' => $clubId,
+            ':user_id' => $userId,
+        ]);
+    }
 
-public function isMember(int $clubId, int $userId): bool
-{
-    $stmt = $this->db->prepare("
+    public function isMember(int $clubId, int $userId): bool
+    {
+        $stmt = $this->db->prepare("
         SELECT COUNT(*) FROM club_member
         WHERE club_id = :club_id AND user_id = :user_id
     ");
 
-    $stmt->execute([
-        ':club_id' => $clubId,
-        ':user_id' => $userId,
-    ]);
+        $stmt->execute([
+            ':club_id' => $clubId,
+            ':user_id' => $userId,
+        ]);
 
-    return (bool) $stmt->fetchColumn();
-}
-// leave clubs 
-public function leave(int $clubId, int $userId): bool
-{
-    $stmt = $this->db->prepare("
+        return (bool) $stmt->fetchColumn();
+    }
+
+    public function getByUser(int $userId): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT c.* FROM club c
+            JOIN club_member cm ON c.club_id = cm.club_id
+            WHERE cm.user_id = :user_id
+        ");
+
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // leave clubs 
+    public function leave(int $clubId, int $userId): bool
+    {
+        $stmt = $this->db->prepare("
         DELETE FROM club_member
         WHERE club_id = :club_id AND user_id = :user_id AND role != 'admin'
     ");
 
-    $stmt->execute([
-        ':club_id' => $clubId,
-        ':user_id' => $userId,
-    ]);
+        $stmt->execute([
+            ':club_id' => $clubId,
+            ':user_id' => $userId,
+        ]);
 
-    return $stmt->rowCount() > 0;
-}
-public function findAll(): array
-{
-    $stmt = $this->db->prepare("
+        return $stmt->rowCount() > 0;
+    }
+
+    public function getMemberCount(int $clubId): int
+    {
+        $stmt = $this->db->prepare("
+        SELECT COUNT(*) FROM club_member WHERE club_id = :club_id
+    ");
+        $stmt->execute([':club_id' => $clubId]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function findAll(): array
+    {
+        $stmt = $this->db->prepare("
         SELECT c.*, u.name AS created_by_name,
                COUNT(cm.club_member_id) AS total_members
         FROM club c
@@ -94,7 +118,7 @@ public function findAll(): array
         ORDER BY c.club_id DESC
     ");
 
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

@@ -75,6 +75,21 @@ class ClubVoteController extends Controller
 
         try {
             $this->voteModel->castVote($voteId, $optionId, $userId);
+
+            // +3 pontos por participar na votação
+            require_once __DIR__ .'/../models/ClubRankingModel.php';
+            require_once __DIR__ .'/../models/ClubSeasonModel.php';
+
+            $vote = $this->voteModel->findById($voteId);
+            if ($vote) {
+                $seasonModel = new ClubSeasonModel();
+                $rankingModel = new ClubRankingModel();
+                $season = $seasonModel->getCurrent();
+                if ($season) {
+                    $rankingModel->addPoints($season['season_id'], $vote['club_id'], 3);
+                }
+            }
+
             $this->success(null, 'Voto registado com sucesso.', 201);
         } catch (Exception $e) {
             $this->error($e->getMessage(), 409);

@@ -85,4 +85,15 @@ class ClubVoteModel
         $stmt->execute([':club_id' => $clubId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function findById(int $voteId): ?array
+    {
+        $stmt = $this->db->prepare("
+            SELECT * FROM club_reading_vote WHERE vote_id = :vote_id
+        ");
+
+        $stmt->execute([':vote_id' => $voteId]);
+        $return = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $return ?: null;
+    }
 }
