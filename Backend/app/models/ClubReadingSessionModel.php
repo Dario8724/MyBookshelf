@@ -42,6 +42,17 @@ class ClubReadingSessionModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function findById(int $sessionId) : ?array
+    {
+        $stmt = $this->db->prepare("
+            SELECT * FROM club_reading_session
+            WHERE session_id = :session_id
+        ");
+        $stmt->execute([':session_id' => $sessionId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
     public function complete(int $sessionId): bool
     {
         $stmt = $this->db->prepare("

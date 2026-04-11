@@ -74,10 +74,26 @@ class ClubReadingSessionController extends Controller
     {
         $payload = AuthMiddleware::requireAuth();
 
-        $completed = $this->sessionModel->complete($sessionId);
-
-        if (!$completed) {
+        $session = $this->sessionModel->findById($sessionId);
+        if (!$session) {
             $this->error('Sessão não encontrada.', 404);
+        }
+
+        $completed = $this->sessionModel->complete($sessionId);
+        if (!$completed) {
+            $this->error('Erro ao completar a sessão.', 500);
+        }
+
+        //Atribui ponto ao clube
+        require_once __DIR__ . '/../models/ClubRankingModel.php';
+        require_once __DIR__ . '/../models/ClubSeasonModel.php';
+
+        $seasonModel  = new ClubSeasonModel();
+        $rankingModel = new ClubRankingModel();
+
+        $season = $seasonModel->getCurrent();
+        if ($season) {
+            $rankingModel->addPoints($season['season_id'], $session['club_id'], 10);
         }
 
         $this->success(null, 'Sessão marcada como concluída.');
