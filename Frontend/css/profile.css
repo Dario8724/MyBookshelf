@@ -463,11 +463,13 @@ nav {
     font-weight: 500;
     padding: 0.2rem 0.45rem;
     border-radius: 6px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
-.badge-reading   { background: var(--blue-bg); color: var(--blue);   }
-.badge-completed { background: var(--green-bg); color: var(--green); }
-.badge-want      { background: var(--amber-bg); color: var(--amber); }
+.badge-reading   { background: rgba(58,90,138,0.85);  color: #fff; }
+.badge-completed { background: rgba(58,122,80,0.85);  color: #fff; }
+.badge-want      { background: rgba(176,112,32,0.85); color: #fff; }
 
 .book-fav { 
     position: absolute; 
