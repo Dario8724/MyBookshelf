@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MyBookshelf - Livro</title>
+    </head>
+    <body>
+
+        <nav>
+            <a href="profile.html"><strong>MyBookshelf</strong></a> |
+            <a href="feed.html">Feed</a>
+            <a href="search.html">Buscar</a>
+            <a href="profile.html">Perfil</a>
+            <button onclick="logout()">Sair</button>
+        </nav>
+
+        <hr>
+
+        <div id="bookContainer">
+            <p>A carregar livro...</p>
+        </div>
+
+        <!--Avaliação -->
+        <div id="ratingSection" style="display:none;">
+            <h3>A tua avaliação</h3>
+            <div id="starRating">
+                <span onclick="rate(1)">★</span>
+                <span onclick="rate(2)">★</span>
+                <span onclick="rate(3)">★</span>
+                <span onclick="rate(4)">★</span>
+                <span onclick="rate(5)">★</span>
+            </div>
+            <p id="ratingMsg"></p>
+        </div>
+
+        <hr>
+
+        <!--Reviews-->
+        <div id="reviewSection" style="display:none;">
+            <h3>Escrever review</h3>
+            <textarea id="reviewContent" rows="4" cols="50" placeholder="Escreve a tua review..."></textarea>
+            <br>
+            <label>
+                <input type="checkbox" id="spoilerCheck"> Contém spoilers
+            </label>
+            <br>
+            <button onclick="submitReview()">Publicar review</button>
+            <p id="reviewMsg"></p>
+        </div>
+
+        <hr>
+
+        <div id="reviewsList">
+            <h3>Reviews</h3>
+            <p>A carregar reviews...</p>
+        </div>
+
+        <script src="../js/config.js"></script>
+        <script src="../js/auth.js"></script>
+        <script src="../js/book.js"></script>
+    </body>
+</html>
