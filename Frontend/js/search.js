@@ -73,13 +73,13 @@ function renderResults(books, total) {
 
     const grid = document.getElementById('resultsGrid');
     grid.innerHTML = books.map(book => `
-        <div class="book-card" onclick="openAddModal(${JSON.stringify(book).replace(/"/g, '&quot;')})">
+        <div class="book-card" onclick="window.location.href='book.html?google_id=${encodeURIComponent(book.google_id)}'">
             <div class="book-cover-wrap">
                 ${book.cover
                     ? `<img src="${book.cover}" alt="${book.title}" class="book-cover" loading="lazy">`
                     : `<div class="book-cover-placeholder">📖</div>`
                 }
-                <button class="book-add-btn" title="Adicionar à biblioteca">+</button>
+                <button class="book-add-btn" title="Adicionar à biblioteca" onclick="event.stopPropagation(); openAddModal(${JSON.stringify(book).replace(/"/g, '&quot;')})">+</button>
             </div>
             <div class="book-title">${book.title}</div>
             <div class="book-author">${book.author}</div>
