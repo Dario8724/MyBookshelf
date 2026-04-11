@@ -60,7 +60,10 @@
 
             <!--Metas de leitura-->
             <div class="card" id="goalsCard" style="display:none">
-                <div class="section-title">🎯 Metas de Leitura</div>
+                <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+                    <span>🎯 Metas de Leitura</span>
+                    <button class="btn btn-outline" style="margin-right:1.5rem;font-size:0.8rem" onclick="openGoalModal()">+ Criar Meta</button>
+                </div>
                 <div class="goals-list" id="goalsList"></div>
             </div>
 
@@ -117,6 +120,37 @@
                 </div>
             </div>
          </div>
+
+        <!-- Modal criar meta -->
+        <div class="overlay" id="goalOverlay">
+            <div class="modal">
+                <div class="modal-title">Criar Meta de Leitura</div>
+                <div class="modal-sub">Define quantos livros queres ler este ano ou semestre.</div>
+
+                <div class="field">
+                    <label>Tipo de Meta</label>
+                    <select id="goalType" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:0.7rem 1rem;font-size:0.9375rem;font-family:'Inter',sans-serif;color:var(--text);outline:none">
+                        <option value="annual">Anual</option>
+                        <option value="semester">Semestral</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Número de livros</label>
+                    <input type="number" id="goalTarget" placeholder="Ex: 12" min="1" max="365" />
+                </div>
+
+                <div class="field">
+                    <label>Data de início</label>
+                    <input type="date" id="goalStartDate" />
+                </div>
+
+                 <div class="modal-actions">
+                    <button class="btn btn-outline" onclick="closeGoalModal()">Cancelar</button>
+                    <button class="btn btn-primary" id="goalBtn" onclick="saveGoal()">Criar Meta</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Notificações -->
         <div id="toastContainer"></div>
