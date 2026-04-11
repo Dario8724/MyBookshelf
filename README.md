@@ -203,7 +203,10 @@ Rede social literária bastante popular no Brasil.
 #### Pontos fracos
 - Funcionalidades limitadas fora do Brasil  
 - Falhas de desempenho  
-- Menor alcance global 
+- Menor alcance global
+
+![Livros](./Imagens/Livros.png)
+  
 ---
 
 ## Descrição da Solução a Implementar
