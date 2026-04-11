@@ -172,7 +172,10 @@ Focado na catalogação de livros e organização de bibliotecas pessoais, com u
 #### Pontos fracos
 - Interface pouco moderna  
 - Não é muito intuitivo para iniciantes  
-- Parte social menos desenvolvida  
+- Parte social menos desenvolvida
+
+![Informações_Adicionais](./Imagens/Informações_Adicionais.png)
+ 
 
 ### Bookly
 
