@@ -122,7 +122,7 @@ async function addToLibrary(status) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer' + getToken()
+                'Authorization': 'Bearer ' + getToken()
             },
             body: JSON.stringify({ google_id: selectedBook.google_id }),
         });
