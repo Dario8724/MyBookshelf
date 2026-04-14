@@ -22,3 +22,14 @@ INSERT IGNORE INTO achievement (name, description, icon, condition_type, conditi
 
 ('Primeira Meta',       'Criaste a tua primeira meta de leitura.',          '🎯', 'goals_created',     1),
 ('Meta Concluída',      'Concluíste uma meta de leitura.',                  '🥇', 'goals_completed',   1);
+
+
+// =========================
+// livros provisórios para teste
+
+INSERT INTO book (title, author, isbn, publisher, publication_year, language, description, cover) VALUES
+('Harry Potter e a Pedra Filosofal', 'J.K. Rowling', '9788532511010', 'Rocco', 1997, 'Português', 'O primeiro livro da série Harry Potter.', NULL),
+('Harry Potter e a Câmara Secreta', 'J.K. Rowling', '9788532512123', 'Rocco', 1998, 'Português', 'O segundo livro da série Harry Potter.', NULL),
+('O Senhor dos Anéis', 'J.R.R. Tolkien', '9788533613379', 'Martins Fontes', 1954, 'Português', 'A épica aventura da Terra Média.', NULL),
+('1984', 'George Orwell', '9788535914849', 'Companhia das Letras', 1949, 'Português', 'Uma distopia sobre um estado totalitário.', NULL),
+('O Hobbit', 'J.R.R. Tolkien', '9788533613286', 'Martins Fontes', 1937, 'Português', 'A aventura de Bilbo Bolseiro.', NULL);

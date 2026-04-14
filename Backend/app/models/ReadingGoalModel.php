@@ -11,7 +11,7 @@ class ReadingGoalModel
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function create(int $userId, string $goalType, int $targetValue, string $startDate, string $endDate) : int
+    public function create(int $userId, string $goalType, int $targetValue, string $startDate, string $endDate): int
     {
         $stmt = $this->db->prepare("
             INSERT INTO reading_goal (user_id, goal_type, target_value, start_date, end_date)
@@ -19,17 +19,17 @@ class ReadingGoalModel
         ");
 
         $stmt->execute([
-            ':user_id'      => $userId,
-            ':goal_type'    => $goalType,
+            ':user_id' => $userId,
+            ':goal_type' => $goalType,
             ':target_value' => $targetValue,
-            ':start_date'   => $startDate,
-            ':end_date'     => $endDate
+            ':start_date' => $startDate,
+            ':end_date' => $endDate
         ]);
 
         return (int) $this->db->lastInsertId();
     }
 
-    public function getByUser(int $userId) : array
+    public function getByUser(int $userId): array
     {
         $stmt = $this->db->prepare("
             SELECT 
@@ -38,6 +38,7 @@ class ReadingGoalModel
                 rg.target_value,
                 rg.start_date,
                 rg.end_date,
+                rg.rewarded,
                 COUNT(ub.user_book_id) AS current_value
             FROM reading_goal rg
             LEFT JOIN user_book ub
@@ -54,7 +55,7 @@ class ReadingGoalModel
         return $stmt->fetchAll();
     }
 
-    public function delete(int $goalId, int $userId) : bool
+    public function delete(int $goalId, int $userId): bool
     {
         $stmt = $this->db->prepare("
             DELETE FROM reading_goal 
@@ -68,5 +69,13 @@ class ReadingGoalModel
         ]);
 
         return $stmt->rowCount() > 0;
+    }
+
+    public function markAsRewarded(int $goalId): void
+    {
+        $stmt = $this->db->prepare("
+            UPDATE reading_goal SET rewarded = 1 WHERE reading_goal_id = :goal_id
+        ");
+        $stmt->execute([':goal_id' => $goalId]);
     }
 }

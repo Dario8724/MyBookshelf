@@ -13,13 +13,13 @@ class ClubReadingSessionController extends Controller
     public function __construct()
     {
         $this->sessionModel = new ClubReadingSessionModel();
-        $this->clubModel    = new ClubModel();
+        $this->clubModel = new ClubModel();
     }
 
     public function create(int $clubId): void
     {
         $payload = AuthMiddleware::requireAuth();
-        $userId  = $payload['user_id'];
+        $userId = $payload['user_id'];
 
         $club = $this->clubModel->findById($clubId);
         if (!$club) {
@@ -30,10 +30,10 @@ class ClubReadingSessionController extends Controller
             $this->error('Tens de ser membro do clube.', 403);
         }
 
-        $body      = $this->getBody();
-        $bookId    = (int) ($body['book_id']    ?? 0);
+        $body = $this->getBody();
+        $bookId = (int) ($body['book_id'] ?? 0);
         $startDate = trim($body['start_date'] ?? '');
-        $endDate   = trim($body['end_date']   ?? '');
+        $endDate = trim($body['end_date'] ?? '');
 
         if (empty($bookId)) {
             $this->error('O book_id é obrigatório.', 422);
@@ -51,7 +51,7 @@ class ClubReadingSessionController extends Controller
     public function index(int $clubId): void
     {
         $payload = AuthMiddleware::requireAuth();
-        $userId  = $payload['user_id'];
+        $userId = $payload['user_id'];
 
         $club = $this->clubModel->findById($clubId);
         if (!$club) {
@@ -65,7 +65,7 @@ class ClubReadingSessionController extends Controller
         $sessions = $this->sessionModel->getByClub($clubId);
 
         $this->success([
-            'total'    => count($sessions),
+            'total' => count($sessions),
             'sessions' => $sessions,
         ]);
     }
@@ -74,10 +74,35 @@ class ClubReadingSessionController extends Controller
     {
         $payload = AuthMiddleware::requireAuth();
 
-        $completed = $this->sessionModel->complete($sessionId);
-
-        if (!$completed) {
+        $session = $this->sessionModel->findById($sessionId);
+        if (!$session) {
             $this->error('Sessão não encontrada.', 404);
+        }
+
+        $completed = $this->sessionModel->complete($sessionId);
+        if (!$completed) {
+            $this->error('Erro ao completar a sessão.', 500);
+        }
+
+        //Atribui ponto ao clube
+        require_once __DIR__ . '/../models/ClubRankingModel.php';
+        require_once __DIR__ . '/../models/ClubSeasonModel.php';
+
+        $seasonModel = new ClubSeasonModel();
+        $rankingModel = new ClubRankingModel();
+
+        $season = $seasonModel->getCurrent();
+        if ($season) {
+            $rankingModel->addPoints($season['season_id'], $session['club_id'], 10);
+
+            // Verifica se completou 3 sessões seguidas (+30 pts)
+            $lastThree = $this->sessionModel->getLastThreeCompleted($session['club_id']);
+            if (count($lastThree) === 3) {
+                $allCompleted = array_filter($lastThree, fn($s) => $s['status'] === 'completed');
+                if (count($allCompleted) === 3) {
+                    $rankingModel->addPoints($season['season_id'], $session['club_id'], 30);
+                }
+            }
         }
 
         $this->success(null, 'Sessão marcada como concluída.');

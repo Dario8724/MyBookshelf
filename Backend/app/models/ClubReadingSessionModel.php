@@ -19,10 +19,10 @@ class ClubReadingSessionModel
         ");
 
         $stmt->execute([
-            ':club_id'    => $clubId,
-            ':book_id'    => $bookId,
+            ':club_id' => $clubId,
+            ':book_id' => $bookId,
             ':start_date' => $startDate,
-            ':end_date'   => $endDate,
+            ':end_date' => $endDate,
         ]);
 
         return (int) $this->db->lastInsertId();
@@ -42,6 +42,17 @@ class ClubReadingSessionModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function findById(int $sessionId): ?array
+    {
+        $stmt = $this->db->prepare("
+            SELECT * FROM club_reading_session
+            WHERE session_id = :session_id
+        ");
+        $stmt->execute([':session_id' => $sessionId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
     public function complete(int $sessionId): bool
     {
         $stmt = $this->db->prepare("
@@ -52,5 +63,17 @@ class ClubReadingSessionModel
 
         $stmt->execute([':session_id' => $sessionId]);
         return $stmt->rowCount() > 0;
+    }
+
+    public function getLastThreeCompleted(int $clubId): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT status FROM club_reading_session
+            WHERE club_id = :club_id
+            ORDER BY session_id DESC
+            LIMIT 3
+        ");
+        $stmt->execute([':club_id' => $clubId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

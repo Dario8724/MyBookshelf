@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ ."/../core/Controller.php";
-require_once __DIR__ ."/../models/UserBookModel.php";
-require_once __DIR__ ."/../middleware/AuthMiddleware.php";
+require_once __DIR__ . "/../core/Controller.php";
+require_once __DIR__ . "/../models/UserBookModel.php";
+require_once __DIR__ . "/../middleware/AuthMiddleware.php";
 
 class UserBookController extends Controller
 {
@@ -34,6 +34,39 @@ class UserBookController extends Controller
 
         $this->userBookModel->addBook($userid, $bookId, $status);
 
+        // Verifica se completou alguma meta ao marcar livro como lido
+        if ($status === 'completed') {
+            require_once __DIR__ . '/../models/ReadingGoalModel.php';
+            require_once __DIR__ . '/../models/ClubRankingModel.php';
+            require_once __DIR__ . '/../models/ClubSeasonModel.php';
+            require_once __DIR__ . '/../models/ClubModel.php';
+
+            $goalModel = new ReadingGoalModel();
+            $seasonModel = new ClubSeasonModel();
+            $rankingModel = new ClubRankingModel();
+            $clubModel = new ClubModel();
+
+            $goals = $goalModel->getByUser($userid);
+            foreach ($goals as $goal) {
+                $progress = (int) $goal['current_value'];
+                $target = (int) $goal['target_value'];
+
+                // Se acabou de atingir o objetivo (progresse == target)
+                if ($progress >= $target && !$goal['rewarded']) {
+                    $season = $seasonModel->getCurrent();
+                    if ($season) {
+                        $clubs = $clubModel->getByUser($userid);
+                        foreach ($clubs as $club) {
+                            $rankingModel->addPoints($season['season_id'], $club['club_id'], 15);
+                        }
+                        // Marca a meta como recompensada
+                        $goalModel->markAsRewarded($goal['reading_goal_id']);
+                    }
+                    break;
+                }
+            }
+        }
+
         $this->success(null, 'Livro adicionado à biblioteca com sucesso.', 201);
     }
 
@@ -58,7 +91,7 @@ class UserBookController extends Controller
 
         $status = $this->userBookModel->getStatus($userid, $bookID);
 
-        $this->success(['status'=> $status]);
+        $this->success(['status' => $status]);
     }
 
     public function getLibrary(): void

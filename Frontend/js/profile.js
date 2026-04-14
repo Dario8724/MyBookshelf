@@ -305,6 +305,69 @@ async function saveProfile() {
     }
 }
 
+// ── MODAL CRIAR META ──────────────────────────────────────
+function openGoalModal() {
+    // Define a data de hoje como padrão
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('goalStartDate').value = today;
+    document.getElementById('goalTarget').value = '';
+    document.getElementById('goalOverlay').classList.add('open');
+}
+
+function closeGoalModal() {
+    document.getElementById('goalOverlay').classList.remove('open');
+}
+
+async function saveGoal() {
+    const type      = document.getElementById('goalType').value;
+    const target    = document.getElementById('goalTarget').value;
+    const startDate = document.getElementById('goalStartDate').value;
+    const btn       = document.getElementById('goalBtn');
+
+    if (!target || target < 1) {
+        showToast('Introduz um número de livros válido.', 'error');
+        return;
+    }
+
+    if (!startDate) {
+        showToast('Escolhe uma data de início.', 'error');
+        return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'A criar...';
+
+    try {
+        const res  = await fetch(`${API}/api/goals`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + getToken()
+            },
+            body: JSON.stringify({
+                goal_type:    type,
+                target_value: parseInt(target),
+                year:         new Date(startDate).getFullYear(),
+                semester:     type === 'semester' ? (new Date(startDate).getMonth() < 6 ? 1 : 2) : 0,
+            }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            closeGoalModal();
+            showToast('Meta criada com sucesso!', 'success');
+            await loadGoals();
+        } else {
+            showToast(data.error || 'Erro ao criar meta.', 'error');
+        }
+    } catch (err) {
+        showToast('Não foi possível ligar ao servidor.', 'error');
+    } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Criar Meta';
+    }
+}
+
 // ── TOAST ─────────────────────────────────────────────────
 function showToast(msg, type = 'success') {
     const el = document.createElement('div');
