@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang= "pt">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MyBookshelf — Clubes</title>
+    </head>
+    <body>
+
+        <nav>
+            <a href="profile.html"><strong>MyBookshelf</strong></a> |
+            <a href="feed.html">Feed</a>
+            <a href="search.html">Buscar</a>
+            <a href="clubs.html">Clubes</a>
+            <a href="profile.html">Perfil</a>
+            <button onclick="logout()">Sair</button>
+        </nav>
+
+        <hr>
+
+        <!---Criar clube--->
+        <div id="createSection">
+            <h2>Clube de Leitura</h2>
+            <button onclick="toggleCreateForm()">+ Criar clube</button>
+
+            <div id="createForm" style="display:none; margin-top:1rem">
+                <h3>Novo Clube</h3>
+                <input type="text" id="clubName" placeholder="Nome do clube" style="width:300px"><br><br>
+                <textarea id="clubDescription" rows="3" cols="40" placeholder="Descrição..."></textarea><br><br>
+                <input type="number" id="clubLat" placeholder="Latitude (ex: 38.7169)" style="width:200px">
+                <input type="number" id="clubLng" placeholder="Longitude (ex: -9.1399)" style="width:200px"><br><br>
+                <button onclick="createClub()">Criar</button>
+                <button onclick="toggleCreateForm()">Cancelar</button>
+                <p id="createMsg"></p>
+            </div>
+        </div>
+
+        <hr>
+
+        <!---Lista de clubes--->
+        <div id="clubsList">
+            <h3>Clubes Disponíveis</h3>
+            <p>A carregar...</p>
+        </div>
+
+        <hr>
+
+        <!--Detalhes do clube selecionado-->
+        <div id="clubDetail" style="display:none">
+            <button onclick="closeClub()">← Voltar à lista</button>
+            <h2 id="clubDetailName"></h2>
+            <p id="clubDetailDesc"></p>
+            <div id="clubActions"></div>
+
+            <hr>
+
+            <!--Tabs-->
+            <button onclick="showTab('messages')">💬 Mensagens</button>
+            <button onclick="showTab('sessions')">📖 Sessões</button>
+            <button onclick="showTab('votes')">🗳️ Votações</button>
+            <button onclick="showTab('library')">📚 Biblioteca</button>
+            <button onclick="showTab('ranking')">🏆 Ranking</button>
+
+            <hr>
+
+            <!--Tab Mensagens-->
+            <div id="tab-messages" style="display:none">
+                <h3>Mensagens</h3>
+                <div id="messagesList" style="max-height:300px;overflow-y:auto;border:1px solid #ccc;padding:1rem;margin-bottom:1rem"></div>
+                <textarea id="messageContent" rows="2" cols="50" placeholder="Escreve uma mensagem..."></textarea><br>
+                <button onclick="sendMessage()">Enviar</button>
+            </div>
+
+            <!--Tab Sessões-->
+            <div id="tab-sessions" style="display:none">
+                <h3>Sessões de Leitura</h3>
+                <div id="sessionsList"></div>
+                <hr>
+                <h4>Nova Sessão</h4>
+                <input type="number" id="sessionBookId" placeholder="Book ID" style="width:100px">
+                <input type="date" id="sessionStart">
+                <input type="date" id="sessionEnd">
+                <button onclick="createSession()">Criar Sessão</button>
+                <p id="sessionMsg"></p>
+            </div>
+
+            <!--Tab Votações-->
+            <div id="tab-votes" style="display:none">
+                <h3>Votações</h3>
+                <div id="votesList"></div>
+                <hr>
+                <h4>Nova Votação</h4>
+                <input type="text" id="voteTitle" placeholder="Título da votação" style="width:300px"><br><br>
+                <input type="date" id="voteStart">
+                <input type="date" id="voteEnd">
+                <button onclick="createVote()">Criar Votação</button>
+                <p id="voteMsg"></p>
+            </div>
+
+            <!--Tab Biblioteca-->
+            <div id="tab-library" style="display:none">
+                <h3>Biblioteca do Clube</h3>
+                <div id="clubLibraryList"></div>
+                <hr>
+                <h4>Adicionar Livro</h4>
+                <input type="number" id="libraryBookId" placeholder="Book ID" style="width:100px">
+                <button onclick="addBookToClub()">Adicionar</button>
+                <p id="libraryMsg"></p>
+            </div>
+
+            <!--Tab Ranking-->
+            <div id="tab-ranking" style="display:none">
+                <h3>Ranking</h3>
+                <div id="rankingList"></div>
+            </div>
+
+        </div>
+
+        <script src="../js/config.js"></script>
+        <script src="../js/auth.js"></script>
+        <script src="../js/clubs.js"></script>
+
+    </body>
+</html>
