@@ -94,12 +94,16 @@ class ClubController extends Controller
     public function show(int $clubId): void
     {
         $payload = AuthMiddleware::requireAuth();
+        $userId  = $payload['user_id'];
 
         $club = $this->clubModel->findById($clubId);
 
         if (!$club) {
             $this->error('Clube não encontrado.', 404);
         }
+
+        $club['is_member']     = $this->clubModel->isMember($clubId, $userId);
+        $club['member_count']  = $this->clubModel->getMemberCount($clubId);
 
         $this->success(['club' => $club]);
     }
