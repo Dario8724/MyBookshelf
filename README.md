@@ -100,9 +100,6 @@ O elemento central da aplicação são os clubes de leitura, onde os utilizadore
   - Facilidade de manutenção  
   - Modularidade do sistema  
 
-- **Integrações externas**
-  - Botão de redirecionamento para compra de livros (Amazon)  
-
 ---
 
 ## Descrição dos Objetivos e da Motivação do Trabalho
@@ -234,7 +231,7 @@ Rede social literária bastante popular no Brasil.
 - Algoritmos e Estruturas de Dados: Organização e otimização da pesquisa e gestão de livros
 - Estatística: Análise de dados e geração de relatórios de utilização
 - Interfaces e Usabilidade: Criação de uma interface intuitiva e responsiva
-- Sistemas de Informação Geográficos: Integração de mapas para localização de bibliotecas ou eventos literários 
+- Sistemas de Informação Geográficos: Integração de mapas para localização de clubes de leitura
 
 **Tecnologias:**
 - IDE: Visual Studio, Intellij
