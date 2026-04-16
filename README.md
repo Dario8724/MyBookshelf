@@ -270,7 +270,8 @@ Rede social literária bastante popular no Brasil.
 - Atualização da calendarização  
 - Modelo de base de dados  
 - Wireframes  
-- Front-end  
+- Front-end
+- Design System   
 
 ### Edmilson Tudo
 - Proposta inicial
@@ -281,7 +282,8 @@ Rede social literária bastante popular no Brasil.
 - Personas
 - Coluna de Base de Dados
 - Arquitetura de informação  
-- Project Charter e WBS  
+- Project Charter e WBS
+- Design System  
 - Relatórios  
 
 ### Francisco Zolana
