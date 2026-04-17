@@ -223,8 +223,6 @@ Rede social literária bastante popular no Brasil.
 - Implementação de uma componente social e comunitária.
 - Integração de um módulo de descoberta cultural.
 - Implementação de páginas individuais de livros, com informação detalhada, avaliações, reviews, estado de leitura e recomendações relacionadas.
-- Integração de um sistema de redirecionamento para aquisição de livros, através de plataformas externas (ex.: Amazon Portugal).
-- Implementação de uma base de dados relacional (MySQL ou PostgreSQL) para armazenamento estruturado e seguro da informação relativa a utilizadores, livros, eventos, interações sociais e histórico de leitura.
 
 **Áreas curriculares envolvidas:**
 - Programação Web: Desenvolvimento da plataforma web (frontend e backend)
