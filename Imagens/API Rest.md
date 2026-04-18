@@ -1148,5 +1148,3 @@ Os pontos são atribuídos automaticamente ao clube na season activa quando:
     "error": "Mensagem de erro descritiva."
 }
 ```
-EOF
-echo "Ficheiro criado com sucesso!"
