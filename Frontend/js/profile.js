@@ -78,32 +78,26 @@ function renderProfile(user, followersCount, followingCount) {
     const header = document.getElementById('profileHeader');
 
     const avatar = user.profile_image
-        ? `<img src="${API}/${user.profile_image}" alt="${user.name}" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid var(--border);flex-sherink:0">`
-        : `<div style="width:110px;height:110px;border-radius:50%;background:var(--surface2);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:2.5rem;color:var(--muted);flex-sherink:0">${user.name.charAt(0).toUpperCase()}</div>`;
+        ? `<img src="${API}/${user.profile_image}" alt="${user.name}" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid var(--border);flex-shrink:0">`
+        : `<div style="width:110px;height:110px;border-radius:50%;background:var(--surface2);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:2.5rem;color:var(--muted);flex-shrink:0">${user.name.charAt(0).toUpperCase()}</div>`;
 
     header.innerHTML = `
-        ${avatar}
-        <div class="profile-info">
-            <div class="profile-name">${user.name}</div>
-            <div class="profile-email">${user.email}</div>
-            <div class="profile-bio">${user.bio || ''}</div>
-            <div class="stats">
-                <div class="stat">
-                    <strong>${followersCount}</strong>
-                    <span>seguidores</span>
+        <div style="display:flex;gap:2rem;align-items:center;width:100%">
+            ${avatar}
+            <div class="profile-info" style="flex:1">
+                <div class="profile-name">${user.name}</div>
+                <div class="profile-email">${user.email}</div>
+                <div class="profile-bio">${user.bio || ''}</div>
+                <div class="stats">
+                    <div class="stat"><strong>${followersCount}</strong><span>seguidores</span></div>
+                    <div class="stat"><strong>${followingCount}</strong><span>a seguir</span></div>
+                    <div class="stat"><strong id="statBooks">—</strong><span>livros</span></div>
                 </div>
-                <div class="stat">
-                    <strong>${followingCount}</strong>
-                    <span>a seguir</span>
-                </div>
-                <div class="stat">
-                    <strong id="statBooks">-</strong>
-                    <span>livros</span>
+                <div class="profile-actions">
+                    <button class="btn btn-outline" onclick="openEditModal()">Editar Perfil</button>
                 </div>
             </div>
-            <div class="profile-actions">
-                <button class="btn btn-outline" onclick="openEditModal()">Editar perfil</button>
-            </div>
+            <div id="profileGoalSummary" style="width:360px;flex-shrink:0;margin-right:1rem"></div>
         </div>
     `;
 }
@@ -187,8 +181,9 @@ async function loadAchievements(){
         const achievements = data.data.achievements;
         const grid = document.getElementById('achievementsGrid');
 
-        grid.innerHTML = achievements.map(a => `
-            <div class="achievement-item ${parseInt(a.earned) === 1 ? 'earned' : 'locked'}">
+        grid.innerHTML = achievements.map((a, index) => `
+            <div class="achievement-item ${parseInt(a.earned) === 1 ? 'earned' : 'locked'} ${index >= 5 ? 'achievement-hidden' : ''}" 
+                style="${index >= 5 ? 'display:none' : ''}">
                 <div class="achievement-icon">${a.icon}</div>
                 <div class="achievement-name">${a.name}</div>
                 <div class="achievement-desc">${a.description}</div>
@@ -202,6 +197,24 @@ async function loadAchievements(){
     
     } catch (err) {
         console.error('Erro ao carregar conquistas:', err);
+    }
+}
+
+function toggleAchievements() {
+    const grid   = document.getElementById('achievementsGrid');
+    const arrow  = document.getElementById('achievementsArrow');
+    const hidden = grid.querySelectorAll('.achievement-hidden');
+    const isOpen = arrow.style.transform === 'rotate(180deg)';
+
+    if (!isOpen) {
+        // Expandir
+        grid.style.display = 'grid';
+        hidden.forEach(el => el.style.display = 'flex');
+        arrow.style.transform = 'rotate(180deg)';
+    } else {
+        // Recolher
+        hidden.forEach(el => el.style.display = 'none');
+        arrow.style.transform = 'rotate(0deg)';
     }
 }
 
@@ -235,6 +248,30 @@ async function loadGoals() {
                     </div>
             `).join('');
         }
+
+        //Resumo da meta activa no banner do perfil
+        const activeGoals = goals.filter(g => !g.completed).slice(0, 2);
+        const summaryEl   = document.getElementById('profileGoalSummary');
+
+        if (summaryEl && activeGoals.length > 0) {
+            summaryEl.innerHTML = `
+                <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;">
+                    <div style="font-size:0.75rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem">Metas actuais</div>
+                    ${activeGoals.map(g => `
+                        <div style="margin-bottom:${activeGoals.length > 1 ? '0.75rem' : '0'}">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">
+                                <span style="font-size:0.8rem;font-weight:500;color:var(--text)">🎯 ${g.label}</span>
+                                <span style="font-size:0.75rem;color:var(--muted)">${g.percentage}%</span>
+                            </div>
+                            <div style="width:100%;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden">
+                                <div style="width:${g.percentage}%;height:100%;background:var(--accent);border-radius:99px"></div>
+                            </div>
+                            <div style="font-size:0.75rem;color:var(--muted);margin-top:0.3rem">${g.progress} de ${g.target_value} livros</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }        
 
         document.getElementById('goalsCard').style.display = 'block';
 

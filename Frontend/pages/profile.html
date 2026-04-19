@@ -54,7 +54,10 @@
 
             <!--Conquistas-->
             <div class="card" id="achievementsCard" style="display:none">
-                <div class="section-title">🏆 Conquistas</div>
+                <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleAchievements()">
+                    <span>🏆 Conquistas</span>
+                    <span id="achievementsArrow" style="margin-right:1.5em;font-size:1rem;transition:transform 0.3s;display:inline-block;">▼</span>
+                </div>
                 <div class="achievements-grid" id="achievementsGrid"></div>
             </div>
 
