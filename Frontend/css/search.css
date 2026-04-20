@@ -177,12 +177,29 @@ nav {
 /*EMPTY / LOADING*/
 .search-empty{
     text-align: center;
-    padding: 4rem 1rem;
+    padding: 0;
     color: var(--muted);
 }
 
 .search-empty .empty-icon { font-size: 3rem; margin-bottom: 0.75rem; }
 .search-empty p { font-size: 0.9rem; }
+
+.featured-books { width: 100%; }
+
+.featured-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: rgb(78, 77, 77);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.featured-books .results-grid {
+    grid-template-columns: repeat(3, 160px);
+    gap: 1.5rem;
+    justify-content: center;
+}
 
 .search-loading {
     text-align: center;

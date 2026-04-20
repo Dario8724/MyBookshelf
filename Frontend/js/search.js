@@ -1,5 +1,44 @@
 let selectedBook = null;
 
+const featuredBooks = [
+    {
+        title: 'O Pequeno Príncipe',
+        author: 'Antoine de Saint-Exupéry',
+        google_id: '_NTSEAAAQBAJ',
+        cover: 'http://books.google.com/books/content?id=_NTSEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api'
+    },
+    {
+        title: 'O Diário de Anne Frank',
+        author: 'Anne Frank',
+        google_id: 'Z2OyCwAAQBAJ',
+        cover: 'http://books.google.com/books/content?id=Z2OyCwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api'
+    },
+    {
+        title: 'Orgulho e Preconceito',
+        author: 'Jane Austen',
+        google_id: 'UGIC7N0Op2MC',
+        cover: 'http://books.google.com/books/content?id=UGIC7N0Op2MC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api'
+    },
+    {
+        title: '1984',
+        author: 'George Orwell',
+        google_id: 'EKgWEAAAQBAJ',
+        cover: 'http://books.google.com/books/content?id=EKgWEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api'
+    },
+    {
+        title: 'Cem Anos de Solidão',
+        author: 'Gabriel García Márquez',
+        google_id: 'ZfjpEAAAQBAJ',
+        cover: 'http://books.google.com/books/content?id=ZfjpEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api'
+    },
+    {
+        title: 'Dom Casmurro',
+        author: 'Machado de Assis',
+        google_id: 'qmE0EQAAQBAJ',
+        cover: 'http://books.google.com/books/content?id=qmE0EQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api'
+    }
+];
+
 document.addEventListener('DOMContentLoaded', () => {
     if (!getToken()) {
         window.location.href = 'login.html'
@@ -7,6 +46,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateNavAvatar();
+    renderFeatured();
+
+    //Restaura pesquisa anterior
+    const lastQuery = sessionStorage.getItem('lastSearchQuery');
+    const lastResults = sessionStorage.getItem('lastSearchResults');
+    const cameFromBook = sessionStorage.getItem('cameFromBook');
+
+    sessionStorage.removeItem('cameFromBook');
+
+    if (lastQuery && lastResults && cameFromBook === 'true') {
+        document.getElementById('searchInput').value = lastQuery;
+        document.getElementById('searchEmpty').style.display = 'none';
+        const data = JSON.parse(lastResults);
+        renderResults(data.books, data.total);
+    } else {
+        sessionStorage.removeItem('lastSearchQuery');
+        sessionStorage.removeItem('lastSearchResults');
+    }
 
     //pesquisa ao pressionar Enter
     document.getElementById('searchInput').addEventListener('keydown', e => {
@@ -17,6 +74,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === e.currentTarget) closeAddModal();
     });
 });
+
+// –––– RENDERIZAR LIVROS EM DESTAQUE –––––
+function renderFeatured() {
+    const grid = document.getElementById('featuredGrid');
+    if (!grid) return;
+
+    grid.innerHTML = featuredBooks.map(book => `
+        <div class="book-card" onclick="sessionStorage.setItem('cameFromBook','true'); window.location.href='book.html?google_id=${encodeURIComponent(book.google_id)}'">
+            <div class="book-cover-wrap">
+                <img src="${book.cover}" alt="${book.title}" class="book-cover" loading="lazy">
+                <button class="book-add-btn" title="Adicionar à biblioteca" onclick="event.stopPropagation(); openAddModal(${JSON.stringify(book).replace(/"/g, '&quot;')})">+</button>
+            </div>
+            <div class="book-title">${book.title}</div>
+            <div class="book-author">${book.author}</div>
+        </div>
+    `).join('');
+}
 
 // –– ATUALIZA AVATAR DA NAV ––––––
 function updateNavAvatar() {
@@ -39,6 +113,9 @@ async function doSearch(){
 
     if (!query) return;
 
+    //Guarda a query no sessionStorage
+    sessionStorage.setItem('lastSearchQuery', query);
+
     document.getElementById('searchEmpty').style.display = 'none';
     document.getElementById('searchResults').style.display = 'none';
     document.getElementById('searchLoading').style.display = 'block';
@@ -55,8 +132,13 @@ async function doSearch(){
                 <div class="empty-icon">📭</div>
                 <p>Nenhum livro encontrado para "<strong>${query}</strong>"</p>
             `;
+            sessionStorage.removeItem('lastSearchQuery');
+            sessionStorage.removeItem('lastSearchResults');
             return;
         }
+
+        //Guarda os resultados no sessionStorage
+        sessionStorage.setItem('lastSearchResults', JSON.stringify(data.data));
 
         renderResults(data.data.books, data.data.total);
 
@@ -73,7 +155,7 @@ function renderResults(books, total) {
 
     const grid = document.getElementById('resultsGrid');
     grid.innerHTML = books.map(book => `
-        <div class="book-card" onclick="window.location.href='book.html?google_id=${encodeURIComponent(book.google_id)}'">
+        <div class="book-card" onclick="sessionStorage.setItem('cameFromBook', 'true'); window.location.href='book.html?google_id=${encodeURIComponent(book.google_id)}'">
             <div class="book-cover-wrap">
                 ${book.cover
                     ? `<img src="${book.cover}" alt="${book.title}" class="book-cover" loading="lazy">`

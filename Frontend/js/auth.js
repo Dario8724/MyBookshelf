@@ -16,5 +16,7 @@ function isLoggedIn() {
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('lastSearchQuery');
+    sessionStorage.removeItem('lastSearchResults');
     window.location.href = 'login.html';
 }
