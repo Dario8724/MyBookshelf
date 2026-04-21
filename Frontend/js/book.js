@@ -41,8 +41,27 @@ async function loadBook() {
 
         const book = data.data.book;
 
-        // Guarda o book_id para usar nas outras funções
-        if (book.book_id) currentBookId = book.book_id;
+        // Se veio pelo google_id, tenta buscar o book_id da BD
+        if (!book.book_id && currentGoogleId) {
+        try {
+            const saveRes = await fetch(`${API}/api/books/save`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + getToken()
+              },
+              body: JSON.stringify({ google_id: currentGoogleId }),
+            });
+            const saveData = await saveRes.json();
+            if (saveData.success) {
+                currentBookId = saveData.data.book_id;
+            }
+        } catch (err) {
+          console.error('Erro ao buscar book_id:', err);
+        }
+    } else if (book.book_id) {
+      currentBookId = book.book_id;
+    }
 
         renderBook(book);
         await loadStatus();
