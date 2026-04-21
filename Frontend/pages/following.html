@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MyBookshelf - Seguindo</title>
+    </head>
+    <body>
+
+        <nav>
+            <a href="profile.html"><strong>MyBookshelf</strong></a> |
+            <a href="feed.html">Feed</a>
+            <a href="search.html">Buscar</a>
+            <a href="clubs.html">Clubes</a>
+            <a href="following.html">Seguindo</a>
+            <a href="profile.html">Perfil</a>
+            <button onclick="logout()">Sair</button>
+        </nav>
+
+        <hr>
+
+        <h2>Descobrir Leitores</h2>
+        <p>Segue outros leitores para ver as suas publicações no feed.</p>
+
+        <hr>
+
+        <div id="userList"><p>A carregar...</p></div>
+
+        <script src="../js/config.js"></script>
+        <script src="../js/auth.js"></script>
+        <script>
+            let currentUserId = null;
+            let following = [];
+
+            document.addEventListener('DOMContentLoaded', async () => {
+                if (!getToken()) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const meRes = await fetch(`${API}/api/users/me`, { headers: authHeader() });
+                const meData = await meRes.json();
+                if (meData.success) {
+                    currentUserId = meData.data.user.user_id;
+                }
+
+                const fRes = await fetch(`${API}/api/users/${currentUserId}/following`, { headers: authHeader() });
+                const fData = await fRes.json();
+                if (fData.success) {
+                    following = fData.data.following.map(u => u.user_id);
+                }
+
+                await loadUsers();
+            });
+
+            async function loadUsers(){
+                const res = await fetch(`${API}/api/users`, { headers: authHeader() });
+                const data = await res.json();
+
+                const list = document.getElementById('userList');
+
+                if (!data.success || !data.data.users.length) {
+                    list.innerHTML = '<p>Não há outros utilizadores.</p>';
+                    return;
+                }
+
+                list.innerHTML = data.data.users.map(u => {
+                    const isFollowing = following.includes(u.user_id);
+                    const avatar =  u.profile_image
+                        ? `<img src="${API}/${u.profile_image}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0.75rem">`
+                        : `<span style="width:48px;height:48px;border-radius:50%;background:#D4CBBA;display:inline-flex;align-items:center;justify-content:center;font-size:1.2rem;margin-right:0.75rem;vertical-align:middle">${u.name.charAt(0).toUpperCase()}</span>`;
+
+                    return `
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;border:1px solid #D4CBBA;border-radius:12px;margin-bottom:0.75rem;background:#EDE8DC">
+                            <div style="display:flex;align-items:center">
+                                ${avatar}
+                                <div>
+                                    <strong style="color:#2C2A24">${u.name}</strong>
+                                    ${u.bio ? `<p style="color:#8a8070;font-size:0.875rem;margin:0">${u.bio}</p>` : ''}
+                                </div>
+                            </div>
+                            <button
+                                id="btn-${u.user_id}"
+                                onclick="toggleFollow(${u.user_id})"
+                                style="padding:0.5rem 1.25rem;border-radius:10px;border:1px solid ${isFollowing ? '#D4CBBA' : '#C07B3A'};background:${isFollowing ? 'transparent' : '#C07B3A'};color:${isFollowing ? '#2C2A24' : '#fff'};cursor:pointer;font-weight:500">
+                                ${isFollowing ? 'A seguir' : 'Seguir'}
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            async function toggleFollow(userId) {
+                const isFollowing = following.includes(userId);
+                const btn = document.getElementById(`btn-${userId}`);
+
+                try {
+                    const res = await fetch(`${API}/api/users/${userId}/follow`, {
+                        method: isFollowing ? 'DELETE' : 'POST',
+                        headers: authHeader(),
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        if (isFollowing) {
+                            following = following.filter(id => id !== userId);
+                            btn.textContent = 'Seguir';
+                            btn.style.background = '#C07B3A';
+                            btn.style.color = '#fff';
+                            btn.style.borderColor = '#C07B3A';
+                        } else {
+                            following.push(userId);
+                            btn.textContent = 'A seguir';
+                            btn.style.background = 'transparent';
+                            btn.style.color = '#2C2A24';
+                            btn.style.borderColor = '#D4CBBA';
+                        }
+                    } else {
+                        alert(data.error || 'Erro ao seguir.');
+                    }
+                } catch (err) {
+                    alert('Erro ao ligar ao servidor.');
+                }
+            }
+        </script>
+    </body>
+</html>

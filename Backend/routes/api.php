@@ -3,6 +3,7 @@
 $router->post('/api/users/register',        'UserController@register');
 $router->post('/api/users/login',           'UserController@login');
 $router->get('/api/users/me',               'UserController@me');
+$router->get('/api/users',                  'UserController@index');
 $router->post('/api/users/profile',         'UserController@updateProfile');
 $router->get('/api/books/search',           'BookController@search');
 $router->get('/api/books/google/{id}',      'BookController@showByGoogleId');

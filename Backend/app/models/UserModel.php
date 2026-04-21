@@ -100,4 +100,16 @@ class UserModel
 
         return $stmt->execute($params);
     }
+
+    public function findAll(int $excludeUserId): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT user_id, name, email, profile_image, bio
+            FROM user
+            WHERE user_id != :user_id
+            ORDER BY name ASC
+        ");
+        $stmt->execute([':user_id' => $excludeUserId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

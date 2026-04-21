@@ -197,4 +197,17 @@ class UserController extends Controller
 
         $this->success(['user' => $user], 'Perfil atualizado com sucesso.');
     }
+
+    public function index(): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+        $userId = $payload['user_id'];
+
+        $users = $this->userModel->findAll($userId);
+
+        $this->success([
+            'total' => count($users),
+            'users' => $users,
+        ]);
+    }
 }
