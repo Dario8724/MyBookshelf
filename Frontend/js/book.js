@@ -85,15 +85,27 @@ function renderBook(book) {
 
 //––––ESTADO NA BIBLIOTECA ––––
 async function loadStatus() {
-  if (!currentBookId) return;
+  const statusEl = document.getElementById("libraryStatus");
+
+
+  if (!currentBookId){
+    statusEl.innerHTML = `
+      <p>Este livro não está na tua biblioteca.</p>
+      <select onchange="addToLibraryFromBook(this.value)">
+          <option value="">Adicionar à biblioteca</option>
+          <option value="want_to_read">Quero ler</option>
+          <option value="reading">A ler</option>
+          <option value="completed">Lido</option>
+      </select>
+    `;
+    return;
+  } 
 
   try {
     const res = await fetch(`${API}/api/library/${currentBookId}/status`, {
       headers: authHeader(),
     });
     const data = await res.json();
-
-    const statuEl = document.getElementById("libraryStatus");
 
     if (data.success && data.data.status) {
       const statusLabel = {
@@ -102,7 +114,7 @@ async function loadStatus() {
         want_to_read: "Quero ler",
       };
 
-      statuEl.innerHTML = `
+      statusEl.innerHTML = `
                 <p>📚 Status: <strong>${statusLabel[data.data.status] || data.data.status}</strong></p>
                 <select onchange="changeStatus(this.value)">
                     <option value="">Mudar status</option>
@@ -113,7 +125,7 @@ async function loadStatus() {
                 <button onclick="removeFromLibrary()">Remover da biblioteca</button>
             `;
     } else {
-      statuEl.innerHTML = `
+      statusEl.innerHTML = `
                 <p>Este livro não está na sua biblioteca.</p>
                 <select onchange="addToLibrary(this.value)">
                     <option value="">Adicionar à biblioteca</option>
@@ -125,6 +137,50 @@ async function loadStatus() {
     }
   } catch (err) {
     console.error("Erro ao carregar status:", err);
+  }
+}
+
+async function addToLibraryFromBook(status) {
+  console.log('addToLibraryFromBook chamado com status:', status);
+  console.log('currentGoogleId:', currentGoogleId);
+  if (!status) return;
+
+  try {
+    const saveRes = await fetch(`${API}/api/books/save`,{
+      method: 'POST',
+      headers: {
+        "Content-Type": 'application/json',
+        Authorization: 'Bearer ' + getToken(),
+      },
+      body: JSON.stringify({ google_id: currentGoogleId }),
+    });
+    const saveData = await saveRes.json();
+
+    if (!saveData.success) {
+        alert('Erro ao guardar o livro.');
+        return;
+    }
+
+    currentBookId = saveData.data.book_id;
+
+    const libRes = await fetch(`${API}/api/library`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": 'application/json',
+        Authorization: 'Bearer ' + getToken(),
+      },
+      body: JSON.stringify({ book_id: currentBookId, status }),
+    });
+    const libData = await libRes.json();
+
+    if (libData.success) {
+      await loadStatus();
+      alert('Livro adicionado à biblioteca!');
+    } else {
+      alert(libData.error || 'Erro ao adicionar.');
+    }
+  } catch (err) {
+    alert('Não foi possível ligar ao servidor.');
   }
 }
 

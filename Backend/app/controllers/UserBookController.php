@@ -77,7 +77,7 @@ class UserBookController extends Controller
 
         $removed = $this->userBookModel->removeBook($userid, $bookId);
 
-        if ($removed) {
+        if (!$removed) {
             $this->error('Livro não encontrado na tua biblioteca.', 404);
         }
 
