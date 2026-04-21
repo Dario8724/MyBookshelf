@@ -25,7 +25,7 @@ class ReviewController extends Controller
         $bookId     = (int)  ($body['book_id'] ?? 0);
         $reviewText = trim( $body['review_text'] ?? '');
         $score      = isset($body['score']) ? (float) $body['score'] :null;
-        $hasSpoiler = (bool) ($body['has_spoiler'] ?? false);
+        $hasSpoiler = (int) ($body['has_spoiler'] ?? 0);
 
         if (empty($bookId)) {
             $this->error('O book_id é obrigatório', 422);

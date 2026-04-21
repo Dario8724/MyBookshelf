@@ -22,7 +22,7 @@ class ReviewModel
             ':user_id'      => $userId,
             ':book_id'      =>$bookId,
             ':review_text'  =>$reviewText,
-            ':has_spoiler'  =>$hasSpoiler,
+            ':has_spoiler'  =>(int) $hasSpoiler,
         ]);
 
         return (int) $this->db->lastInsertId();

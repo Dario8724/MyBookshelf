@@ -260,27 +260,8 @@ async function removeFromLibrary() {
 //––––––AVALIAÇÃO––––
 async function loadRating() {
   if (!currentBookId) return;
-
-  try {
-    const res = await fetch(`${API}/api/ratings?book_id=${currentBookId}`, {
-      headers: authHeader(),
-    });
-    const data = await res.json();
-
-    if (data.success && data.data.user_score) {
-      highlightStars(data.data.user_score);
-      document.getElementById("ratingMsg").textContent =
-        `A tua avaliação: ${data.data.user_score}/5`;
-    }
-
-    //Mostra média
-    if (data.data.average_score) {
-      document.getElementById("ratingMsg").textContent +=
-        ` | Média: ${parseFloat(data.data.average_score).toFixed(1)}/5 (${data.data.total_ratings} avaliações)`;
-    }
-  } catch (err) {
-    console.error("Erro ao carregar avaliação:", err);
-  }
+  // Inicializa as estrelas sem fazer GET
+    highlightStars(0);
 }
 
 async function rate(score) {
@@ -326,35 +307,50 @@ async function loadReviews() {
 
         const list = document.getElementById('reviewsList');
 
-        if (!data.success || data.data.reviews.length) {
+        if (!data.success || !data.data.reviews.length) {
             list.innerHTML = '<h3>Reviews</h3><p>Ainda não há reviews. Sê o primeiro!</p>';
             return;
         }
 
-        list.innerHTML = '<h3>Reviews (' + data.data.total + ')</h3>' +
+        list.innerHTML = '<h3>Reviews (' + data.data.total_reviews + ')</h3>' +
+            '<label style="margin-bottom:1rem;display:block"><input type="checkbox" id="showSpoilers" onchange="toggleSpoilers()"> Mostrar reviews com spoilers</label>' +
             data.data.reviews.map(r => `
-                <strong>${r.name}</strong>
-                    <span style="color:gold">${'★'.repeat(r.score || 0)}</span>
+                <div style="border:1px solid #ccc;padding:1rem;margin-bottom:1rem;border-radius:8px" class="${r.has_spoiler ? 'spoiler-review' : ''}">
+                    <strong>${r.name}</strong>
+                    <span style="color:gold">${'★'.repeat(Math.round(r.score || 0))}</span>
                     ${r.has_spoiler ? '<span style="color:red">[SPOILER]</span>' : ''}
-                    <p>${r.review_text}</p>
+                    ${r.has_spoiler 
+                        ? `<div class="spoiler-content" style="display:none"><p>${r.review_text}</p></div>
+                          <div class="spoiler-hidden" style="color:#8a8070;font-style:italic">🚫 Esta review contém spoilers. Activa "Mostrar reviews com spoilers" para ver.</div>`
+                        : `<p>${r.review_text}</p>`
+                    }
                     <small>${new Date(r.created_at).toLocaleDateString('pt-PT')}</small>
                 </div>
-            `).join('');
+          `).join('');
 
     } catch (err) {
         console.error('Erro ao carregar reviews:', err);
     }
 }
 
+function toggleSpoilers() {
+    const show    = document.getElementById('showSpoilers').checked;
+    const content = document.querySelectorAll('.spoiler-content');
+    const hidden  = document.querySelectorAll('.spoiler-hidden');
+
+    content.forEach(el => el.style.display = show ? 'block' : 'none');
+    hidden.forEach(el  => el.style.display = show ? 'none'  : 'block');
+}
+
 async function submitReview() {
     if (!currentBookId) return;
 
     const content = document.getElementById('reviewContent').value.trim();
-    const hasSpoiler = document.getElementById('hasSpoiler').checked;
+    const hasSpoiler = document.getElementById('spoilerCheck').checked;
     const msg = document.getElementById('reviewMsg');
 
     if (!content) { msg.textContent = 'Escreve algo primeiro.'; return; }
-
+  
     try {
         const res = await fetch(`${API}/api/reviews`, {
             method: 'POST',
@@ -369,7 +365,7 @@ async function submitReview() {
 
         if (data.success) {
             document.getElementById('reviewContent').value = '';
-            document.getElementById('hasSpoiler').checked = false;
+            document.getElementById('spoilerCheck').checked = false;
             msg.textContent = 'Review submetida!';
             await loadReviews();
         } else {
