@@ -102,4 +102,19 @@ class ReviewController extends Controller
             'average_score' => $average,
         ], 'Avaliação registrada com sucesso.');
     }
+
+    public function getRating(int $bookId): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+        $userId = $payload['user_id'];
+        
+        $average = $this->ratingModel->getAverageScore($bookId);
+        $userScore = $this->ratingModel->getUserScore($userId, $bookId);
+
+        $this->success([
+            'average_score' => $average ? round((float)$average, 1) : null,
+            'user_score'    => $userScore ? (int)$userScore : null,
+            'total_ratings' => $this->ratingModel->getTotalRatings($bookId),
+        ]);
+    }
 }

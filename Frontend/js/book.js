@@ -279,8 +279,28 @@ async function removeFromLibrary() {
 //––––––AVALIAÇÃO––––
 async function loadRating() {
   if (!currentBookId) return;
-  // Inicializa as estrelas sem fazer GET
-    highlightStars(0);
+
+    try {
+        const res  = await fetch(`${API}/api/ratings/${currentBookId}`, { headers: authHeader() });
+        const data = await res.json();
+
+        if (data.success) {
+            // Mostra avaliação do utilizador
+            if (data.data.user_score) {
+                highlightStars(data.data.user_score);
+                document.getElementById('ratingMsg').textContent =
+                    `A tua avaliação: ${data.data.user_score}/5`;
+            }
+
+            // Mostra média
+            if (data.data.average_score) {
+                document.getElementById('ratingMsg').textContent +=
+                    ` | Média: ${data.data.average_score}/5 (${data.data.total_ratings} avaliações)`;
+            }
+        }
+    } catch (err) {
+        console.error('Erro ao carregar avaliação:', err);
+    }
 }
 
 async function rate(score) {

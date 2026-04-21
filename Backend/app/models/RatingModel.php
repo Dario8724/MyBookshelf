@@ -57,4 +57,14 @@ class RatingModel
         $result = $stmt->fetch();
         return $result ? (float) $result['score'] : null;
     }
+
+    public function getTotalRatings(int $bookId): int
+    {
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) FROM rating WHERE book_id = :book_id
+        ");
+
+        $stmt->execute([':book_id' => $bookId]);
+        return (int) $stmt->fetchColumn();
+    }
 }
