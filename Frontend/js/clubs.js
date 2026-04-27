@@ -322,7 +322,7 @@ async function completeSession(sessionId) {
 // --- VOTAÇÕES ---
 async function loadVotes() {
     try {
-        const res = await fetch(`${API}/api/clubs/${currentClubId}/votes`, { headers: authHeader() });
+        const res  = await fetch(`${API}/api/clubs/${currentClubId}/votes`, { headers: authHeader() });
         const data = await res.json();
 
         const list = document.getElementById('votesList');
@@ -333,17 +333,33 @@ async function loadVotes() {
         }
 
         list.innerHTML = data.data.votes.map(v => `
-            <div style="border:1px solid #ccc;padding:0.75rem;margin-bottom:0.5rem;border-radius:6px">
-                <strong>${v.title}</strong>
-                <span style="margin-left:1rem;color:${v.status === 'open' ? 'green' : 'gray'}">${v.status}</span>
-                <small> · ${v.total_votes} votos</small><br>
-                <small>📅 ${v.start_date} → ${v.end_date}</small><br><br>
-                ${v.status === 'open' ? `
-                    <input type="number" id="optionBook-${v.vote_id}" placeholder="Book ID" style="width:80px">
-                    <button onclick="addVoteOption(${v.vote_id})">+ Opção</button>
-                    &nbsp;
-                    <input type="number" id="castOption-${v.vote_id}" placeholder="Option ID" style="width:80px">
-                    <button onclick="castVote(${v.vote_id})">Votar</button>
+            <div style="border:1px solid #ccc;padding:1rem;margin-bottom:0.75rem;border-radius:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+                    <strong>${v.title}</strong>
+                    <span style="color:${v.status === 'open' ? 'green' : 'gray'};font-size:0.8rem">${v.status === 'open' ? '🟢 Aberta' : '🔴 Fechada'}</span>
+                </div>
+                <small style="color:#8a8070">📅 ${formatDate(v.start_date)} → ${formatDate(v.end_date)} · ${v.total_votes} votos</small>
+
+                <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap">
+                    ${v.options.map(o => `
+                        <div style="border:2px solid ${v.user_voted_option === o.option_id ? '#C07B3A' : '#D4CBBA'};border-radius:10px;padding:0.75rem;width:140px;text-align:center;cursor:${v.status === 'open' && !v.user_voted_option ? 'pointer' : 'default'}"
+                             onclick="${v.status === 'open' && !v.user_voted_option ? `castVote(${v.vote_id}, ${o.option_id})` : ''}">
+                            ${o.cover ? `<img src="${o.cover}" style="width:80px;height:110px;object-fit:cover;border-radius:6px;margin-bottom:0.5rem">` : '<div style="width:80px;height:110px;background:#EDE8DC;border-radius:6px;margin:0 auto 0.5rem;display:flex;align-items:center;justify-content:center">📖</div>'}
+                            <div style="font-size:0.75rem;font-weight:500;color:#2C2A24">${o.title}</div>
+                            <div style="font-size:0.7rem;color:#8a8070">${o.author}</div>
+                            <div style="font-size:0.75rem;margin-top:0.4rem;color:#C07B3A;font-weight:600">${o.total_votes} votos</div>
+                            ${v.user_voted_option === o.option_id ? '<div style="font-size:0.7rem;color:#C07B3A">✓ O teu voto</div>' : ''}
+                        </div>
+                    `).join('')}
+                </div>
+
+                ${v.status === 'open' && currentClubMember ? `
+                    <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #D4CBBA">
+                        ${v.user_voted_option
+                            ? '<small style="color:#8a8070">✓ Já votaste nesta votação</small>'
+                            : '<small style="color:#8a8070">Clica num livro para votar</small>'
+                        }
+                    </div>
                 ` : ''}
             </div>
         `).join('');
@@ -406,23 +422,19 @@ async function addVoteOption(voteId) {
     }
 }
 
-async function castVote(voteId) {
-    const optionId = document.getElementById(`castOption-${voteId}`).value;
-    if (!optionId) return;
-
+async function castVote(voteId, optionId) {
     try {
         const res  = await fetch(`${API}/api/clubs/votes/${voteId}/cast`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-            body: JSON.stringify({ option_id: parseInt(optionId) }),
+            body: JSON.stringify({ option_id: optionId }),
         });
         const data = await res.json();
 
         if (data.success) {
-            alert('Voto registrado!');
             await loadVotes();
         } else {
-            alert(data.error || 'Erro ao voto.');
+            alert(data.error || 'Erro ao votar.');
         }
     } catch (err) {
         alert('Erro ao ligar ao servidor.');
