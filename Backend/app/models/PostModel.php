@@ -46,7 +46,7 @@ class PostModel
             OR p.user_id = :user_id2
             GROUP BY p.post_id
             ORDER BY p.created_at DESC
-            LIMIT 20
+            LIMIT 35
         ");
 
         $stmt->execute([

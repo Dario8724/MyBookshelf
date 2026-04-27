@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadClubs();
 });
 
+function formatDate(dateStr) {
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
+}
+
 // --- LISTA DE CLUBES -----
 async function loadClubs() {
     try {
@@ -255,7 +260,7 @@ async function loadSessions() {
         list.innerHTML = data.data.sessions.map(s => `
             <div style="border:1px solid #ccc;padding:0.75rem;margin-bottom:0.5rem;border-radius:6px">
                 <strong>${s.title}</strong> - ${s.author}<br>
-                <small>📅 ${s.start_date} → ${s.end_date}</small>
+                <small>📅 ${formatDate(s.start_date)} → ${formatDate(s.end_date)}</small>
                 <span style="margin-left:1rem;color:${s.status === 'completed' ? 'green' : 'orange'}">${s.status}</span>
                 ${s.status === 'active' ? `<button onclick="completeSession(${s.session_id})">Marcar como concluída</button>` : ''}
             </div>
@@ -500,23 +505,32 @@ async function removeBookFromClub(clubLibraryId) {
 // ––– RANKING ––––
 async function loadRanking() {
     try {
-        const res = await fetch(`${API}/api/clubs/${currentClubId}/ranking`, { headers: authHeader() });
+        const res  = await fetch(`${API}/api/clubs/ranking/global`, { headers: authHeader() });
         const data = await res.json();
 
         const list = document.getElementById('rankingList');
 
         if (!data.success || !data.data.ranking.length) {
-            list.innerHTML = '<p>Ainda não há pontos neste clube.</p>';
+            list.innerHTML = '<p>Ainda não há pontos nesta season.</p>';
             return;
         }
 
-        list.innerHTML = data.data.ranking.map((r, i) => `
-            <div style="border:1px solid #ccc;padding:0.75rem;margin-bottom:0.5rem;border-radius:6px">
-                <strong>#${i + 1}</strong>
-                🏆 <strong>${r.points} pontos</strong>
-                <small style="margin-left:1rem">Season ${r.season_id} (${r.season_start} → ${r.season_end})</small>
-            </div>
-        `).join('');
+        const medals = ['🥇', '🥈', '🥉'];
+
+        list.innerHTML = `
+            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">
+                Season ${data.data.season.season_id} — ${data.data.season.start_date} → ${data.data.season.end_date}
+            </p>
+            ${data.data.ranking.map((r, i) => `
+                <div style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);padding:0.75rem 1rem;margin-bottom:0.5rem;border-radius:10px;background:${r.club_id === currentClubId ? 'var(--surface)' : 'transparent'}">
+                    <div style="display:flex;align-items:center;gap:0.75rem">
+                        <span style="font-size:1.2rem">${medals[i] || '#' + (i + 1)}</span>
+                        <strong style="color:${r.club_id === currentClubId ? 'var(--accent)' : 'var(--text)'}">${r.name}</strong>
+                    </div>
+                    <span style="font-weight:600;color:var(--accent)">${r.total_points} pts</span>
+                </div>
+            `).join('')}
+        `;
 
     } catch (err) {
         console.error('Erro ao carregar ranking:', err);

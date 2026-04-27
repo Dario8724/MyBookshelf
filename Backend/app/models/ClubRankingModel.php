@@ -36,9 +36,23 @@ class ClubRankingModel
 
         $stmt->execute([
             ':season_id' => $seasonId,
-            ':club_id'   => $clubId,
-            ':points'    => $points,
-            ':points2'   => $points,
+            ':club_id' => $clubId,
+            ':points' => $points,
+            ':points2' => $points,
         ]);
+    }
+
+    public function getGlobalRanking(int $seasonId): array
+    {
+        $stmt = $this->db->prepare("
+        SELECT cr.club_id, c.name, SUM(cr.points) AS total_points
+        FROM club_ranking cr
+        JOIN club c ON cr.club_id = c.club_id
+        WHERE cr.season_id = :season_id
+        GROUP BY cr.club_id
+        ORDER BY total_points DESC
+    ");
+        $stmt->execute([':season_id' => $seasonId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
