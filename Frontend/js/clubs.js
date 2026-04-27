@@ -27,7 +27,7 @@ async function loadClubs() {
                 <div style="border:1px solid #ccc;padding:1rem;margin-bottom:0.75rem;border-radius:8px">
                     <strong>${c.name}</strong>
                     <p>${c.description || ''}</p>
-                    <small>👥 ${c.member_count || 0} membros</small>
+                    <small>👥 ${c.total_members || 0} membros</small>
                     <br><br>
                     <button onclick="openClub(${c.club_id})">Ver Clube</button>
                 </div>
@@ -178,7 +178,7 @@ function showTab(tab) {
 // --- MENSAGENS ---
 async function loadMessages() {
     try {
-        const res = await fetch(`${API}/api/clubs/${currentClubId}/messages`, { headers: authHeader() });
+        const res  = await fetch(`${API}/api/clubs/${currentClubId}/messages`, { headers: authHeader() });
         const data = await res.json();
 
         const list = document.getElementById('messagesList');
@@ -188,14 +188,31 @@ async function loadMessages() {
             return;
         }
 
-        list.innerHTML = data.data.messages.map(m => `
+        const messages  = data.data.messages;
+        const preview   = currentClubMember ? messages : messages.slice(0, 3);
+
+        list.innerHTML = preview.map(m => `
             <div style="margin-bottom:0.75rem">
                 <strong>${m.user_name}</strong>
                 <p style="margin:0.2rem 0">${m.message}</p>
             </div>
         `).join('');
 
+        if (!currentClubMember && messages.length > 3) {
+            list.innerHTML += `
+                <div style="text-align:center;padding:1rem;background:var(--surface);border-radius:10px;margin-top:0.75rem">
+                    <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0.5rem">
+                        🔒 Entra no clube para ver todas as mensagens e participar na conversa.
+                    </p>
+                    <button onclick="joinClub()" style="padding:0.5rem 1.25rem;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:500">
+                        Entrar no Clube
+                    </button>
+                </div>
+            `;
+        }
+
         list.scrollTop = list.scrollHeight;
+
     } catch (err) {
         console.error('Erro ao carregar mensagens:', err);
     }

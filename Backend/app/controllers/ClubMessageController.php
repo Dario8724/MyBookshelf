@@ -13,13 +13,13 @@ class ClubMessageController extends Controller
     public function __construct()
     {
         $this->clubMessageModel = new ClubMessageModel();
-        $this->clubModel        = new ClubModel();
+        $this->clubModel = new ClubModel();
     }
 
     public function send(int $clubId): void
     {
         $payload = AuthMiddleware::requireAuth();
-        $userId  = $payload['user_id'];
+        $userId = $payload['user_id'];
 
         $club = $this->clubModel->findById($clubId);
 
@@ -31,7 +31,7 @@ class ClubMessageController extends Controller
             $this->error('Tens de ser membro do clube para enviar mensagens.', 403);
         }
 
-        $body    = $this->getBody();
+        $body = $this->getBody();
         $message = trim($body['message'] ?? '');
 
         if (empty($message)) {
@@ -46,7 +46,7 @@ class ClubMessageController extends Controller
     public function index(int $clubId): void
     {
         $payload = AuthMiddleware::requireAuth();
-        $userId  = $payload['user_id'];
+        $userId = $payload['user_id'];
 
         $club = $this->clubModel->findById($clubId);
 
@@ -54,15 +54,18 @@ class ClubMessageController extends Controller
             $this->error('Clube não encontrado.', 404);
         }
 
-        if (!$this->clubModel->isMember($clubId, $userId)) {
-            $this->error('Tens de ser membro do clube para ver as mensagens.', 403);
-        }
-
+        $isMember = $this->clubModel->isMember($clubId, $userId);
         $messages = $this->clubMessageModel->getByClub($clubId);
 
+        // Não membros só vêem as últimas 3 mensagens
+        if (!$isMember) {
+            $messages = array_slice($messages, 0, 3);
+        }
+
         $this->success([
-            'total'    => count($messages),
+            'total' => count($messages),
             'messages' => $messages,
-        ], 'Mensagens carregadas com sucesso.');
+            'is_member' => $isMember,
+        ]);
     }
 }
