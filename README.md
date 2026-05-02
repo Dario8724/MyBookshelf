@@ -155,7 +155,7 @@ Plataforma muito popular que permite aos utilizadores avaliar livros, criar list
 - Pouca inovação nos últimos anos  
 - Experiência móvel inferior a apps modernas
 
-![Autores](./Imagens/Autores.png)
+![Autores](./Documentação/1ªEntrega/Autores.png)
 
 ### LibraryThing
 
@@ -171,7 +171,7 @@ Focado na catalogação de livros e organização de bibliotecas pessoais, com u
 - Não é muito intuitivo para iniciantes  
 - Parte social menos desenvolvida
 
-![Informações_Adicionais](./Imagens/Informações_Adicionais.png)
+![Informações_Adicionais](./Documentação/1ªEntrega/Informações_Adicionais.png)
  
 
 ### Bookly
@@ -205,7 +205,7 @@ Rede social literária bastante popular no Brasil.
 - Falhas de desempenho  
 - Menor alcance global
 
-![Livros](./Imagens/Livros.png)
+![Livros](./Documentação/1ªEntrega/Livros.png)
   
 ---
 
