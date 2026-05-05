@@ -92,20 +92,36 @@ function renderFeed(posts) {
             : `<span>${p.name.charAt(0).toUpperCase()}</span>`;
 
         const date = new Date(p.created_at).toLocaleDateString('pt-PT', {
-            day: 'numeric', month: 'short', year: 'numeric'
+            day: '2-digit', month: '2-digit', year: 'numeric'
         });
+
+        //Bloco de livro
+        const bookBlock = p.book_id ? `
+            <div class="post-book">
+                <div class="post-book-cover">
+                    ${p.book_cover
+                        ? `<img src="${p.book_cover}" alt="${p.book_title}">`
+                        : `<div class="book-placeholder"></div>`
+                    }
+                </div>
+                <div class="post-book-info">
+                    <h4 class="post-book-title">${p.book_title}</h4>
+                    <p class="post-book-author">${p.book_author || ''}</p>
+                    ${p.rating ? `<div class="post-rating">${renderStars(p.rating)}</div>` : ''}
+                </div>
+            </div>
+        ` : '';
 
         return `
         <div class="post-card" id="post-${p.post_id}">
             <div class="post-header">
                 <div class="post-user">
                     <div class="post-avatar">${avatar}</div>
-                    <div>
-                        <div class="post-name">${p.name}</div>
-                        <div class="post-date">${date}</div>
-                    </div>
+                    <div class="post-name">${p.name}</div>
                 </div>
+                <span class="post-date">${date}</span>
             </div>
+            ${bookBlock}
             <div class="post-content">${p.content}</div>
             <div class="post-actions">
                 <button class="post-action ${p.liked ? 'liked' : ''}" onclick="toggleLike(${p.post_id}, this)">
@@ -124,6 +140,35 @@ function renderFeed(posts) {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = '1.25rem';
+}
+
+function renderStars(rating) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        const filled = i <= rating;
+        html += `<svg class="star ${filled ? 'filled' : ''}" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    }
+    return html;
+}
+
+// ––––TABS–––
+let currentTab = 'all';
+function switchTab (tab, btn) {
+    currentTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadFeed();
+}
+
+// ––––Toggle do criar post –––
+function openCreatePost() {
+    document.getElementById('createPostCard').style.display = 'block';
+    document.getElementById('postContent').focus();
+}
+function closeCreatePost() {
+    document.getElementById('createPostCard').style.display = 'none';
+    document.getElementById('postContent').value = '';
+    document.getElementById('charCount').textContent = '0/500';
 }
 
 // –––CRIAR POST––––––
@@ -261,6 +306,55 @@ async function submitComment() {
         }
     } catch (err) {
         showToast('Não foi possível ligar ao servidor.', 'error');
+    }
+}
+
+// Sidebar - Sugestões
+async function loadSuggestions() {
+    const container = document.getElementById('suggestionsList');
+    try {
+        const res = await fetch(`${API}/api/users/suggestions`, { headers: authHeader() });
+        const data = await res.json();
+        const users = (data.data?.users || data.users || []).slice(0, 2);
+
+        if (!users.length) {
+            container.innerHTML = '<div class="muted-text">Sem sugestões.</div>';
+            return;
+        }
+
+        container.innerHTML = users.map(u => {
+            const avatar = u.profile_image
+                ? `<img src="${API}/${u.profile_image}" alt="${u.name}">`
+                : `<span>${u.name.charAt(0).toUpperCase()}</span>`;
+            return `
+                <div class="suggestion-item">
+                    <div class="suggestion-user">
+                        <div class="suggestion-avatar">${avatar}</div>
+                        <div class="suggestion-name">${u.name}</div>
+                    </div>
+                    <button class="btn-follow" onclick="followUser(${u.user_id || u.id}, this)">Seguir</button>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        container.innerHTML = '<div class="muted-text">Erro ao carregar.</div>';
+    }
+}
+
+async function followUser(userId, btn) {
+    try {
+        const res = await fetch(`${API}/api/users/${userId}/follow`, {
+            method: 'POST',
+            headers: authHeader()
+        });
+        const data = await res.json();
+        if (data.success) {
+            btn.textContent = 'Seguindo';
+            btn.classList.add('following');
+            btn.disabled = true;
+        }
+    } catch (err) {
+        showToast('Erro ao seguir.', 'error');
     }
 }
 
