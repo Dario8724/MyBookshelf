@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', async () =>{
 
     loadUserData();
     await loadFeed();
+    loadSuggestions();
+    loadUserActivity();
+    loadReadingGoal();
 
     //contador de caracteres
     document.getElementById('postContent').addEventListener('input', updateCharCount);
@@ -356,6 +359,45 @@ async function followUser(userId, btn) {
     } catch (err) {
         showToast('Erro ao seguir.', 'error');
     }
+}
+
+
+//Sidebar - Atividade
+
+async function loadUserActivity() {
+    try {
+        const res = await fetch(`${API}/api/users/activity`, { headers: authHeader() });
+        const data = await res.json();
+        if (!data.success) return;
+        const a = data.data;
+        document.getElementById('followingCount').textContent = a.following_count || 0;
+        document.getElementById('reviewCount').textContent = a.reviews_this_month || 0;
+        document.getElementById('likesCount').textContent = a.likes_count || 0;
+    } catch (err) { }
+}
+
+//Sidebar - Desafio
+async function loadReadingGoal() {
+    try {
+        const res = await fetch(`${API}/api/users/reading-goal`, { headers: authHeader() });
+        const data = await res.json();
+        if (!data.success) return;
+        const g = data.data;
+        const current = g.current || 0;
+        const total = g.goal || 50;
+        const percent = Math.min(100, Math.round((current / total) * 100));
+
+        document.getElementById('goalCurrent').textContent = current;
+        document.getElementById('goalTotal').textContent = total;
+        document.getElementById('goalTotal2').textContent = total;
+        document.getElementById('goaldPercent').textContent = percent;
+        document.getElementById('progressFill').style.width =  `${percent}%`;
+    } catch (err) { }
+}
+
+//Load more
+function loadMore() {
+    showToast('Em breve!', 'success');
 }
 
 // ── TOAST ─────────────────────────────────────────────────
