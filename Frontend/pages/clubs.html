@@ -131,6 +131,29 @@
                 Ranking
             </button>
          </div>
+
+         <!---conteúdo da aba selecionada--->
+         <div class="detail-grid">
+            <div class="detail-main">
+                 <!---mensagens--->
+                 <div id="tab-messagses" class="tab-content card">
+                    <div id="messagesLocked" class="locked-msg" display:none>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <h3>Junta-te ao clube para veres as mensagens</h3>
+                        <p>Faz parte da comunidade e participa das discussões </p>
+                    <button class="btn btn-primary" onclick="toggleMembership()">Juntar-se</button>
+                    </div>
+                    <div id="messagesList" class="message-list">
+                        <div id="messageInput" class="message-input">
+                            <textarea id="msgContent" placeholder="Escreva uma mensagem ..." rows="2"></textarea>
+                            <button class="btn btn-primary" onclick="sendMessage()">Enviar</button>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        </div>
+                 </div>
+                    <!---sessões--->
+                    
+            </div>
+         </div>
     
     </div>
 
