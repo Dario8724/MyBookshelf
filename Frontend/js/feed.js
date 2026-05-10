@@ -394,15 +394,23 @@ async function loadUserActivity() {
         if (!meData.success) return;
         const myId = meData.data.user.user_id;
 
+        // Quem sigo
         const fRes = await fetch(`${API}/api/users/${myId}/following`, { headers: authHeader() });
         const fData = await fRes.json();
         document.getElementById('followingCount').textContent =
             fData.success ? fData.data.following.length : 0;
 
+        // Quem me segue
         const fwRes = await fetch(`${API}/api/users/${myId}/followers`, { headers: authHeader() });
         const fwData = await fwRes.json();
         document.getElementById('followersCount').textContent =
             fwData.success ? fwData.data.followers.length : 0;
+
+        // Posts este mês
+        const sRes = await fetch(`${API}/api/posts/my/stats`, { headers: authHeader() });
+        const sData = await sRes.json();
+        document.getElementById('postsCount').textContent =
+            sData.success ? sData.data.posts_this_month : 0;
     } catch (err) {
         console.error('Erro atividade:', err);
     }

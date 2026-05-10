@@ -19,9 +19,9 @@ class PostModel
         ");
 
         $stmt->execute([
-            ':user_id'  => $userId,
-            ':content'  => $content,
-            ':review_id'=> $reviewId
+            ':user_id' => $userId,
+            ':content' => $content,
+            ':review_id' => $reviewId
         ]);
 
         return (int) $this->db->lastInsertId();
@@ -50,7 +50,7 @@ class PostModel
         ");
 
         $stmt->execute([
-            ':user_id'  => $userId,
+            ':user_id' => $userId,
             ':user_id2' => $userId,
         ]);
 
@@ -67,7 +67,7 @@ class PostModel
 
         $stmt->execute([
             ':post_id' => $postId,
-            ':user_id'=> $userId,
+            ':user_id' => $userId,
         ]);
 
         return $stmt->rowCount() > 0;
@@ -99,14 +99,14 @@ class PostModel
                 ':user_id' => $userId,
             ]);
             return false;
-        }else{
+        } else {
             $stmt = $this->db->prepare("
                 INSERT INTO post_like (post_id, user_id)
                 VALUES (:post_id, :user_id) 
             ");
             $stmt->execute([
                 ':post_id' => $postId,
-                ':user_id'=> $userId,
+                ':user_id' => $userId,
             ]);
             return true;
         }
@@ -122,7 +122,7 @@ class PostModel
         $stmt->execute([
             ':post_id' => $postId,
             ':user_id' => $userId,
-            'comment'  => $comment,
+            'comment' => $comment,
         ]);
 
         return (int) $this->db->lastInsertId();
@@ -141,5 +141,21 @@ class PostModel
 
         $stmt->execute([':post_id' => $postId]);
         return $stmt->fetchAll();
+    }
+
+    public function countByUserThisMonth(int $userId): int
+    {
+        $stmt = $this->db->prepare("
+        SELECT COUNT(*) AS total
+        FROM post
+        WHERE user_id = :user_id
+        AND MONTH(created_at) = MONTH(CURRENT_DATE())
+        AND YEAR(created_at) = YEAR(CURRENT_DATE())
+    ");
+
+        $stmt->execute([':user_id' => $userId]);
+        $result = $stmt->fetch();
+
+        return (int) ($result['total'] ?? 0);
     }
 }

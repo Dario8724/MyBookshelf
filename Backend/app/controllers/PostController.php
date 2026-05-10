@@ -16,17 +16,17 @@ class PostController extends Controller
     public function create(): void
     {
         $payload = AuthMiddleware::requireAuth();
-        $userId  = $payload['user_id'];
+        $userId = $payload['user_id'];
 
-        $body     = $this->getBody();
-        $content  = trim($body['content'] ?? '');
+        $body = $this->getBody();
+        $content = trim($body['content'] ?? '');
         $reviewId = isset($body['review_id']) ? (int) $body['review_id'] : null;
 
         if (empty($content)) {
             $this->error('O conteúdo do post é obrigatório.', 422);
         }
 
-        if (strlen($content) > 500){
+        if (strlen($content) > 500) {
             $this->error('O posto não pode ter mais de 500 caracteres.', 422);
         }
 
@@ -79,15 +79,15 @@ class PostController extends Controller
         $payload = AuthMiddleware::requireAuth();
         $userId = $payload['user_id'];
 
-        $body    = $this->getBody();
+        $body = $this->getBody();
         $comment = trim($body['comment'] ?? '');
 
         if (empty($comment)) {
-            $this->error('O comentário não pode estar vazio.',422);
+            $this->error('O comentário não pode estar vazio.', 422);
         }
 
         if (strlen($comment) > 300) {
-            $this->error('O comentário não pode ter mais de 300 caracteres',422);
+            $this->error('O comentário não pode ter mais de 300 caracteres', 422);
         }
 
         $commentId = $this->postModel->addComment($postId, $userId, $comment);
@@ -100,8 +100,20 @@ class PostController extends Controller
         $comments = $this->postModel->getComments($postId);
 
         $this->success([
-            'total'    => count($comments),
+            'total' => count($comments),
             'comments' => $comments,
         ], 'Commentários carregados com sucesso.');
+    }
+
+    public function getMyStats(): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+        $userId = $payload['user_id'];
+
+        $postsThisMonth = $this->postModel->countByUserThisMonth($userId);
+
+        $this->success([
+            'posts_this_month' => $postsThisMonth,
+        ], 'Estatísticas carregadas com sucesso.');
     }
 }
