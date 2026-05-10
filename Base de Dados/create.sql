@@ -54,7 +54,10 @@ CREATE TABLE user_book (
     book_id INT NOT NULL,
     status ENUM('reading','completed','want_to_read'),
     favorite BOOLEAN DEFAULT FALSE,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    current_page INT DEFAULT 0,
+    total_pages INT DEFAULT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+        ON UPDATE CURRENT_TIMESTAMP,
 
     UNIQUE (user_id, book_id),
 

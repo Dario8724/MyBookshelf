@@ -14,6 +14,7 @@ $router->delete('/api/library/{id}',        'UserBookController@removeBook');
 $router->get('/api/library/{id}/status',    'UserBookController@getStatus');
 $router->get('/api/library',                'UserBookController@getLibrary');
 $router->post('/api/library/{id}/favorite', 'UserBookController@toggleFavorite');
+$router->post('/api/library/{id}/progress', 'UserBookController@updateProgress');
 $router->post('/api/reviews',               'ReviewController@create');
 $router->get('/api/reviews/book/{id}',      'ReviewController@getByBook');
 $router->delete('/api/reviews/{id}',        'ReviewController@delete');

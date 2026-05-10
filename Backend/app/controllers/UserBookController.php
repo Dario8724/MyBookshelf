@@ -89,9 +89,19 @@ class UserBookController extends Controller
         $payload = AuthMiddleware::requireAuth();
         $userid = $payload['user_id'];
 
-        $status = $this->userBookModel->getStatus($userid, $bookID);
+        $data = $this->userBookModel->getStatus($userid, $bookID);
 
-        $this->success(['status' => $status]);
+        if (!$data) {
+            $this->success(['status' => null]);
+            return;
+        }
+
+        $this->success([
+            'status' => $data['status'],
+            'favorite' => (bool) $data['favorite'],
+            'current_page' => (int) $data['current_page'],
+            'total_pages' => $data['total_pages'] !== null ? (int) $data['total_pages'] : null,
+        ]);
     }
 
     public function getLibrary(): void
@@ -125,6 +135,32 @@ class UserBookController extends Controller
         $message = $result ? 'Livro adicionado aos favoritos.' : 'Livro removido dos favoritos.';
 
         $this->success(['favorite' => $result], $message);
+    }
+
+    public function updateProgress(int $bookId): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+        $userId = $payload['user_id'];
+
+        $body = $this->getBody();
+        $currentPage = (int) ($body['current_page'] ?? 0);
+        $totalPages = isset($body['total_pages']) ? (int) $body['total_pages'] : null;
+
+        if ($currentPage < 0) {
+            $this->error('A página atual não pode ser negativa.', 422);
+        }
+
+        if ($totalPages !== null && $totalPages < 1) {
+            $this->error('O total de páginas deve ser pelo menos 1.', 422);
+        }
+
+        if ($totalPages !== null && $currentPage > $totalPages) {
+            $this->error('A página atual não pode ser maior que o total.', 422);
+        }
+
+        $result = $this->userBookModel->updateProgress($userId, $bookId, $currentPage, $totalPages);
+
+        $this->success($result, 'Progresso atualizado com sucesso.');
     }
 
 }
