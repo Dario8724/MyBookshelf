@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ .'/../core/Database.php';
+require_once __DIR__ . '/../core/Database.php';
 
 class FollowModel
 {
@@ -20,7 +20,7 @@ class FollowModel
 
         return $stmt->execute([
             ':follower_id' => $followerId,
-            ':following_id'=> $followingId
+            ':following_id' => $followingId
         ]);
     }
 
@@ -34,7 +34,7 @@ class FollowModel
 
         $stmt->execute([
             ':follower_id' => $followerId,
-            ':following_id'=> $followingId,
+            ':following_id' => $followingId,
         ]);
 
         return $stmt->rowCount() > 0;
@@ -50,7 +50,7 @@ class FollowModel
 
         $stmt->execute([
             ':follower_id' => $followerId,
-            ':following_id'=> $followingId
+            ':following_id' => $followingId
         ]);
 
         return (int) $stmt->fetchColumn() > 0;
@@ -59,11 +59,17 @@ class FollowModel
     public function getFollowers(int $userId): array
     {
         $stmt = $this->db->prepare("
-            SELECT u.user_id, u.name, u.profile_image
-            FROM follow f
-            JOIN user u ON f.follower_id = u.user_id
-            WHERE f.following_id = :user_id
-        ");
+        SELECT
+            u.user_id,
+            u.name,
+            u.profile_image,
+            u.bio,
+            (SELECT COUNT(*) FROM follow WHERE following_id = u.user_id) AS followers_count,
+            (SELECT COUNT(*) FROM follow WHERE follower_id = u.user_id) AS following_count
+        FROM follow f
+        JOIN user u ON f.follower_id = u.user_id
+        WHERE f.following_id = :user_id
+    ");
 
         $stmt->execute([':user_id' => $userId]);
         return $stmt->fetchAll();
@@ -72,11 +78,17 @@ class FollowModel
     public function getFollowing(int $userId): array
     {
         $stmt = $this->db->prepare("
-            SELECT u.user_id, u.name, u.profile_image
-            FROM follow f
-            JOIN user u ON f.following_id = u.user_id
-            WHERE f.follower_id = :user_id
-        ");
+        SELECT
+            u.user_id,
+            u.name,
+            u.profile_image,
+            u.bio,
+            (SELECT COUNT(*) FROM follow WHERE following_id = u.user_id) AS followers_count,
+            (SELECT COUNT(*) FROM follow WHERE follower_id = u.user_id) AS following_count
+        FROM follow f
+        JOIN user u ON f.following_id = u.user_id
+        WHERE f.follower_id = :user_id
+    ");
 
         $stmt->execute([':user_id' => $userId]);
         return $stmt->fetchAll();

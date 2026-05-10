@@ -19,9 +19,9 @@ class UserModel
         ");
 
         $stmt->execute([
-            ':name'          => $name,
-            ':email'         => $email,
-            ':password'      => $hashedPassword,
+            ':name' => $name,
+            ':email' => $email,
+            ':password' => $hashedPassword,
             ':profile_image' => $profileImage,
         ]);
 
@@ -82,14 +82,14 @@ class UserModel
             $fields[] = 'bio = :bio';
             $params[':bio'] = $data['bio'];
         }
-        
+
         if (isset($data['profile_image'])) {
             $fields[] = 'profile_image = :profile_image';
             $params[':profile_image'] = $data['profile_image'];
         }
 
         if (empty($fields)) {
-            return false; 
+            return false;
         }
 
         $stmt = $this->db->prepare("
@@ -104,11 +104,18 @@ class UserModel
     public function findAll(int $excludeUserId): array
     {
         $stmt = $this->db->prepare("
-            SELECT user_id, name, email, profile_image, bio
-            FROM user
-            WHERE user_id != :user_id
-            ORDER BY name ASC
-        ");
+        SELECT
+            u.user_id,
+            u.name,
+            u.email,
+            u.profile_image,
+            u.bio,
+            (SELECT COUNT(*) FROM follow WHERE following_id = u.user_id) AS followers_count,
+            (SELECT COUNT(*) FROM follow WHERE follower_id = u.user_id) AS following_count
+        FROM user u
+        WHERE u.user_id != :user_id
+        ORDER BY u.name ASC
+    ");
         $stmt->execute([':user_id' => $excludeUserId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
