@@ -316,16 +316,36 @@ async function submitComment() {
 async function loadSuggestions() {
     const container = document.getElementById('suggestionsList');
     try {
-        const res = await fetch(`${API}/api/users/suggestions`, { headers: authHeader() });
-        const data = await res.json();
-        const users = (data.data?.users || data.users || []).slice(0, 2);
+        const meRes = await fetch(`${API}/api/users/me`, { headers: authHeader() });
+        const meData = await meRes.json();
+        if (!meData.success) throw new Error('me');
+        const myId = meData.data.user.user_id;
 
-        if (!users.length) {
+        // 2. Buscar quem já sigo
+        const fRes = await fetch(`${API}/api/users/${myId}/following`, { headers: authHeader() });
+        const fData = await fRes.json();
+        const followingIds = fData.success
+            ? fData.data.following.map(u => u.user_id)
+            : [];
+
+        const res = await fetch(`${API}/api/users`, { headers: authHeader() });
+        const data = await res.json();
+
+        if (!data.success || !data.data.users.length) {
             container.innerHTML = '<div class="muted-text">Sem sugestões.</div>';
             return;
         }
 
-        container.innerHTML = users.map(u => {
+        const suggestions = data.data.users
+            .filter(u => u.user_id !== myId && !followingIds.includes(u.user_id))
+            .slice(0, 3);
+
+        if (!suggestions.length) {
+            container.innerHTML = '<div class="muted-text">Já segues todos!</div>';
+            return;
+        }
+
+        container.innerHTML = suggestions.map(u => {
             const avatar = u.profile_image
                 ? `<img src="${API}/${u.profile_image}" alt="${u.name}">`
                 : `<span>${u.name.charAt(0).toUpperCase()}</span>`;
@@ -333,13 +353,14 @@ async function loadSuggestions() {
                 <div class="suggestion-item">
                     <div class="suggestion-user">
                         <div class="suggestion-avatar">${avatar}</div>
-                        <div class="suggestion-name">${u.name}</div>
+                        <span class="suggestion-name">${u.name}</span>
                     </div>
-                    <button class="btn-follow" onclick="followUser(${u.user_id || u.id}, this)">Seguir</button>
+                    <button class="btn-follow" id="suggest-btn-${u.user_id}" onclick="followUser(${u.user_id}, this)">Seguir</button>
                 </div>
             `;
         }).join('');
     } catch (err) {
+        console.error('Erro sugestões:', err);
         container.innerHTML = '<div class="muted-text">Erro ao carregar.</div>';
     }
 }
@@ -352,47 +373,85 @@ async function followUser(userId, btn) {
         });
         const data = await res.json();
         if (data.success) {
-            btn.textContent = 'Seguindo';
+            btn.textContent = 'A seguir';
             btn.classList.add('following');
             btn.disabled = true;
+            showToast('A seguir!', 'success');
+        } else {
+            showToast(data.error || 'Erro ao seguir.', 'error');
         }
     } catch (err) {
-        showToast('Erro ao seguir.', 'error');
+        showToast('Erro ao ligar ao servidor.', 'error');
     }
 }
-
 
 //Sidebar - Atividade
 
 async function loadUserActivity() {
     try {
-        const res = await fetch(`${API}/api/users/activity`, { headers: authHeader() });
-        const data = await res.json();
-        if (!data.success) return;
-        const a = data.data;
-        document.getElementById('followingCount').textContent = a.following_count || 0;
-        document.getElementById('reviewCount').textContent = a.reviews_this_month || 0;
-        document.getElementById('likesCount').textContent = a.likes_count || 0;
-    } catch (err) { }
+        const meRes = await fetch(`${API}/api/users/me`, { headers: authHeader() });
+        const meData = await meRes.json();
+        if (!meData.success) return;
+        const myId = meData.data.user.user_id;
+
+        const fRes = await fetch(`${API}/api/users/${myId}/following`, { headers: authHeader() });
+        const fData = await fRes.json();
+        document.getElementById('followingCount').textContent =
+            fData.success ? fData.data.following.length : 0;
+
+        const fwRes = await fetch(`${API}/api/users/${myId}/followers`, { headers: authHeader() });
+        const fwData = await fwRes.json();
+        document.getElementById('followersCount').textContent =
+            fwData.success ? fwData.data.followers.length : 0;
+    } catch (err) {
+        console.error('Erro atividade:', err);
+    }
 }
 
 //Sidebar - Desafio
 async function loadReadingGoal() {
     try {
-        const res = await fetch(`${API}/api/users/reading-goal`, { headers: authHeader() });
+        const res = await fetch(`${API}/api/goals`, { headers: authHeader() });
         const data = await res.json();
-        if (!data.success) return;
-        const g = data.data;
-        const current = g.current || 0;
-        const total = g.goal || 50;
-        const percent = Math.min(100, Math.round((current / total) * 100));
 
-        document.getElementById('goalCurrent').textContent = current;
-        document.getElementById('goalTotal').textContent = total;
-        document.getElementById('goalTotal2').textContent = total;
-        document.getElementById('goaldPercent').textContent = percent;
-        document.getElementById('progressFill').style.width =  `${percent}%`;
-    } catch (err) { }
+        const content = document.getElementById('challengeContent');
+        const empty = document.getElementById('challengeEmpty');
+        const currentYear = new Date().getFullYear();
+
+        if (!data.success || !data.data.goals.length) {
+            content.style.display = 'none';
+            empty.style.display = 'block';
+            return;
+        }
+
+        // Procurar meta anual do ano atual
+        const annualGoal = data.data.goals.find(g => {
+            const startYear = new Date(g.start_date).getFullYear();
+            return g.goal_type === 'annual' && startYear === currentYear;
+        });
+
+        // Se não há anual, tenta a primeira meta ativa
+        const goal = annualGoal || data.data.goals[0];
+
+        if (!goal) {
+            content.style.display = 'none';
+            empty.style.display = 'block';
+            return;
+        }
+
+        // Preencher dados
+        document.getElementById('challengeYear').textContent = new Date(goal.start_date).getFullYear();
+        document.getElementById('goalCurrent').textContent = goal.progress;
+        document.getElementById('goalTotal').textContent = goal.target_value;
+        document.getElementById('goalTotal2').textContent = goal.target_value;
+        document.getElementById('goalPercent').textContent = goal.percentage;
+        document.getElementById('progressFill').style.width = `${goal.percentage}%`;
+
+        content.style.display = 'block';
+        empty.style.display = 'none';
+    } catch (err) {
+        console.error('Erro meta:', err);
+    }
 }
 
 //Load more
