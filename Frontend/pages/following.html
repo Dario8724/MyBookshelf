@@ -1,127 +1,99 @@
 <!DOCTYPE html>
 <html lang="pt">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MyBookshelf - Seguidores</title>
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyBookshelf — Seguidores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/following.css">
+</head>
+<body>
 
-        <nav>
-            <a href="profile.html"><strong>MyBookshelf</strong></a> |
-            <a href="feed.html">Feed</a>
-            <a href="search.html">Buscar</a>
-            <a href="clubs.html">Clubes</a>
-            <a href="following.html">Seguidores</a>
-            <a href="profile.html">Perfil</a>
-            <button onclick="logout()">Sair</button>
-        </nav>
+    <nav>
+        <a href="profile.html" class="logo-text" style="display:flex;align-items:center;gap:0.5rem">
+            <img src="../assets/Bookshelf_Icon.png" alt="logo" style="width:35px;height:35px;object-fit:contain;flex-shrink:0">
+            <span style="transform:translateY(7px)">My<span class="logo-det">B</span>ookshelf</span>
+        </a>
 
-        <hr>
+        <div class="nav-center">
+            <a href="feed.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Feed</span>
+            </a>
+            <a href="clubs.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <span>Clubes</span>
+            </a>
+            <a href="following.html" class="nav-link active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Seguidores</span>
+            </a>
+            <a href="search.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>Buscar</span>
+            </a>
+        </div>
 
-        <h2>Descobrir Leitores</h2>
-        <p>Segue outros leitores para ver as suas publicações no feed.</p>
+        <div class="nav-right">
+            <a href="profile.html" class="nav-avatar" id="navAvatar">G</a>
+            <button class="btn-logout" onclick="logout()" title="Sair">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+        </div>
+    </nav>
 
-        <hr>
+    <div class="page">
 
-        <div id="userList"><p>A carregar...</p></div>
+        <!-- HEADER -->
+        <div class="page-header">
+            <h1 class="page-title">Seguidores</h1>
+            <p class="page-subtitle">Descobre novos leitores e expande a tua comunidade literária</p>
+        </div>
 
-        <script src="../js/config.js"></script>
-        <script src="../js/auth.js"></script>
-        <script>
-            let currentUserId = null;
-            let following = [];
+        <!-- BUSCA -->
+        <div class="search-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="searchInput" placeholder="Buscar por nome ou utilizador...">
+        </div>
 
-            document.addEventListener('DOMContentLoaded', async () => {
-                if (!getToken()) {
-                    window.location.href = 'login.html';
-                    return;
-                }
+        <!-- LOADING -->
+        <div class="page-loading" id="pageLoading">
+            <div class="spinner"></div>
+            <p>A carregar...</p>
+        </div>
 
-                const meRes = await fetch(`${API}/api/users/me`, { headers: authHeader() });
-                const meData = await meRes.json();
-                if (meData.success) {
-                    currentUserId = meData.data.user.user_id;
-                }
+        <!-- A SEGUIR -->
+        <section class="users-section" id="followingSection" style="display:none">
+            <h2 class="section-title">A seguir (<span id="followingCount">0</span>)</h2>
+            <div class="users-grid" id="followingGrid"></div>
+            <div class="section-empty" id="followingEmpty" style="display:none">
+                <p>Ainda não segues ninguém.</p>
+            </div>
+        </section>
 
-                const fRes = await fetch(`${API}/api/users/${currentUserId}/following`, { headers: authHeader() });
-                const fData = await fRes.json();
-                if (fData.success) {
-                    following = fData.data.following.map(u => u.user_id);
-                }
+        <!-- SUGESTÕES -->
+        <section class="users-section" id="suggestionsSection" style="display:none">
+            <h2 class="section-title">Sugestões para seguir</h2>
+            <div class="users-grid" id="suggestionsGrid"></div>
+            <div class="section-empty" id="suggestionsEmpty" style="display:none">
+                <p>Já segues todos os leitores disponíveis!</p>
+            </div>
+        </section>
 
-                await loadUsers();
-            });
+        <!-- SEM RESULTADOS DE BUSCA -->
+        <div class="search-empty" id="searchEmpty" style="display:none">
+            <p>Nenhum utilizador encontrado.</p>
+        </div>
 
-            async function loadUsers(){
-                const res = await fetch(`${API}/api/users`, { headers: authHeader() });
-                const data = await res.json();
+    </div>
 
-                const list = document.getElementById('userList');
+    <div id="toastContainer"></div>
 
-                if (!data.success || !data.data.users.length) {
-                    list.innerHTML = '<p>Não há outros utilizadores.</p>';
-                    return;
-                }
-
-                list.innerHTML = data.data.users.map(u => {
-                    const isFollowing = following.includes(u.user_id);
-                    const avatar =  u.profile_image
-                        ? `<img src="${API}/${u.profile_image}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0.75rem">`
-                        : `<span style="width:48px;height:48px;border-radius:50%;background:#D4CBBA;display:inline-flex;align-items:center;justify-content:center;font-size:1.2rem;margin-right:0.75rem;vertical-align:middle">${u.name.charAt(0).toUpperCase()}</span>`;
-
-                    return `
-                        <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;border:1px solid #D4CBBA;border-radius:12px;margin-bottom:0.75rem;background:#EDE8DC">
-                            <div style="display:flex;align-items:center">
-                                ${avatar}
-                                <div>
-                                    <strong style="color:#2C2A24">${u.name}</strong>
-                                    ${u.bio ? `<p style="color:#8a8070;font-size:0.875rem;margin:0">${u.bio}</p>` : ''}
-                                </div>
-                            </div>
-                            <button
-                                id="btn-${u.user_id}"
-                                onclick="toggleFollow(${u.user_id})"
-                                style="padding:0.5rem 1.25rem;border-radius:10px;border:1px solid ${isFollowing ? '#D4CBBA' : '#C07B3A'};background:${isFollowing ? 'transparent' : '#C07B3A'};color:${isFollowing ? '#2C2A24' : '#fff'};cursor:pointer;font-weight:500">
-                                ${isFollowing ? 'A seguir' : 'Seguir'}
-                            </button>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            async function toggleFollow(userId) {
-                const isFollowing = following.includes(userId);
-                const btn = document.getElementById(`btn-${userId}`);
-
-                try {
-                    const res = await fetch(`${API}/api/users/${userId}/follow`, {
-                        method: isFollowing ? 'DELETE' : 'POST',
-                        headers: authHeader(),
-                    });
-                    const data = await res.json();
-
-                    if (data.success) {
-                        if (isFollowing) {
-                            following = following.filter(id => id !== userId);
-                            btn.textContent = 'Seguir';
-                            btn.style.background = '#C07B3A';
-                            btn.style.color = '#fff';
-                            btn.style.borderColor = '#C07B3A';
-                        } else {
-                            following.push(userId);
-                            btn.textContent = 'A seguir';
-                            btn.style.background = 'transparent';
-                            btn.style.color = '#2C2A24';
-                            btn.style.borderColor = '#D4CBBA';
-                        }
-                    } else {
-                        alert(data.error || 'Erro ao seguir.');
-                    }
-                } catch (err) {
-                    alert('Erro ao ligar ao servidor.');
-                }
-            }
-        </script>
-    </body>
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/following.js"></script>
+</body>
 </html>
