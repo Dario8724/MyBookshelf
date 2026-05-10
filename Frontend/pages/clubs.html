@@ -151,8 +151,62 @@
                         </div>
                  </div>
                     <!---sessões--->
-                    
+                    <!---wip btw wip is short for "work in progress"--->
+                    <div id="tab-sessions" class="tab-content" style="display: none;">
+                        <div id="sessionsList"></div>
+                    </div>
+
+                    <!---votações--->
+                    <div id="tab-voting" class="tab-content" style="display:none">
+                        <div class="voting-header">
+                            <h2>Livros em votação</h2>
+                            <p id="votingInfo">Participa das votações e ajuda a escolher os próximos livros para o clube!</p>
+                        </div>
+                        <div id="votingLocked" class="locked-msg" style="display:none">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                            <h3>Junta-te ao clube para participares nas votações</h3>
+                            <p>Faz parte da comunidade e ajuda a escolher os próximos livros para o clube </p>
+                            <button class="btn btn-primary" onclick="toggleMembership()">Juntar-se</button  >
+                        </div>
+                        <div id="votingsList"></div>
+                    </div>
+
+                <!-- Tab: Biblioteca -->
+                <div id="tab-library" class="tab-content" style="display:none">
+                    <div id="libraryGrid" class="library-grid"></div>
+                </div>
+                 <!-- Tab: Membros -->
+                <div id="tab-members" class="tab-content" style="display:none">
+                    <div class="tab-section-header">
+                        <h2>Membros do Clube</h2>
+                        <p id="membersCount">0 membros ativos</p>
+                    </div>
+                    <div id="membersList" class="members-grid"></div>
+                </div>
+
+                <!-- Tab: Ranking -->
+                <div id="tab-ranking" class="tab-content" style="display:none">
+                    <div class="tab-section-header">
+                        <h2>Ranking de clubes</h2>
+                        <p>Ordenado por pontos e atividade</p>
+                    </div>
+                    <div id="rankingList"></div>
+                </div>
             </div>
+            <!-- Sidebar -->
+            <div class="detail-sidebar">
+                <div class="card sidebar-card">
+                    <p class="sidebar-label">Livro do Mês</p>
+                    <div id="sidebarBook"></div>
+                    <div class="progress-section">
+                        <p class="sidebar-label">Progresso do clube</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                        </div>
+                        <p class="progress-text" id="progressText">0% dos membros já terminaram</p>
+                    </div>
+                </div>
+            
          </div>
     
     </div>
