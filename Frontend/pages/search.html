@@ -8,66 +8,90 @@
         <link rel="stylesheet" href="../css/search.css">
     </head>
     <body>
-
         <nav>
             <a href="profile.html" class="logo-text" style="display:flex;align-items:center;gap:0.5rem">
                 <img src="../assets/Bookshelf_Icon.png" alt="logo" style="width:35px;height:35px;object-fit:contain;flex-shrink:0">
                 <span style="transform:translateY(7px)">My<span class="logo-det">B</span>ookshelf</span>
             </a>
-
             <div class="nav-center">
                 <a href="feed.html" class="nav-link">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    <span>Feed</span> 
+                    <span>Feed</span>
                 </a>
                 <a href="clubs.html" class="nav-link">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
                     <span>Clubes</span>
                 </a>
-                <a href="search.html" class="nav-link active">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <span>Buscar</span>
-                </a>
                 <a href="following.html" class="nav-link">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     <span>Seguidores</span>
+                </a>
+                <a href="search.html" class="nav-link active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"stroke-width="2" stroke-linecap="round"stroke-linejoin="round"><circle cx="11" cy="11"r="8" /><line x1="21" y1="21" x2="16.65"y2="16.65" /></svg>
+                    <span>Buscar</span>
                 </a>
             </div>
 
             <div class="nav-right">
                 <a href="profile.html" class="nav-avatar" id="navAvatar">G</a>
                 <button class="btn-logout" onclick="logout()" title="Sair">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12"x2="9" y2="12"/></svg>
                 </button>
             </div>
         </nav>
 
         <div class="page">
 
-            <!--Barra de pesquisa-->
-            <div class="search-bar">
+            <!-- HEADER -->
+            <div class="page-header">
+                <h1 class="page-title">Pesquisar livros</h1>
+                <p class="page-subtitle">Encontra o teu próximo livro favorito</p>
+            </div>
+
+            <!-- SEARCH BAR -->
+            <div class="search-row">
                 <div class="search-input-wrap">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" id="searchInput" placeholder="Pesquisar por título, autor ou ISBN..." autocomplete="off" />
-                    <button id="searchBtn" onclick="doSearch()">Buscar</button>
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none"stroke="currentColor" stroke-width="2"stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21"x2="16.65" y2="16.65" /></svg>
+                    <input type="text" id="searchInput"placeholder="Título, autor ou ISBN..."autocomplete="off" />
+                </div>
+                <button id="searchBtn" class="btn-search"onclick="doSearch()">Pesquisar</button>
+            </div>
+
+            <!-- GENRE CHIPS -->
+            <div class="genre-chips" id="genreChips">
+                <button class="chip active" data-genre>Todos os géneros</button>
+                <button class="chip" data-genre="Romance Clássico">Romance Clássico</button>
+                <button class="chip" data-genre="Realismo Mágico">Realismo Mágico</button>
+                <button class="chip" data-genre="Ficção Política">Ficção Política</button>
+                <button class="chip" data-genre="Ficção Filosófica">Ficção Filosófica</button>
+                <button class="chip" data-genre="Realismo">Realismo</button>
+                <button class="chip" data-genre="Romance Histórico">Romance Histórico</button>
+                <button class="chip" data-genre="Poesia">Poesia</button>
+                <button class="chip" data-genre="Ficção">Ficção</button>
+                <button class="chip" data-genre="Romance">Romance</button>
+                <button class="chip" data-genre="Terror">Terror</button>
+                <button class="chip" data-genre="Ficção Absurdista">Ficção Absurdista</button>
+                <button class="chip" data-genre="Suspense">Suspense</button>
+                <button class="chip" data-genre="Distopia">Distopia</button>
+                <button class="chip" data-genre="Fantasia">Fantasia</button>
+                <button class="chip" data-genre="Mistério">Mistério</button>
+                <button class="chip" data-genre="Ficção Científica">Ficção Científica</button>
+            </div>
+
+            <!-- ESTADO INICIAL -->
+            <div class="search-empty" id="searchEmpty">
+                <div class="featured-books">
+                    <div class="results-grid" id="featuredGrid"></div>
                 </div>
             </div>
 
-            <!--Estado inicial-->
-            <div class="search-empty" id="searchEmpty">
-                <div class="featured-books">
-                    <div class="featured-title">📚 Livros em destaque</div>
-                    <div class="results-grid" id="featuredGrid"></div>
-                </div>                        
-            </div>
-
-            <!--Loading-->
+            <!-- LOADING -->
             <div class="search-loading" id="searchLoading" style="display:none">
                 <div class="spinner"></div>
                 <p>A pesquisar...</p>
             </div>
 
-            <!--Resultados-->
+            <!-- RESULTADOS -->
             <div id="searchResults" style="display:none">
                 <div class="results-header" id="resultsHeader"></div>
                 <div class="results-grid" id="resultsGrid"></div>
@@ -75,7 +99,7 @@
 
         </div>
 
-        <!--Modal adicionar à biblioteca-->
+        <!-- MODAL ADICIONAR À BIBLIOTECA -->
         <div class="overlay" id="addOverlay">
             <div class="modal">
                 <div class="modal-title">Adicionar à Biblioteca</div>
