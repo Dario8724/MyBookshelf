@@ -8,7 +8,7 @@
     <body>
 
 
-<nav>
+    <nav>
         <a href="profile.html" class="logo-text" style="display:flex;align-items:center;gap:0.5rem">
             <img src="../assets/Bookshelf_Icon.png" alt="logo" style="width:35px;height:35px;object-fit:contain;flex-shrink:0">
             <span style="transform:translateY(7px)">My<span class="logo-det">B</span>ookshelf</span>
@@ -64,8 +64,48 @@
                 <div id="mapMarkers" class="map-markers"></div>
                 <div class="map-count" id="mapCount">0 clubes</div>
              </div>
+            <!-- painel direito -->
+             <div class="clubs-painel">
+                <div class="clubs-loading" id="clubsLooading">
+                    <div class="spinner"></div>
+                    <p>A carregar clubes...</p>
+                </div>
+                <div id="clubList" style="display: none;"></div>
+                <div id="clubsEmpty" style="display:none" class="clubs-empty"></div>
+                <div class="empty-icon">📚</div>
+                <p>Nenhum clube encontrado.</p>
+                <p class="empty-sub">Sê o primeiro a criar um!</p>
 
+             </div>
         </div>
+    </div>
+
+    <!---Vista de detalhe do clube--->
+    <div id="viewDetail" style="display: none;" class="page">
+        <button class="btn-back" onclick="showMainView">
+            <svg> width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Clubes
+        </button>
+
+    <!---Header do clube--->
+        <div class="card club-detail-header">
+            <div class="club-detail-top">
+                <div class="club-detail-avatar" id="detailAvatar">C</div>
+                <div class="club-detail-info">
+                    <span class="club-badge">Quinzenal</span>
+                    <h1 class="club-detail-name" id="detailName"></h1>
+                    <p class="club-detail-desk" id="detailDesc"></p>
+                    <div class="club-detail-meta">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                        <span id="detailMembers">0 membros</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="memberBtn" onclick="toggleMembership">Juntar-se</button>
+            </div>
+        </div>
+
+        
+    
     </div>
 
         <!---Criar clube--->
