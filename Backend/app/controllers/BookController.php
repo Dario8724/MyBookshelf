@@ -28,16 +28,48 @@ class BookController extends Controller
             $this->error('A pesquisa deve ter no mínimo 2 caracteres.', 422);
         }
 
-        $books = $this->googleBooks->search($query);
+        $authorThreshold = 3;
 
-        if (empty($books)) {
-            $this->success([], 'Nenhum livro encontrado.');
+        // Fazer ambas as queries
+        $byAuthor = $this->googleBooks->search('inauthor:"' . $query . '"');
+        $byTitle = $this->googleBooks->search('intitle:"' . $query . '"');
+
+        // Se a query for um autor reconhecido (>= 3 livros), prioriza autor
+        if (count($byAuthor) >= $authorThreshold) {
+            $this->success([
+                'total' => count($byAuthor),
+                'books' => $byAuthor,
+                'search_mode' => 'author',
+            ], 'Livros encontrados.');
+            return;
+        }
+
+        // Senão, usa busca por título
+        if (count($byTitle) > 0) {
+            $this->success([
+                'total' => count($byTitle),
+                'books' => $byTitle,
+                'search_mode' => 'title',
+            ], 'Livros encontrados.');
+            return;
+        }
+
+        // Fallback — busca geral
+        $general = $this->googleBooks->search($query);
+
+        if (empty($general)) {
+            $this->success([
+                'total' => 0,
+                'books' => [],
+                'search_mode' => 'general',
+            ], 'Nenhum livro encontrado.');
             return;
         }
 
         $this->success([
-            'total' => count($books),
-            'books' => $books,
+            'total' => count($general),
+            'books' => $general,
+            'search_mode' => 'general',
         ], 'Livros encontrados.');
     }
 
@@ -112,7 +144,7 @@ class BookController extends Controller
 
         // Usa a sintaxe inauthor: da API do Google Books
         $query = 'inauthor:"' . $author . '"';
-        $books = $this->googleBooks->search($query);
+        $books = $this->googleBooks->search('inauthor:"' . $author . '"');
 
         if (empty($books)) {
             $this->success([
