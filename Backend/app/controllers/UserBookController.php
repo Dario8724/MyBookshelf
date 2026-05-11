@@ -163,4 +163,17 @@ class UserBookController extends Controller
         $this->success($result, 'Progresso atualizado com sucesso.');
     }
 
+    public function getFriendsReading(int $bookId): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+        $userId = $payload['user_id'];
+
+        $friends = $this->userBookModel->getFriendsReading($userId, $bookId);
+
+        $this->success([
+            'total' => count($friends),
+            'friends' => $friends,
+        ], 'Amigos a ler carregados com sucesso.');
+    }
+
 }

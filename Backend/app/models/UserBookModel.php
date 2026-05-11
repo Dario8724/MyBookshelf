@@ -33,7 +33,7 @@ class UserBookModel
         return $stmt->execute([
             ':user_id' => $userId,
             ':book_id' => $bookId,
-            ':status'  => $status,
+            ':status' => $status,
             ':status2' => $status,
         ]);
     }
@@ -84,10 +84,10 @@ class UserBookModel
                 VALUES (:user_id, :book_id, 'reading', :current_page, :total_pages)
             ");
             $stmt->execute([
-                ':user_id'      => $userId,
-                ':book_id'      => $bookId,
+                ':user_id' => $userId,
+                ':book_id' => $bookId,
                 ':current_page' => $currentPage,
-                ':total_pages'  => $totalPages,
+                ':total_pages' => $totalPages,
             ]);
             $existing = ['status' => 'reading', 'total_pages' => $totalPages];
         }
@@ -118,16 +118,16 @@ class UserBookModel
 
         $stmt->execute([
             ':current_page' => $currentPage,
-            ':total_pages'  => $finalTotal,
-            ':status'       => $newStatus,
-            ':user_id'      => $userId,
-            ':book_id'      => $bookId,
+            ':total_pages' => $finalTotal,
+            ':status' => $newStatus,
+            ':user_id' => $userId,
+            ':book_id' => $bookId,
         ]);
 
         return [
-            'current_page'   => $currentPage,
-            'total_pages'    => $finalTotal,
-            'status'         => $newStatus,
+            'current_page' => $currentPage,
+            'total_pages' => $finalTotal,
+            'status' => $newStatus,
             'auto_completed' => $autoCompleted,
         ];
     }
@@ -182,10 +182,53 @@ class UserBookModel
 
         $stmt->execute([
             ':favorite' => $newValue,
-            ':user_id'  => $userId,
-            ':book_id'  => $bookId,
+            ':user_id' => $userId,
+            ':book_id' => $bookId,
         ]);
 
         return (bool) $newValue;
+    }
+
+    public function getFriendsReading(int $userId, int $bookId): array
+    {
+        $stmt = $this->db->prepare("
+        SELECT
+            u.user_id,
+            u.name,
+            u.profile_image,
+            ub.current_page,
+            ub.total_pages,
+            ub.updated_at
+        FROM user_book ub
+        JOIN user u ON ub.user_id = u.user_id
+        JOIN follow f ON f.following_id = u.user_id
+        WHERE f.follower_id = :user_id
+        AND ub.book_id = :book_id
+        AND ub.status = 'reading'
+        ORDER BY ub.updated_at DESC
+    ");
+
+        $stmt->execute([
+            ':user_id' => $userId,
+            ':book_id' => $bookId,
+        ]);
+
+        $rows = $stmt->fetchAll();
+
+        // Calcular percentagem no PHP para não fazer no frontend
+        return array_map(function ($r) {
+            $current = (int) $r['current_page'];
+            $total = $r['total_pages'] !== null ? (int) $r['total_pages'] : null;
+            $percent = ($total && $total > 0) ? min(100, round(($current / $total) * 100)) : null;
+
+            return [
+                'user_id' => (int) $r['user_id'],
+                'name' => $r['name'],
+                'profile_image' => $r['profile_image'],
+                'current_page' => $current,
+                'total_pages' => $total,
+                'percent' => $percent,
+            ];
+        }, $rows);
     }
 }
