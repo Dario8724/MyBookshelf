@@ -6,7 +6,15 @@ let isFavorite = false;
 let userScore = 0;
 let showSpoilers = false;
 
-// ===== INIT =====
+const ratingLabels = {
+  1: "Não gostei",
+  2: "Razoável",
+  3: "Gostei",
+  4: "Muito bom",
+  5: "Excelente",
+};
+
+// ---INIT---
 document.addEventListener("DOMContentLoaded", async () => {
   if (!getToken()) {
     window.location.href = "login.html";
@@ -24,10 +32,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  // Fechar modais ao clicar fora
+  document.getElementById("progressOverlay")?.addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeProgressModal();
+  });
+  document.getElementById("shareOverlay")?.addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeShareModal();
+  });
+
   await loadBook();
 });
 
-// ===== NAV AVATAR =====
+// ---NAVEGAÇÃO---
 function updateNavAvatar() {
   const user = JSON.parse(localStorage.getItem("user"));
   if (!user) return;
@@ -42,7 +58,6 @@ function updateNavAvatar() {
   }
 }
 
-// ===== BACK =====
 function goBack() {
   if (window.history.length > 1) {
     window.history.back();
@@ -51,7 +66,7 @@ function goBack() {
   }
 }
 
-// ===== LOAD BOOK =====
+// ---CARREGAR LIVRO---
 async function loadBook() {
   try {
     const url = currentBookId
@@ -68,7 +83,6 @@ async function loadBook() {
 
     currentBook = data.data.book;
 
-    // Se veio pelo google_id, garantir que existe na BD para obter o book_id
     if (!currentBook.book_id && currentGoogleId) {
       try {
         const saveRes = await fetch(`${API}/api/books/save`, {
@@ -93,17 +107,16 @@ async function loadBook() {
 
     renderBook();
 
-    // Mostrar conteúdo
     document.getElementById("pageLoading").style.display = "none";
     document.getElementById("bookContent").style.display = "block";
 
-    // Carregar dados extra em paralelo
     await Promise.all([
       loadStatus(),
       loadRatingAndReviews(),
       loadUserRating(),
       loadReviews(),
       loadFriendsReading(),
+      loadAuthorBooks(),
     ]);
   } catch (err) {
     console.error("Erro ao carregar livro:", err);
@@ -111,14 +124,6 @@ async function loadBook() {
   }
 }
 
-function showError() {
-  document.getElementById("pageLoading").style.display = "none";
-  document.getElementById("bookContent").style.display = "block";
-  document.getElementById("heroCard").style.display = "none";
-  document.getElementById("bookError").style.display = "block";
-}
-
-// ===== RENDER BOOK =====
 function renderBook() {
   const b = currentBook;
   document.title = `MyBookshelf - ${b.title}`;
@@ -147,7 +152,7 @@ function renderBook() {
   document.getElementById("bookAuthor").textContent =
     b.author || "Autor desconhecido";
 
-  // Sinopse — remove HTML que vem da API
+  // Sinopse
   const synopsisEl = document.getElementById("bookSynopsis");
   if (b.description) {
     synopsisEl.textContent = stripHtml(b.description);
@@ -158,7 +163,14 @@ function renderBook() {
   }
 }
 
-// ===== STATUS =====
+function showError() {
+  document.getElementById("pageLoading").style.display = "none";
+  document.getElementById("bookContent").style.display = "block";
+  document.getElementById("heroCard").style.display = "none";
+  document.getElementById("bookError").style.display = "block";
+}
+
+// ---STATUS NA BIBLIOTECA---
 async function loadStatus() {
   if (!currentBookId) {
     renderProgress(null);
@@ -188,7 +200,6 @@ async function loadStatus() {
 }
 
 function updateStatusButtons() {
-  // Status buttons
   document.querySelectorAll(".btn-status[data-status]").forEach((btn) => {
     if (btn.dataset.status === currentStatus) {
       btn.classList.add("active");
@@ -197,7 +208,6 @@ function updateStatusButtons() {
     }
   });
 
-  // Favorite
   const favBtn = document.getElementById("btnFavorite");
   if (isFavorite) {
     favBtn.classList.add("active");
@@ -212,7 +222,6 @@ async function setStatus(status) {
     return;
   }
 
-  // Se clicar no que já está ativo, remove da biblioteca
   if (currentStatus === status) {
     await removeFromLibrary();
     return;
@@ -267,7 +276,7 @@ function statusLabel(status) {
   );
 }
 
-// ===== FAVORITE =====
+// ---FAVORITOS---
 async function toggleFavorite() {
   if (!currentBookId) {
     showToast("Adiciona o livro à biblioteca primeiro.", "error");
@@ -275,7 +284,6 @@ async function toggleFavorite() {
   }
 
   if (!currentStatus) {
-    // Se ainda não está na biblioteca, adiciona como "want_to_read" primeiro
     await setStatus("want_to_read");
   }
 
@@ -299,67 +307,7 @@ async function toggleFavorite() {
   }
 }
 
-// ===== RATING + REVIEWS COUNT =====
-async function loadRatingAndReviews() {
-  if (!currentBookId) return;
-
-  try {
-    // Rating médio
-    const rRes = await fetch(`${API}/api/ratings/${currentBookId}`, {
-      headers: authHeader(),
-    });
-    const rData = await rRes.json();
-
-    if (rData.success && rData.data.average_score) {
-      document.getElementById("ratingValue").textContent =
-        rData.data.average_score;
-    } else {
-      document.getElementById("ratingValue").textContent = "—";
-    }
-
-    // Total reviews
-    const revRes = await fetch(`${API}/api/reviews/book/${currentBookId}`, {
-      headers: authHeader(),
-    });
-    const revData = await revRes.json();
-
-    if (revData.success) {
-      const total = revData.data.total_reviews || 0;
-      document.getElementById("reviewsValue").textContent = formatNumber(total);
-    }
-  } catch (err) {
-    console.error("Erro ao carregar rating/reviews:", err);
-  }
-}
-
-function formatNumber(n) {
-  if (n >= 1000) return (n / 1000).toFixed(1).replace(".0", "") + "k";
-  return n.toString();
-}
-
-// ===== UTILS =====
-function escapeHtml(text) {
-  if (text == null) return "";
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function showToast(msg, type = "success") {
-  const el = document.createElement("div");
-  el.className = "toast " + type;
-  el.textContent = msg;
-  document.getElementById("toastContainer").appendChild(el);
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => el.classList.add("show"));
-  });
-  setTimeout(() => {
-    el.classList.remove("show");
-    setTimeout(() => el.remove(), 300);
-  }, 3000);
-}
-
-// ===== PROGRESSO =====
+// ---PROGRESSO DE LEITURA---
 function renderProgress(data) {
   const container = document.getElementById("progressContent");
   if (!container) return;
@@ -426,7 +374,6 @@ function renderProgress(data) {
     `;
 }
 
-// ===== MODAL =====
 async function openProgressModal() {
   if (!currentBookId) return;
 
@@ -521,24 +468,58 @@ async function saveProgress() {
   }
 }
 
-// Fechar modal ao clicar fora
-document.addEventListener("DOMContentLoaded", () => {
-  const overlay = document.getElementById("progressOverlay");
-  if (overlay) {
-    overlay.addEventListener("click", (e) => {
-      if (e.target === e.currentTarget) closeProgressModal();
-    });
-  }
-});
+// --- AVALIAÇÃO (ESTRELAS) ---
+async function loadRatingAndReviews() {
+  if (!currentBookId) return;
 
-// ===== RATING (estrelas) =====
-const ratingLabels = {
-  1: "Não gostei",
-  2: "Razoável",
-  3: "Gostei",
-  4: "Muito bom",
-  5: "Excelente",
-};
+  try {
+    // Rating médio
+    const rRes = await fetch(`${API}/api/ratings/${currentBookId}`, {
+      headers: authHeader(),
+    });
+    const rData = await rRes.json();
+
+    if (rData.success && rData.data.average_score) {
+      document.getElementById("ratingValue").textContent =
+        rData.data.average_score;
+    } else {
+      document.getElementById("ratingValue").textContent = "—";
+    }
+
+    // Total reviews
+    const revRes = await fetch(`${API}/api/reviews/book/${currentBookId}`, {
+      headers: authHeader(),
+    });
+    const revData = await revRes.json();
+
+    if (revData.success) {
+      const total = revData.data.total_reviews || 0;
+      document.getElementById("reviewsValue").textContent = formatNumber(total);
+    }
+  } catch (err) {
+    console.error("Erro ao carregar rating/reviews:", err);
+  }
+}
+
+async function loadUserRating() {
+  if (!currentBookId) return;
+
+  try {
+    const res = await fetch(`${API}/api/ratings/${currentBookId}`, {
+      headers: authHeader(),
+    });
+    const data = await res.json();
+
+    if (data.success && data.data.user_score) {
+      userScore = data.data.user_score;
+      renderStars(userScore);
+      document.getElementById("ratingLabel").textContent =
+        ratingLabels[userScore];
+    }
+  } catch (err) {
+    console.error("Erro ao carregar avaliação:", err);
+  }
+}
 
 function renderStars(score, hover = false) {
   const buttons = document.querySelectorAll(".star-btn");
@@ -599,28 +580,7 @@ async function setRating(score) {
   }
 }
 
-// ===== USER RATING (carregar avaliação existente) =====
-async function loadUserRating() {
-  if (!currentBookId) return;
-
-  try {
-    const res = await fetch(`${API}/api/ratings/${currentBookId}`, {
-      headers: authHeader(),
-    });
-    const data = await res.json();
-
-    if (data.success && data.data.user_score) {
-      userScore = data.data.user_score;
-      renderStars(userScore);
-      document.getElementById("ratingLabel").textContent =
-        ratingLabels[userScore];
-    }
-  } catch (err) {
-    console.error("Erro ao carregar avaliação:", err);
-  }
-}
-
-// ===== REVIEWS =====
+// ---REVIEWS DA COMUNIDADE---
 async function loadReviews() {
   if (!currentBookId) return;
 
@@ -695,17 +655,6 @@ function renderInlineStars(score) {
   return html;
 }
 
-function formatReviewDate(dateString) {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  if (isNaN(date)) return dateString;
-  return date.toLocaleDateString("pt-PT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
 function toggleSpoilers() {
   showSpoilers = !showSpoilers;
   const btn = document.getElementById("toggleSpoilersBtn");
@@ -715,7 +664,6 @@ function toggleSpoilers() {
   loadReviews();
 }
 
-// ===== SUBMETER REVIEW =====
 async function submitReview() {
   if (!currentBookId) {
     showToast("Adiciona o livro à biblioteca primeiro.", "error");
@@ -763,29 +711,7 @@ async function submitReview() {
   }
 }
 
-function stripHtml(html) {
-  if (!html) return "";
-
-  // Substituir <br>, <p>, </p> por quebras de linha antes de remover tags
-  let text = html
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/p>\s*<p[^>]*>/gi, "\n\n")
-    .replace(/<p[^>]*>/gi, "")
-    .replace(/<\/p>/gi, "\n\n");
-
-  // Usar o browser para decodificar entidades HTML e remover tags restantes
-  const div = document.createElement("div");
-  div.innerHTML = text;
-  text = div.textContent || div.innerText || "";
-
-  // Limpar espaços e quebras excessivas
-  return text
-    .replace(/\n{3,}/g, "\n\n")
-    .replace(/[ \t]+/g, " ")
-    .trim();
-}
-
-// ===== AMIGOS A LER =====
+// ---AMIGOS A LER---
 async function loadFriendsReading() {
   if (!currentBookId) return;
 
@@ -831,4 +757,175 @@ async function loadFriendsReading() {
     console.error("Erro ao carregar amigos:", err);
     list.innerHTML = `<p class="friends-empty">Erro ao carregar amigos.</p>`;
   }
+}
+
+// ---MAIS DO AUTOR---
+async function loadAuthorBooks() {
+  if (!currentBook || !currentBook.author) return;
+
+  const list = document.getElementById("authorBooksList");
+
+  // Pega no primeiro autor (caso haja vários separados por vírgula)
+  const author = currentBook.author.split(",")[0].trim();
+  const excludeId = currentBook.google_id || "";
+
+  try {
+    const url = `${API}/api/books/by-author?name=${encodeURIComponent(author)}&exclude=${encodeURIComponent(excludeId)}&limit=3`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.success || !data.data.books.length) {
+      list.innerHTML = `<p class="author-books-empty">Nenhum outro livro encontrado deste autor.</p>`;
+      return;
+    }
+
+    list.innerHTML = data.data.books
+      .map((book) => {
+        const cover = book.cover
+          ? `<img src="${book.cover}" alt="${escapeHtml(book.title)}" loading="lazy">`
+          : "";
+
+        return `
+                <a href="book.html?google_id=${encodeURIComponent(book.google_id)}" class="author-book-item">
+                    <div class="author-book-cover">${cover}</div>
+                    <div class="author-book-info">
+                        <div class="author-book-title">${escapeHtml(book.title)}</div>
+                        ${book.publication_year ? `<div class="author-book-year">${book.publication_year}</div>` : ""}
+                    </div>
+                </a>
+            `;
+      })
+      .join("");
+  } catch (err) {
+    console.error("Erro ao carregar livros do autor:", err);
+    list.innerHTML = `<p class="author-books-empty">Erro ao carregar.</p>`;
+  }
+}
+
+// ---PARTILHAR---
+function buildShareMessage() {
+  const title = currentBook?.title || "um livro";
+  const author =
+    currentBook?.author?.split(",")[0].trim() || "autor desconhecido";
+  const link = window.location.href;
+  return {
+    text: `Recomendo: "${title}" de ${author} — descobre mais no MyBookshelf: ${link}`,
+    title,
+    author,
+    link,
+  };
+}
+
+function openShareModal() {
+  const msg = buildShareMessage();
+  document.getElementById("sharePreview").textContent = msg.text;
+  document.getElementById("shareLink").value = msg.link;
+
+  // Reset do botão "copiar"
+  const copyBtn = document.getElementById("copyBtn");
+  copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar`;
+
+  document.getElementById("shareOverlay").classList.add("open");
+}
+
+function closeShareModal() {
+  document.getElementById("shareOverlay").classList.remove("open");
+}
+
+async function copyShareLink() {
+  const link = document.getElementById("shareLink").value;
+  const btn = document.getElementById("copyBtn");
+
+  try {
+    await navigator.clipboard.writeText(link);
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copiado!`;
+    showToast("Link copiado.", "success");
+    setTimeout(() => {
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar`;
+    }, 2500);
+  } catch (err) {
+    // Fallback para browsers antigos
+    const input = document.getElementById("shareLink");
+    input.select();
+    document.execCommand("copy");
+    showToast("Link copiado.", "success");
+  }
+}
+
+function shareOn(network) {
+  const msg = buildShareMessage();
+  const encodedText = encodeURIComponent(msg.text);
+  const encodedLink = encodeURIComponent(msg.link);
+
+  const urls = {
+    whatsapp: `https://wa.me/?text=${encodedText}`,
+    x: `https://twitter.com/intent/tweet?text=${encodedText}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedLink}`,
+    telegram: `https://t.me/share/url?url=${encodedLink}&text=${encodedText}`,
+  };
+
+  const url = urls[network];
+  if (!url) return;
+
+  window.open(url, "_blank", "noopener,noreferrer,width=600,height=600");
+}
+
+// ---UTILS---
+function escapeHtml(text) {
+  if (text == null) return "";
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function stripHtml(html) {
+  if (!html) return "";
+
+  // Substituir <br>, <p>, </p> por quebras de linha antes de remover tags
+  let text = html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>\s*<p[^>]*>/gi, "\n\n")
+    .replace(/<p[^>]*>/gi, "")
+    .replace(/<\/p>/gi, "\n\n");
+
+  // Usar o browser para decodificar entidades HTML e remover tags restantes
+  const div = document.createElement("div");
+  div.innerHTML = text;
+  text = div.textContent || div.innerText || "";
+
+  // Limpar espaços e quebras excessivas
+  return text
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]+/g, " ")
+    .trim();
+}
+
+function formatNumber(n) {
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(".0", "") + "k";
+  return n.toString();
+}
+
+function formatReviewDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (isNaN(date)) return dateString;
+  return date.toLocaleDateString("pt-PT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function showToast(msg, type = "success") {
+  const el = document.createElement("div");
+  el.className = "toast " + type;
+  el.textContent = msg;
+  document.getElementById("toastContainer").appendChild(el);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => el.classList.add("show"));
+  });
+  setTimeout(() => {
+    el.classList.remove("show");
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
 }
