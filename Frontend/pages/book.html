@@ -1,66 +1,230 @@
 <!DOCTYPE html>
 <html lang="pt">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MyBookshelf - Livro</title>
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyBookshelf - Livro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/book.css">
+</head>
+<body>
 
-        <nav>
-            <a href="profile.html"><strong>MyBookshelf</strong></a> |
-            <a href="feed.html">Feed</a>
-            <a href="search.html">Buscar</a>
-            <a href="profile.html">Perfil</a>
-            <button onclick="logout()">Sair</button>
-        </nav>
+    <nav>
+        <a href="profile.html" class="logo-text" style="display:flex;align-items:center;gap:0.5rem">
+            <img src="../assets/Bookshelf_Icon.png" alt="logo" style="width:35px;height:35px;object-fit:contain;flex-shrink:0">
+            <span style="transform:translateY(7px)">My<span class="logo-det">B</span>ookshelf</span>
+        </a>
 
-        <hr>
+        <div class="nav-center">
+            <a href="feed.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Feed</span>
+            </a>
+            <a href="clubs.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <span>Clubes</span>
+            </a>
+            <a href="following.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Seguidores</span>
+            </a>
+            <a href="search.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>Buscar</span>
+            </a>
+        </div>
 
-        <div id="bookContainer">
+        <div class="nav-right">
+            <a href="profile.html" class="nav-avatar" id="navAvatar">G</a>
+            <button class="btn-logout" onclick="logout()" title="Sair">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    <div class="page">
+
+        <!-- BACK BUTTON -->
+        <button class="btn-back" onclick="goBack()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            <span>Voltar</span>
+        </button>
+
+        <!-- LOADING -->
+        <div class="page-loading" id="pageLoading">
+            <div class="spinner"></div>
             <p>A carregar livro...</p>
         </div>
 
-        <!--Avaliação -->
-        <div id="ratingSection" style="display:none;">
-            <h3>A tua avaliação</h3>
-            <div id="starRating">
-                <span onclick="rate(1)">★</span>
-                <span onclick="rate(2)">★</span>
-                <span onclick="rate(3)">★</span>
-                <span onclick="rate(4)">★</span>
-                <span onclick="rate(5)">★</span>
+        <!-- MAIN CONTENT -->
+        <div id="bookContent" style="display:none">
+
+            <!-- HERO CARD -->
+            <div class="hero-card" id="heroCard">
+                <div class="hero-cover">
+                    <img id="bookCover" src="" alt="">
+                </div>
+                <div class="hero-info">
+                    <div class="hero-tags" id="heroTags"></div>
+                    <h1 class="hero-title" id="bookTitle"></h1>
+                    <p class="hero-author" id="bookAuthor"></p>
+
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="ratingValue">—</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="reviewsValue">0</div>
+                            <div class="stat-label">Reviews</div>
+                        </div>
+                    </div>
+
+                    <div class="hero-actions" id="heroActions">
+                        <button class="btn-status" data-status="reading" onclick="setStatus('reading')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                            A ler
+                        </button>
+                        <button class="btn-status" data-status="completed" onclick="setStatus('completed')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Lido
+                        </button>
+                        <button class="btn-status" data-status="want_to_read" onclick="setStatus('want_to_read')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                            Quero ler
+                        </button>
+                        <button class="btn-status btn-fav" id="btnFavorite" onclick="toggleFavorite()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            Favorito
+                        </button>
+                    </div>
+                </div>
             </div>
-            <p id="ratingMsg"></p>
+            <!-- LAYOUT 2 COLUNAS -->
+            <div class="content-grid">
+
+                <!-- COLUNA PRINCIPAL -->
+                <div class="main-column">
+
+                    <!-- SINOPSE -->
+                    <section class="content-section">
+                        <h2 class="section-title">Sinopse</h2>
+                        <p class="synopsis" id="bookSynopsis"></p>
+                    </section>
+
+                    <!-- A TUA AVALIAÇÃO -->
+                    <section class="content-section" id="userReviewSection">
+                        <h2 class="section-title">A tua avaliação</h2>
+
+                        <div class="star-rating" id="starRating">
+                            <button class="star-btn" data-score="1" onclick="setRating(1)" onmouseenter="hoverRating(1)" onmouseleave="hoverRating(0)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            </button>
+                            <button class="star-btn" data-score="2" onclick="setRating(2)" onmouseenter="hoverRating(2)" onmouseleave="hoverRating(0)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            </button>
+                            <button class="star-btn" data-score="3" onclick="setRating(3)" onmouseenter="hoverRating(3)" onmouseleave="hoverRating(0)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            </button>
+                            <button class="star-btn" data-score="4" onclick="setRating(4)" onmouseenter="hoverRating(4)" onmouseleave="hoverRating(0)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            </button>
+                            <button class="star-btn" data-score="5" onclick="setRating(5)" onmouseenter="hoverRating(5)" onmouseleave="hoverRating(0)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            </button>
+                            <span class="rating-label" id="ratingLabel"></span>
+                        </div>
+
+                        <textarea id="reviewContent" class="review-textarea" placeholder="Escreve a tua review..." rows="4" maxlength="2000"></textarea>
+
+                        <div class="review-footer">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="spoilerCheck">
+                                <span>Contém spoilers</span>
+                            </label>
+                            <button class="btn btn-primary" id="publishReviewBtn" onclick="submitReview()">Publicar review</button>
+                        </div>
+                    </section>
+
+                    <!-- REVIEWS DA COMUNIDADE -->
+                    <section class="content-section">
+                        <div class="reviews-header">
+                            <h2 class="section-title" style="margin-bottom:0">Reviews da comunidade</h2>
+                            <button class="btn-toggle-spoilers" id="toggleSpoilersBtn" onclick="toggleSpoilers()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <span id="toggleSpoilersText">Mostrar spoilers</span>
+                            </button>
+                        </div>
+
+                        <div id="reviewsList" class="reviews-list">
+                            <p class="reviews-empty">A carregar reviews...</p>
+                        </div>
+                    </section>
+
+                </div>
+
+                <!-- SIDEBAR -->
+                <aside class="sidebar">
+
+                    <!-- PROGRESSO -->
+                    <div class="card progress-card" id="progressCard">
+                        <h3 class="card-title">Progresso</h3>
+                        <div id="progressContent">
+                            <!-- preenchido via JS -->
+                        </div>
+                    </div>
+
+                    <!-- AMIGOS A LER -->
+                    <div class="card friends-card" id="friendsCard">
+                        <h3 class="card-title">Amigos a ler</h3>
+                        <div id="friendsList" class="friends-list"></div>
+                    </div>
+
+                </aside>
+
+            </div>
+
+            <!-- ERRO -->
+            <div id="bookError" style="display:none" class="error-state">
+                <p>Livro não encontrado.</p>
+            </div>
+
         </div>
 
-        <hr>
+    </div>
 
-        <!--Reviews-->
-        <div id="reviewSection" style="display:none;">
-            <h3>Escrever review</h3>
-            <textarea id="reviewContent" rows="4" cols="50" placeholder="Escreve a tua review..."></textarea>
-            <br>
-            <label>
-                <input type="checkbox" id="spoilerCheck"> Contém spoilers
-            </label>
-            <br>
-            <button onclick="submitReview()">Publicar review</button>
-            <p id="reviewMsg"></p>
+    <!-- MODAL ATUALIZAR PROGRESSO -->
+    <div class="overlay" id="progressOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Atualizar progresso</h3>
+                <button class="modal-close" onclick="closeProgressModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="totalPagesInput">Total de páginas</label>
+                    <input type="number" id="totalPagesInput" min="1" placeholder="Ex: 320">
+                    <small class="form-hint">Define o total de páginas do livro</small>
+                </div>
+                <div class="form-group">
+                    <label for="currentPageInput">Página atual</label>
+                    <input type="number" id="currentPageInput" min="0" placeholder="Ex: 50">
+                </div>
+                <p id="progressMsg" class="form-error"></p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeProgressModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveProgress()">Guardar</button>
+            </div>
         </div>
+    </div>
 
-        <hr>
+    <div id="toastContainer"></div>
 
-        <div id="reviewsList">
-            <h3>Reviews</h3>
-            <label style="margin-bottom:1rem;display:block">
-                <input type="checkbox" id="showSpoilers" onchange="toggleSpoilers()"> Mostrar reviews com spoilers
-            </label>
-            <p>A carregar reviews...</p>
-        </div>
-
-        <script src="../js/config.js"></script>
-        <script src="../js/auth.js"></script>
-        <script src="../js/book.js"></script>
-    </body>
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/book.js"></script>
+</body>
 </html>

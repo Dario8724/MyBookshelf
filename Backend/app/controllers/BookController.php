@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ .'/../core/Controller.php';
-require_once __DIR__ .'/../core/GoogleBooksService.php';
-require_once __DIR__ .'/../models/BookModel.php';
+require_once __DIR__ . '/../core/Controller.php';
+require_once __DIR__ . '/../core/GoogleBooksService.php';
+require_once __DIR__ . '/../models/BookModel.php';
 
 class BookController extends Controller
 {
@@ -69,8 +69,8 @@ class BookController extends Controller
     //Guarda um livro do Google na nossa BD
     public function saveFromGoogle(): void
     {
-        $body       = $this->getBody();
-        $googleId   = trim($body['google_id'] ?? '');
+        $body = $this->getBody();
+        $googleId = trim($body['google_id'] ?? '');
 
         if (empty($googleId)) {
             $this->error('O google_id é obrgatório', 422);
@@ -93,6 +93,47 @@ class BookController extends Controller
 
         $bookId = $this->bookModel->createFromGoogle($bookData);
 
-        $this->success(['book_id' => $bookId],'Livro guardado com sucesso.', 201);
+        $this->success(['book_id' => $bookId], 'Livro guardado com sucesso.', 201);
+    }
+
+    public function searchByAuthor(): void
+    {
+        $author = trim($_GET['name'] ?? '');
+        $excludeId = trim($_GET['exclude'] ?? '');
+        $limit = (int) ($_GET['limit'] ?? 3);
+
+        if (empty($author)) {
+            $this->error('O nome do autor é obrigatório.', 422);
+        }
+
+        if ($limit < 1 || $limit > 20) {
+            $limit = 3;
+        }
+
+        // Usa a sintaxe inauthor: da API do Google Books
+        $query = 'inauthor:"' . $author . '"';
+        $books = $this->googleBooks->search($query);
+
+        if (empty($books)) {
+            $this->success([
+                'total' => 0,
+                'books' => [],
+            ], 'Nenhum livro encontrado.');
+            return;
+        }
+
+        // Excluir o livro atual e limitar resultados
+        if (!empty($excludeId)) {
+            $books = array_values(array_filter($books, function ($b) use ($excludeId) {
+                return $b['google_id'] !== $excludeId;
+            }));
+        }
+
+        $books = array_slice($books, 0, $limit);
+
+        $this->success([
+            'total' => count($books),
+            'books' => $books,
+        ], 'Livros encontrados.');
     }
 }
