@@ -42,6 +42,194 @@ async function loadClubs() {
     }
 }
 
+// ── GOOGLE MAPS ───────────────────────────────────────────
+let map = null;
+let marker = null;
+let autocomplete = null;
+let selectedLat = null;
+let selectedLng = null;
+
+async function loadGoogleMaps() {
+    try {
+        const res = await fetch(`${API}/api/config/maps`, { headers: authHeader() });
+        const data = await res.json();
+
+        if (!data.success || !data.data.key) {
+            console.error('Chave do Maps não encontrada');
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${data.data.key}&libraries=places&callback=initMap`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+
+    } catch (err) {
+        console.error('Erro ao carregar Google Maps:', err);
+    }
+}
+
+function initMap() {
+    document.getElementById('mapLoading').style.display = 'none';
+
+    map = new google.maps.Map(document.getElementById('createMap'), {
+        center: { lat: 38.7169, lng: -9.1399 }, // Lisboa por defeito
+        zoom: 13,
+        styles: [
+            { featureType: 'all', elementType: 'geometry', stylers: [{ color: '#EDE8DC' }] },
+            { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#D4CBBA' }] },
+            { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#F5F0E8' }] },
+            { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+        ],
+        disableDefaultUI: true,
+        zoomControl: true,
+    });
+
+    // Clique no mapa para selecionar localização
+    map.addListener('click', (e) => {
+        placeMarker(e.latLng.lat(), e.latLng.lng());
+        reverseGeocode(e.latLng.lat(), e.latLng.lng());
+    });
+
+    // Autocomplete na pesquisa
+    autocomplete = new google.maps.places.Autocomplete(
+        document.getElementById('locationSearch'),
+        { types: ['geocode'], componentRestrictions: { country: 'pt' } }
+    );
+
+    autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) return;
+
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+
+        map.setCenter({ lat, lng });
+        map.setZoom(15);
+        placeMarker(lat, lng);
+        setLocationText(place.formatted_address);
+    });
+}
+
+function placeMarker(lat, lng) {
+    if (marker) marker.setMap(null);
+
+    marker = new google.maps.Marker({
+        position: { lat, lng },
+        map,
+        icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: '#C07B3A',
+            fillOpacity: 1,
+            strokeColor: '#fff',
+            strokeWeight: 2,
+        }
+    });
+
+    selectedLat = lat;
+    selectedLng = lng;
+
+    document.getElementById('clubLat').value = lat;
+    document.getElementById('clubLng').value = lng;
+}
+
+function reverseGeocode(lat, lng) {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+            setLocationText(results[0].formatted_address);
+        }
+    });
+}
+
+function setLocationText(text) {
+    document.getElementById('locationText').textContent = text;
+    document.getElementById('locationSelected').style.display = 'flex';
+    document.getElementById('locationSearch').value = text;
+}
+
+function clearLocation() {
+    if (marker) marker.setMap(null);
+    marker = null;
+    selectedLat = null;
+    selectedLng = null;
+    document.getElementById('clubLat').value = '';
+    document.getElementById('clubLng').value = '';
+    document.getElementById('locationSearch').value = '';
+    document.getElementById('locationSelected').style.display = 'none';
+}
+
+function useMyLocation() {
+    if (!navigator.geolocation) {
+        showToast('Geolocalização não suportada.', 'error');
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        if (map) {
+            map.setCenter({ lat, lng });
+            map.setZoom(15);
+            placeMarker(lat, lng);
+            reverseGeocode(lat, lng);
+        }
+    }, () => {
+        showToast('Não foi possível obter a localização.', 'error');
+    });
+}
+
+// ── ABRIR/FECHAR MODAL ────────────────────────────────────
+function openCreateModal() {
+    document.getElementById('createOverlay').classList.add('open');
+
+    // Carrega o mapa só quando o modal abre
+    if (!map) {
+        loadGoogleMaps();
+    } else {
+        setTimeout(() => google.maps.event.trigger(map, 'resize'), 100);
+    }
+}
+
+function closeCreateModal() {
+    document.getElementById('createOverlay').classList.remove('open');
+    document.getElementById('clubName').value = '';
+    document.getElementById('clubDesc').value = '';
+    clearLocation();
+}
+
+// ── CRIAR CLUBE (atualizado com lat/lng) ──────────────────
+async function createClub() {
+    const name = document.getElementById('clubName').value.trim();
+    const description = document.getElementById('clubDesc').value.trim();
+    const latitude = document.getElementById('clubLat').value || null;
+    const longitude = document.getElementById('clubLng').value || null;
+
+    if (!name) { showToast('O nome é obrigatório.', 'error'); return; }
+    if (!description) { showToast('A descrição é obrigatória.', 'error'); return; }
+
+    try {
+        const res = await fetch(`${API}/api/clubs`, {
+            method: 'POST',
+            headers: authHeader(),
+            body: JSON.stringify({ name, description, latitude, longitude })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            closeCreateModal();
+            showToast('Clube criado com sucesso!', 'success');
+            await loadClubs();
+        } else {
+            showToast(data.error || 'Erro ao criar clube.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
+}
 // --- CRIAR CLUBE ---
 function toggleCreateForm() {
     const form = document.getElementById('createForm');
