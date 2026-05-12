@@ -132,9 +132,7 @@ function renderUsers(containerId, users, isFollowing) {
             ? `<img src="${API}/${u.profile_image}" alt="${u.name}">`
             : `<span>${u.name.charAt(0).toUpperCase()}</span>`;
 
-        const bio = u.bio
-            ? `<div class="user-card-bio">${escapeHtml(u.bio)}</div>`
-            : '';
+        const bio = `<div class="user-card-bio">${u.bio ? escapeHtml(u.bio) : ''}</div>`;
 
         const followers = u.followers_count || 0;
         const following = u.following_count || 0;
