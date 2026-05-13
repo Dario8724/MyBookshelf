@@ -1,63 +1,438 @@
 let currentClubId = null;
-let currentClubMember = false;
+let isMember = false;
+let currentTab = 'messages';
+let allClubs = [];
+let map = null;
+let marker = null;
+let autocomplete = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken()) {
         window.location.href = 'login.html';
         return;
     }
+    loadUserData();
     await loadClubs();
+
+    document.getElementById('createOverlay').addEventListener('click', e => {
+        if (e.target === e.currentTarget) closeCreateModal();
+    });
 });
 
-function formatDate(dateStr) {
-    const [year, month, day] = dateStr.split('-');
-    return `${day}/${month}/${year}`;
+// ── UTILIZADOR ────────────────────────────────────────────
+function loadUserData() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) return;
+    const navAvatar = document.getElementById('navAvatar');
+    if (user.profile_image) {
+        navAvatar.innerHTML = `<img src="${API}/${user.profile_image}" alt="${user.name}">`;
+    } else {
+        navAvatar.textContent = user.name.charAt(0).toUpperCase();
+    }
 }
 
-// --- LISTA DE CLUBES -----
+// ── CARREGAR CLUBES ───────────────────────────────────────
 async function loadClubs() {
+    document.getElementById('clubsLoading').style.display = 'block';
+    document.getElementById('clubsList').style.display = 'none';
+    document.getElementById('clubsEmpty').style.display = 'none';
+
     try {
         const res = await fetch(`${API}/api/clubs`, { headers: authHeader() });
         const data = await res.json();
 
-        const list = document.getElementById('clubsList');
+        document.getElementById('clubsLoading').style.display = 'none';
 
         if (!data.success || !data.data.clubs.length) {
-            list.innerHTML = '<h3>Clubes Disponíveis</h3><p>Ainda não há clubes. Cria o primeiro!</p>';
+            document.getElementById('clubsEmpty').style.display = 'flex';
             return;
         }
 
-        list.innerHTML = '<h3>Clubes Disponíveis</h3>' +
-            data.data.clubs.map(c => `
-                <div style="border:1px solid #ccc;padding:1rem;margin-bottom:0.75rem;border-radius:8px">
-                    <strong>${c.name}</strong>
-                    <p>${c.description || ''}</p>
-                    <small>👥 ${c.total_members || 0} membros</small>
-                    <br><br>
-                    <button onclick="openClub(${c.club_id})">Ver Clube</button>
-                </div>
-            `).join('');
+        allClubs = data.data.clubs;
+        renderClubs(allClubs);
+
     } catch (err) {
-        console.error('Erro ao carregar clubes:', err);
+        document.getElementById('clubsLoading').style.display = 'none';
+        showToast('Erro ao carregar clubes.', 'error');
     }
 }
 
-// ── GOOGLE MAPS ───────────────────────────────────────────
-let map = null;
-let marker = null;
-let autocomplete = null;
-let selectedLat = null;
-let selectedLng = null;
+// ── RENDERIZAR LISTA ──────────────────────────────────────
+function renderClubs(clubs) {
+    const colors = ['#E91E63', '#9C27B0', '#2196F3', '#FF9800', '#4CAF50', '#795548', '#F44336', '#607D8B'];
+    const container = document.getElementById('clubsList');
 
+    container.innerHTML = clubs.map((club, i) => {
+        const color = colors[i % colors.length];
+        return `
+        <div class="club-card" onclick="showClubDetail(${club.club_id})">
+            <div class="club-card-top">
+                <div class="club-avatar" style="background:${color}">${club.name.charAt(0)}</div>
+                <div class="club-card-info">
+                    <div class="club-card-name">${club.name}</div>
+                    <div class="club-card-meta">${club.total_members} membros</div>
+                </div>
+            </div>
+            <div class="club-card-desc">${club.description}</div>
+            <div class="club-card-footer">
+                <div class="club-card-members">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    ${club.created_by_name}
+                </div>
+                <span class="btn btn-outline" style="font-size:0.8rem;padding:0.35rem 0.75rem">Ver clube</span>
+            </div>
+        </div>
+        `;
+    }).join('');
+
+    document.getElementById('mapCount').textContent = `${clubs.length} clubes`;
+    document.getElementById('clubsList').style.display = 'flex';
+    document.getElementById('clubsList').style.flexDirection = 'column';
+    document.getElementById('clubsList').style.gap = '0.75rem';
+}
+
+// ── MOSTRAR DETALHE ───────────────────────────────────────
+async function showClubDetail(clubId) {
+    currentClubId = clubId;
+    document.getElementById('viewMain').style.display = 'none';
+    document.getElementById('viewDetail').style.display = 'flex';
+
+    try {
+        const res = await fetch(`${API}/api/clubs/${clubId}`, { headers: authHeader() });
+        const data = await res.json();
+
+        if (!data.success) { showToast('Clube não encontrado.', 'error'); return; }
+
+        const club = data.data.club;
+        isMember = club.is_member;
+
+        document.getElementById('detailAvatar').textContent = club.name.charAt(0);
+        document.getElementById('detailName').textContent = club.name;
+        document.getElementById('detailDesc').textContent = club.description;
+        document.getElementById('detailMembers').textContent = `${club.member_count} membros`;
+
+        updateMemberBtn();
+        switchTab('messages');
+        loadRanking();
+        renderSidebar(club);
+
+    } catch (err) {
+        showToast('Erro ao carregar clube.', 'error');
+    }
+}
+
+function showMainView() {
+    document.getElementById('viewDetail').style.display = 'none';
+    document.getElementById('viewMain').style.display = 'flex';
+    currentClubId = null;
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function switchTab(tab) {
+    currentTab = tab;
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+
+    document.querySelectorAll('.tab-content').forEach(el => {
+        el.style.display = 'none';
+    });
+
+    document.getElementById(`tab-${tab}`).style.display = 'block';
+
+    if (tab === 'messages') loadMessages();
+    if (tab === 'members') loadMembers();
+    if (tab === 'voting') renderVoting();
+    if (tab === 'library') renderLibrary();
+    if (tab === 'sessions') renderSessions();
+}
+
+// ── MEMBERSHIP ────────────────────────────────────────────
+function updateMemberBtn() {
+    const btn = document.getElementById('memberBtn');
+    if (isMember) {
+        btn.textContent = 'Sair';
+        btn.style.background = 'var(--muted)';
+        btn.style.borderColor = 'var(--muted)';
+    } else {
+        btn.textContent = 'Juntar-se';
+        btn.style.background = 'var(--accent)';
+        btn.style.borderColor = 'var(--accent)';
+    }
+}
+
+async function toggleMembership() {
+    if (!currentClubId) return;
+
+    const endpoint = isMember
+        ? `${API}/api/clubs/${currentClubId}/leave`
+        : `${API}/api/clubs/${currentClubId}/join`;
+
+    try {
+        const res = await fetch(endpoint, { method: 'POST', headers: authHeader() });
+        const data = await res.json();
+
+        if (data.success) {
+            isMember = !isMember;
+            updateMemberBtn();
+            showToast(isMember ? 'Entraste no clube!' : 'Saíste do clube.', 'success');
+            switchTab(currentTab);
+        } else {
+            showToast(data.error || 'Erro.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
+}
+
+// ── MENSAGENS ─────────────────────────────────────────────
+async function loadMessages() {
+    const locked = document.getElementById('messagesLocked');
+    const list = document.getElementById('messagesList');
+    const input = document.getElementById('messageInput');
+
+    if (!isMember) {
+        locked.style.display = 'flex';
+        list.style.display = 'none';
+        input.style.display = 'none';
+        return;
+    }
+
+    locked.style.display = 'none';
+    list.style.display = 'flex';
+    input.style.display = 'flex';
+
+    try {
+        const res = await fetch(`${API}/api/clubs/${currentClubId}/messages`, { headers: authHeader() });
+        const data = await res.json();
+
+        if (!data.success || !data.data.messages.length) {
+            list.innerHTML = '<div style="color:var(--muted);font-size:0.875rem;text-align:center;padding:2rem">Ainda não há mensagens. Sê o primeiro!</div>';
+            return;
+        }
+
+        list.innerHTML = data.data.messages.map(m => {
+            const avatar = m.profile_image
+                ? `<img src="${API}/${m.profile_image}" alt="${m.name}">`
+                : `<span>${m.name.charAt(0).toUpperCase()}</span>`;
+
+            const time = new Date(m.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+
+            return `
+            <div class="message-item">
+                <div class="message-avatar">${avatar}</div>
+                <div class="message-body">
+                    <div class="message-meta">
+                        <span class="message-name">${m.name}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-text">${m.message}</div>
+                </div>
+            </div>
+            `;
+        }).join('');
+
+        list.scrollTop = list.scrollHeight;
+
+    } catch (err) {
+        list.innerHTML = '<div style="color:var(--muted);font-size:0.875rem;text-align:center;padding:2rem">Erro ao carregar mensagens.</div>';
+    }
+}
+
+async function sendMessage() {
+    const content = document.getElementById('msgContent').value.trim();
+    if (!content || !currentClubId) return;
+
+    try {
+        const res = await fetch(`${API}/api/clubs/${currentClubId}/messages`, {
+            method: 'POST',
+            headers: authHeader(),
+            body: JSON.stringify({ message: content })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            document.getElementById('msgContent').value = '';
+            await loadMessages();
+        } else {
+            showToast(data.error || 'Erro ao enviar.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
+}
+
+// ── MEMBROS ───────────────────────────────────────────────
+async function loadMembers() {
+    try {
+        const res = await fetch(`${API}/api/clubs/${currentClubId}/members`, { headers: authHeader() });
+        const data = await res.json();
+
+        if (!data.success) return;
+
+        const members = data.data.members;
+        document.getElementById('membersCount').textContent = `${members.length} membros ativos`;
+
+        document.getElementById('membersList').innerHTML = members.map(m => {
+            const avatar = m.profile_image
+                ? `<img src="${API}/${m.profile_image}" alt="${m.name}">`
+                : `<span>${m.name.charAt(0).toUpperCase()}</span>`;
+
+            return `
+            <div class="member-card">
+                <div class="member-avatar">${avatar}</div>
+                <div class="member-info">
+                    <div class="member-name">${m.name}</div>
+                    <div class="member-role">${m.role === 'admin' ? 'Administrador' : 'Membro'}</div>
+                </div>
+            </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        showToast('Erro ao carregar membros.', 'error');
+    }
+}
+
+// ── SESSÕES ───────────────────────────────────────────────
+function renderSessions() {
+    const sessions = [
+        { month: 'Mai', day: '15', title: 'Discussão: capítulos 1-10', attendees: 18 },
+        { month: 'Mai', day: '20', title: 'Discussão: capítulos 11-20', attendees: 24 },
+        { month: 'Jun', day: '12', title: 'Sessão final', attendees: 22 },
+    ];
+
+    document.getElementById('sessionsList').innerHTML = sessions.map(s => `
+        <div class="session-card">
+            <div style="display:flex;align-items:center;gap:1.5rem">
+                <div class="session-date">
+                    <div class="session-month">${s.month}</div>
+                    <div class="session-day">${s.day}</div>
+                </div>
+                <div class="session-info">
+                    <h3>${s.title}</h3>
+                    <p>${s.attendees} confirmados</p>
+                </div>
+            </div>
+            ${isMember ? `<button class="btn btn-outline">Confirmar presença</button>` : ''}
+        </div>
+    `).join('');
+}
+
+// ── VOTAÇÕES ──────────────────────────────────────────────
+function renderVoting() {
+    const locked = document.getElementById('votingLocked');
+    const list = document.getElementById('votingList');
+
+    if (!isMember) {
+        locked.style.display = 'flex';
+        list.style.display = 'none';
+        return;
+    }
+
+    locked.style.display = 'none';
+    list.style.display = 'block';
+
+    const books = [
+        { id: 1, title: 'Os Maias', author: 'Eça de Queirós', votes: 18, percentage: 33 },
+        { id: 2, title: 'Dom Casmurro', author: 'Machado de Assis', votes: 16, percentage: 29 },
+        { id: 3, title: 'Memorial do Convento', author: 'José Saramago', votes: 10, percentage: 18 },
+    ];
+
+    list.innerHTML = books.map(b => `
+        <div class="vote-card" onclick="castVote(${b.id}, this)">
+            <div class="vote-book">
+                <div class="vote-cover" style="display:flex;align-items:center;justify-content:center;font-size:1.5rem">📖</div>
+                <div>
+                    <div class="vote-title">${b.title}</div>
+                    <div class="vote-author">${b.author}</div>
+                </div>
+            </div>
+            <div class="vote-stats">
+                <div class="vote-percent">${b.percentage}%</div>
+                <div class="vote-count">${b.votes} votos</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function castVote(bookId, el) {
+    document.querySelectorAll('.vote-card').forEach(c => c.classList.remove('voted'));
+    el.classList.add('voted');
+    showToast('Voto registado!', 'success');
+}
+
+// ── BIBLIOTECA ────────────────────────────────────────────
+function renderLibrary() {
+    const books = [
+        { title: 'Orgulho e Preconceito', author: 'Jane Austen' },
+        { title: 'Cem Anos de Solidão', author: 'García Márquez' },
+        { title: 'A Revolução dos Bichos', author: 'George Orwell' },
+        { title: '1984', author: 'George Orwell' },
+    ];
+
+    document.getElementById('libraryGrid').innerHTML = books.map(b => `
+        <div class="library-book">
+            <div class="library-cover" style="display:flex;align-items:center;justify-content:center;font-size:2rem">📚</div>
+            <div class="library-title">${b.title}</div>
+            <div class="library-author">${b.author}</div>
+        </div>
+    `).join('');
+}
+
+// ── RANKING ───────────────────────────────────────────────
+async function loadRanking() {
+    try {
+        const res = await fetch(`${API}/api/clubs/ranking`, { headers: authHeader() });
+        const data = await res.json();
+
+        if (!data.success) return;
+
+        const colors = ['#FFD700', '#C0C0C0', '#CD7F32'];
+        const list = data.data.clubs || [];
+
+        document.getElementById('rankingList').innerHTML = list.map((club, i) => `
+            <div class="rank-card">
+                <div class="rank-position" style="background:${colors[i] || 'var(--surface2)'}">
+                    ${i + 1}
+                </div>
+                <div class="rank-avatar">${club.name.charAt(0)}</div>
+                <div class="rank-info">
+                    <div class="rank-name">${club.name}</div>
+                    <div class="rank-type">Clube de leitura</div>
+                </div>
+                <div class="rank-points">
+                    ${club.points || club.total_members}
+                    <span>pontos</span>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        document.getElementById('rankingList').innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem">Sem dados de ranking.</div>';
+    }
+}
+
+// ── SIDEBAR ───────────────────────────────────────────────
+function renderSidebar(club) {
+    document.getElementById('sidebarBook').innerHTML = `
+        <div class="sidebar-book-cover" style="display:flex;align-items:center;justify-content:center;font-size:3rem">📖</div>
+        <div class="sidebar-book-title">Livro do mês</div>
+        <div class="sidebar-book-author">A definir pelos membros</div>
+        <div class="stars">★★★★☆</div>
+    `;
+    document.getElementById('progressFill').style.width = '45%';
+    document.getElementById('progressText').textContent = '45% dos membros já terminaram';
+}
+
+// ── GOOGLE MAPS ───────────────────────────────────────────
 async function loadGoogleMaps() {
     try {
         const res = await fetch(`${API}/api/config/maps`, { headers: authHeader() });
         const data = await res.json();
 
-        if (!data.success || !data.data.key) {
-            console.error('Chave do Maps não encontrada');
-            return;
-        }
+        if (!data.success || !data.data.key) return;
 
         const script = document.createElement('script');
         script.src = `https://maps.googleapis.com/maps/api/js?key=${data.data.key}&libraries=places&callback=initMap`;
@@ -74,7 +449,7 @@ function initMap() {
     document.getElementById('mapLoading').style.display = 'none';
 
     map = new google.maps.Map(document.getElementById('createMap'), {
-        center: { lat: 38.7169, lng: -9.1399 }, // Lisboa por defeito
+        center: { lat: 38.7169, lng: -9.1399 },
         zoom: 13,
         styles: [
             { featureType: 'all', elementType: 'geometry', stylers: [{ color: '#EDE8DC' }] },
@@ -86,13 +461,11 @@ function initMap() {
         zoomControl: true,
     });
 
-    // Clique no mapa para selecionar localização
     map.addListener('click', (e) => {
         placeMarker(e.latLng.lat(), e.latLng.lng());
         reverseGeocode(e.latLng.lat(), e.latLng.lng());
     });
 
-    // Autocomplete na pesquisa
     autocomplete = new google.maps.places.Autocomplete(
         document.getElementById('locationSearch'),
         { types: ['geocode'], componentRestrictions: { country: 'pt' } }
@@ -128,9 +501,6 @@ function placeMarker(lat, lng) {
         }
     });
 
-    selectedLat = lat;
-    selectedLng = lng;
-
     document.getElementById('clubLat').value = lat;
     document.getElementById('clubLng').value = lng;
 }
@@ -153,8 +523,6 @@ function setLocationText(text) {
 function clearLocation() {
     if (marker) marker.setMap(null);
     marker = null;
-    selectedLat = null;
-    selectedLng = null;
     document.getElementById('clubLat').value = '';
     document.getElementById('clubLng').value = '';
     document.getElementById('locationSearch').value = '';
@@ -182,11 +550,9 @@ function useMyLocation() {
     });
 }
 
-// ── ABRIR/FECHAR MODAL ────────────────────────────────────
+// ── MODAL ─────────────────────────────────────────────────
 function openCreateModal() {
     document.getElementById('createOverlay').classList.add('open');
-
-    // Carrega o mapa só quando o modal abre
     if (!map) {
         loadGoogleMaps();
     } else {
@@ -201,7 +567,7 @@ function closeCreateModal() {
     clearLocation();
 }
 
-// ── CRIAR CLUBE (atualizado com lat/lng) ──────────────────
+// ── CRIAR CLUBE ───────────────────────────────────────────
 async function createClub() {
     const name = document.getElementById('clubName').value.trim();
     const description = document.getElementById('clubDesc').value.trim();
@@ -230,509 +596,13 @@ async function createClub() {
         showToast('Erro de ligação.', 'error');
     }
 }
-// --- CRIAR CLUBE ---
-function toggleCreateForm() {
-    const form = document.getElementById('createForm');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-}
 
-async function createClub() {
-    const name = document.getElementById('clubName').value.trim();
-    const description = document.getElementById('clubDescription').value.trim();
-    const latitude = document.getElementById('clubLat').value;
-    const longitude = document.getElementById('clubLng').value;
-    const msg = document.getElementById('createMsg');
-
-    if (!name) { msg.textContent = 'O nome do clube é obrigatório.'; return; }
-
-    try {
-        const res = await fetch(`${API}/api/clubs`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-            body: JSON.stringify({ name, description, latitude, longitude })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            msg.textContent = 'Clube criado com sucesso!';
-            document.getElementById('clubName').value = '';
-            document.getElementById('clubDescription').value = '';
-            toggleCreateForm();
-            await loadClubs();
-        } else {
-            msg.textContent = data.message || 'Erro ao criar clube.';
-        }
-    } catch (err) {
-        msg.textContent = 'Erro ao ligar ao servidor.';
-    }
-}
-
-// --- ABRIR CLUBE ---
-async function openClub(clubId) {
-    currentClubId = clubId;
-
-    try {
-        const res  = await fetch(`${API}/api/clubs/${clubId}`, { headers: authHeader() });
-        const data = await res.json();
-
-        if (!data.success) return;
-
-        const club = data.data.club;
-        currentClubMember = club.is_member || false;
-
-        document.getElementById('clubDetailName').textContent = club.name;
-        document.getElementById('clubDetailDesc').textContent = club.description || '';
-
-        const actions = document.getElementById('clubActions');
-        if (currentClubMember) {
-            actions.innerHTML = `<button onclick="leaveClub()">Sair do Clube</button>`;
-        } else {
-            actions.innerHTML = `<button onclick="joinClub()">Entrar no Clube</button>`;
-        }
-
-        document.getElementById('clubDetail').style.display = 'block';
-        document.getElementById('clubsList').style.display = 'none';
-        document.getElementById('createSection').style.display = 'none';
-        
-        showTab('messages');
-
-    } catch (err) {
-        console.error('Erro ao abrir clube:', err);
-    }
-}
-
-function closeClub() {
-    currentClubId = null;
-    currentClubMember = false;
-    document.getElementById('clubDetail').style.display = 'none';
-    document.getElementById('clubsList').style.display = 'block';
-    document.getElementById('createSection').style.display = 'block';
-}
-
-// --- ENTRAR / SAIR ------
-async function joinClub() {
-    try {
-        const res = await fetch(`${API}/api/clubs/${currentClubId}/join`, {
-            method: 'POST',
-            headers: authHeader()
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            currentClubMember = true;
-            document.getElementById('clubActions').innerHTML =
-                `<button onclick="leaveClub()">Sair do Clube</button>`;
-            alert('Entraste no clube!');
-        } else {
-            alert(data.message || 'Erro ao entrar no clube.');
-        }
-    } catch (err) {
-        alert('Erro ao ligar ao servidor.');
-    }
-}
-
-async function leaveClub() {
-    if (!confirm('Tens a certeza que queres sair do clube?')) return;
-
-    try {
-        const res  = await fetch(`${API}/api/clubs/${currentClubId}/leave`, {
-            method: 'DELETE',
-            headers: authHeader(),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            currentClubMember = false;
-            document.getElementById('clubActions').innerHTML =
-                `<button onclick="joinClub()">Entrar no Clube</button>`;
-            alert('Saíste do clube!');
-        } else {
-            alert(data.message || 'Erro ao sair do clube.');
-        }
-    } catch (err) {
-        alert('Erro ao ligar ao servidor.');
-    }
-}
-
-// --- TABS ---
-function showTab(tab) {
-    const tabs = ['messages', 'sessions', 'votes', 'library', 'ranking'];
-    tabs.forEach(t => {
-        document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
-    });
-
-    if (tab === 'messages') loadMessages();
-    if (tab === 'sessions') loadSessions();
-    if (tab === 'votes') loadVotes();
-    if (tab === 'library') loadClubLibrary();
-    if (tab === 'ranking') loadRanking();
-}
-
-// --- MENSAGENS ---
-async function loadMessages() {
-    try {
-        const res  = await fetch(`${API}/api/clubs/${currentClubId}/messages`, { headers: authHeader() });
-        const data = await res.json();
-
-        const list = document.getElementById('messagesList');
-
-        if (!data.success || !data.data.messages.length) {
-            list.innerHTML = '<p>Ainda não há mensagens.</p>';
-            return;
-        }
-
-        const messages  = data.data.messages;
-        const preview   = currentClubMember ? messages : messages.slice(0, 3);
-
-        list.innerHTML = preview.map(m => `
-            <div style="margin-bottom:0.75rem">
-                <strong>${m.user_name}</strong>
-                <p style="margin:0.2rem 0">${m.message}</p>
-            </div>
-        `).join('');
-
-        if (!currentClubMember && messages.length > 3) {
-            list.innerHTML += `
-                <div style="text-align:center;padding:1rem;background:var(--surface);border-radius:10px;margin-top:0.75rem">
-                    <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0.5rem">
-                        🔒 Entra no clube para ver todas as mensagens e participar na conversa.
-                    </p>
-                    <button onclick="joinClub()" style="padding:0.5rem 1.25rem;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:500">
-                        Entrar no Clube
-                    </button>
-                </div>
-            `;
-        }
-
-        list.scrollTop = list.scrollHeight;
-
-    } catch (err) {
-        console.error('Erro ao carregar mensagens:', err);
-    }
-}
-
-async function sendMessage() {
-    const content = document.getElementById('messageContent').value.trim();
-    if (!content) return;
-
-    try {
-        const res = await fetch(`${API}/api/clubs/${currentClubId}/messages`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-            body: JSON.stringify({ message: content })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            document.getElementById('messageContent').value = '';
-            await loadMessages();
-        }
-    } catch (err) {
-        alert('Erro ao enviar mensagem.');
-    }
-}
-
-// --- SESSÕES ----
-async function loadSessions() {
-    try {
-        const res = await fetch(`${API}/api/clubs/${currentClubId}/sessions`, { headers: authHeader() });
-        const data = await res.json();
-
-        const list = document.getElementById('sessionsList');
-
-        if (!data.success || !data.data.sessions.length) {
-            list.innerHTML = '<p>Ainda não há sessões.</p>';
-            return;
-        }
-
-        list.innerHTML = data.data.sessions.map(s => `
-            <div style="border:1px solid #ccc;padding:0.75rem;margin-bottom:0.5rem;border-radius:6px">
-                <strong>${s.title}</strong> - ${s.author}<br>
-                <small>📅 ${formatDate(s.start_date)} → ${formatDate(s.end_date)}</small>
-                <span style="margin-left:1rem;color:${s.status === 'completed' ? 'green' : 'orange'}">${s.status}</span>
-                ${s.status === 'active' ? `<button onclick="completeSession(${s.session_id})">Marcar como concluída</button>` : ''}
-            </div>
-        `).join('');
-
-    } catch (err) {
-        console.error('Erro ao carregar sessões:', err);
-    }
-}
-
-async function createSession() {
-    const bookId    = document.getElementById('sessionBookId').value;
-    const startDate = document.getElementById('sessionStart').value;
-    const endDate   = document.getElementById('sessionEnd').value;
-    const msg       = document.getElementById('sessionMsg');
-
-    if (!bookId || !startDate || !endDate) {
-        msg.textContent = 'Preenche todos os campos.';
-        return;
-    }
-
-    try {
-        const res  = await fetch(`${API}/api/clubs/${currentClubId}/sessions`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-            body: JSON.stringify({ book_id: parseInt(bookId), start_date: startDate, end_date: endDate }),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            msg.textContent = 'Sessão criada!';
-            await loadSessions();
-        } else {
-            msg.textContent = data.error || 'Erro ao criar sessão.';
-        }
-    } catch (err) {
-        msg.textContent = 'Erro ao ligar ao servidor.';
-    }
-}
-
-async function completeSession(sessionId) {
-    try {
-        const res  = await fetch(`${API}/api/clubs/sessions/${sessionId}/complete`, {
-            method: 'POST',
-            headers: authHeader(),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            await loadSessions();
-        } else {
-            alert(data.error || 'Erro ao completar sessão.');
-        }
-    } catch (err) {
-        console.error('Erro ao ligar ao servidor.');
-    }
-}
-
-// --- VOTAÇÕES ---
-async function loadVotes() {
-    try {
-        const res  = await fetch(`${API}/api/clubs/${currentClubId}/votes`, { headers: authHeader() });
-        const data = await res.json();
-
-        const list = document.getElementById('votesList');
-
-        if (!data.success || !data.data.votes.length) {
-            list.innerHTML = '<p>Ainda não há votações.</p>';
-            return;
-        }
-
-        list.innerHTML = data.data.votes.map(v => `
-            <div style="border:1px solid #ccc;padding:1rem;margin-bottom:0.75rem;border-radius:10px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
-                    <strong>${v.title}</strong>
-                    <span style="color:${v.status === 'open' ? 'green' : 'gray'};font-size:0.8rem">${v.status === 'open' ? '🟢 Aberta' : '🔴 Fechada'}</span>
-                </div>
-                <small style="color:#8a8070">📅 ${formatDate(v.start_date)} → ${formatDate(v.end_date)} · ${v.total_votes} votos</small>
-
-                <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap">
-                    ${v.options.map(o => `
-                        <div style="border:2px solid ${v.user_voted_option === o.option_id ? '#C07B3A' : '#D4CBBA'};border-radius:10px;padding:0.75rem;width:140px;text-align:center;cursor:${v.status === 'open' && !v.user_voted_option ? 'pointer' : 'default'}"
-                             onclick="${v.status === 'open' && !v.user_voted_option ? `castVote(${v.vote_id}, ${o.option_id})` : ''}">
-                            ${o.cover ? `<img src="${o.cover}" style="width:80px;height:110px;object-fit:cover;border-radius:6px;margin-bottom:0.5rem">` : '<div style="width:80px;height:110px;background:#EDE8DC;border-radius:6px;margin:0 auto 0.5rem;display:flex;align-items:center;justify-content:center">📖</div>'}
-                            <div style="font-size:0.75rem;font-weight:500;color:#2C2A24">${o.title}</div>
-                            <div style="font-size:0.7rem;color:#8a8070">${o.author}</div>
-                            <div style="font-size:0.75rem;margin-top:0.4rem;color:#C07B3A;font-weight:600">${o.total_votes} votos</div>
-                            ${v.user_voted_option === o.option_id ? '<div style="font-size:0.7rem;color:#C07B3A">✓ O teu voto</div>' : ''}
-                        </div>
-                    `).join('')}
-                </div>
-
-                ${v.status === 'open' && currentClubMember ? `
-                    <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #D4CBBA">
-                        ${v.user_voted_option
-                            ? '<small style="color:#8a8070">✓ Já votaste nesta votação</small>'
-                            : '<small style="color:#8a8070">Clica num livro para votar</small>'
-                        }
-                    </div>
-                ` : ''}
-            </div>
-        `).join('');
-
-    } catch (err) {
-        console.error('Erro ao carregar votações:', err);
-    }
-}
-
-async function createVote() {
-    const title = document.getElementById('voteTitle').value.trim();
-    const startDate = document.getElementById('voteStart').value;
-    const endDate = document.getElementById('voteEnd').value;
-    const msg = document.getElementById('voteMsg');
-
-    if (!title || !startDate || !endDate) {
-        msg.textContent = 'Preenche todos os campos.';
-        return;
-    }
-
-    try {
-        const res  = await fetch(`${API}/api/clubs/${currentClubId}/votes`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-            body: JSON.stringify({ title, start_date: startDate, end_date: endDate }),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            msg.textContent = 'Votação criada!';
-            document.getElementById('voteTitle').value = '';
-            await loadVotes();
-        } else {
-            msg.textContent = data.error || 'Erro ao criar votação.';
-        }
-    } catch (err) {
-        msg.textContent = 'Erro ao ligar ao servidor.';
-    }
-}
-
-async function addVoteOption(voteId) {
-    const bookId = document.getElementById(`optionBook-${voteId}`).value;
-    if (!bookId) return;
-
-    try {
-        const res  = await fetch(`${API}/api/clubs/votes/${voteId}/options`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-            body: JSON.stringify({ book_id: parseInt(bookId) }),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            alert('Opção adicionada! Option ID: ${data.data.option_id}');
-        } else {
-            alert(data.error || 'Erro ao adicionar opção.');
-        }
-    } catch (err) {
-        alert('Erro ao ligar ao servidor.');
-    }
-}
-
-async function castVote(voteId, optionId) {
-    try {
-        const res  = await fetch(`${API}/api/clubs/votes/${voteId}/cast`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-            body: JSON.stringify({ option_id: optionId }),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            await loadVotes();
-        } else {
-            alert(data.error || 'Erro ao votar.');
-        }
-    } catch (err) {
-        alert('Erro ao ligar ao servidor.');
-    }
-}
-
-// –– BIBLIOTECA DO CLUBE ---
-async function loadClubLibrary() {
-    try {
-        const res = await fetch(`${API}/api/clubs/${currentClubId}/library`, { headers: authHeader() });
-        const data = await res.json();
-        
-        const list = document.getElementById('clubLibraryList');
-
-        if (!data.success || !data.data.books.length) {
-            list.innerHTML = '<p>A biblioteca está vazia.<p>';
-            return;
-        }
-
-        list.innerHTML = data.data.books.map(b => `
-            <div style="border:1px solid #ccc;padding:0.75rem;margin-bottom:0.5rem;border-radius:6px">
-                <strong>${b.title}</strong> - ${b.author}<br>
-                <small style="margin-left:1rem">Adicionado por ${b.added_by_name}</small>
-                <button onclick="removeBookFromClub(${b.club_library_id})" style="margin-left:1rem">Remover</button>
-            </div>
-        `).join('');
-    
-    } catch (err) {
-        console.error('Erro ao carregar biblioteca:', err);
-    }
-}
-
-async function addBookToClub() {
-    const bookId = document.getElementById('libraryBookId').value;
-    const msg = document.getElementById('libraryMsg');
-
-    if (!bookId) { msg.textContent = 'Introduz um Book ID.'; return; }
-
-    try {
-        const res  = await fetch(`${API}/api/clubs/${currentClubId}/library`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-            body: JSON.stringify({ book_id: parseInt(bookId) }),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            msg.textContent = 'Livro adicionado!';
-            document.getElementById('libraryBookId').value = '';
-            await loadClubLibrary();
-        } else {
-            msg.textContent = data.error || 'Erro ao adicionar livro.';
-        }
-    } catch (err) {
-        msg.textContent = 'Erro ao ligar ao servidor.';
-    }
-}
-
-async function removeBookFromClub(clubLibraryId) {
-    if (!confirm('Remover este livro da biblioteca do clube?')) return;
-
-    try {
-        const res  = await fetch(`${API}/api/clubs/library/${clubLibraryId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-            body: JSON.stringify({ club_id: currentClubId }),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            await loadClubLibrary();
-        } else {
-            alert(data.error || 'Erro ao remover livro.');
-        }
-    } catch (err) {
-        alert('Erro ao ligar ao servidor.');
-    }
-}
-
-// ––– RANKING ––––
-async function loadRanking() {
-    try {
-        const res  = await fetch(`${API}/api/clubs/ranking/global`, { headers: authHeader() });
-        const data = await res.json();
-
-        const list = document.getElementById('rankingList');
-
-        if (!data.success || !data.data.ranking.length) {
-            list.innerHTML = '<p>Ainda não há pontos nesta season.</p>';
-            return;
-        }
-
-        const medals = ['🥇', '🥈', '🥉'];
-
-        list.innerHTML = `
-            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">
-                Season ${data.data.season.season_id} — ${data.data.season.start_date} → ${data.data.season.end_date}
-            </p>
-            ${data.data.ranking.map((r, i) => `
-                <div style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);padding:0.75rem 1rem;margin-bottom:0.5rem;border-radius:10px;background:${r.club_id === currentClubId ? 'var(--surface)' : 'transparent'}">
-                    <div style="display:flex;align-items:center;gap:0.75rem">
-                        <span style="font-size:1.2rem">${medals[i] || '#' + (i + 1)}</span>
-                        <strong style="color:${r.club_id === currentClubId ? 'var(--accent)' : 'var(--text)'}">${r.name}</strong>
-                    </div>
-                    <span style="font-weight:600;color:var(--accent)">${r.total_points} pts</span>
-                </div>
-            `).join('')}
-        `;
-
-    } catch (err) {
-        console.error('Erro ao carregar ranking:', err);
-    }
+// ── TOAST ─────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+    const el = document.createElement('div');
+    el.className = 'toast ' + type;
+    el.textContent = msg;
+    document.getElementById('toastContainer').appendChild(el);
+    requestAnimationFrame(() => { requestAnimationFrame(() => el.classList.add('show')); });
+    setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 3000);
 }

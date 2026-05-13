@@ -34,4 +34,3 @@ INSERT INTO book (title, author, isbn, publisher, publication_year, language, de
 ('1984', 'George Orwell', '9788535914849', 'Companhia das Letras', 1949, 'Português', 'Uma distopia sobre um estado totalitário.', NULL),
 ('O Hobbit', 'J.R.R. Tolkien', '9788533613286', 'Martins Fontes', 1937, 'Português', 'A aventura de Bilbo Bolseiro.', NULL);
 
-
