@@ -13,3 +13,6 @@ define('UPLOAD_ALLOWED_TYPES', ['image/jpeg', 'image/png', 'image/webp']);
 
 // Google Books API
 define('GOOGLE_BOOKS_API_KEY', $env['GOOGLE_BOOKS_API_KEY'] ?? '');
+
+// Google Maps API
+define('GOOGLE_MAPS_API_KEY', $env['GOOGLE_MAPS_API_KEY'] ?? '');

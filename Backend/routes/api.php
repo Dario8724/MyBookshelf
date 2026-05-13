@@ -71,3 +71,5 @@ $router->get('/api/seasons',                   'ClubSeasonController@index');
 $router->get('/api/seasons/current',           'ClubSeasonController@current');
 $router->get('/api/seasons/{id}/ranking',      'ClubSeasonController@ranking');
 $router->get('/api/clubs/ranking/global', 'ClubRankingController@globalRanking');
+// new router 
+$router->get('/api/config/maps', 'ConfigController@mapsKey');
