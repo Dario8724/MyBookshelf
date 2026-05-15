@@ -20,6 +20,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
+// ── HELPERS ───────────────────────────────────────────────
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
+}
+
 // ── UTILIZADOR ────────────────────────────────────────────
 function loadUserData() {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -223,8 +230,8 @@ async function loadMessages() {
 
         list.innerHTML = data.data.messages.map(m => {
             const avatar = m.profile_image
-                ? `<img src="${API}/${m.profile_image}" alt="${m.name}">`
-                : `<span>${m.name.charAt(0).toUpperCase()}</span>`;
+                ? `<img src="${API}/${m.profile_image}" alt="${m.user_name}">`
+                : `<span>${m.user_name.charAt(0).toUpperCase()}</span>`;
 
             const time = new Date(m.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
 
@@ -233,7 +240,7 @@ async function loadMessages() {
                 <div class="message-avatar">${avatar}</div>
                 <div class="message-body">
                     <div class="message-meta">
-                        <span class="message-name">${m.name}</span>
+                        <span class="message-name">${m.user_name}</span>
                         <span class="message-time">${time}</span>
                     </div>
                     <div class="message-text">${m.message}</div>
@@ -304,15 +311,93 @@ async function loadMembers() {
 }
 
 // ── SESSÕES ───────────────────────────────────────────────
-function renderSessions() {
-    document.getElementById('sessionsList').innerHTML = `
-        <div style="color:var(--muted);text-align:center;padding:3rem;font-size:0.875rem">
-            Ainda não há sessões agendadas.
-        </div>`;
+async function renderSessions() {
+    const container = document.getElementById('sessionsList');
+    container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem">A carregar...</div>';
+
+    try {
+        const res = await fetch(`${API}/api/clubs/${currentClubId}/sessions`, { headers: authHeader() });
+        const data = await res.json();
+
+        const sessions = (data.success && data.data.sessions) || [];
+
+        const createForm = isMember ? `
+            <div class="card" style="margin-bottom:1rem;padding:1rem">
+                <h4 style="margin-bottom:0.75rem">Nova Sessão</h4>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
+                    <input type="number" id="sessionBookId" placeholder="Book ID" style="width:110px;padding:0.5rem;border:1px solid var(--border);border-radius:8px">
+                    <input type="date" id="sessionStart" style="padding:0.5rem;border:1px solid var(--border);border-radius:8px">
+                    <input type="date" id="sessionEnd" style="padding:0.5rem;border:1px solid var(--border);border-radius:8px">
+                    <button class="btn btn-primary" onclick="createSession()">Criar</button>
+                </div>
+            </div>
+        ` : '';
+
+        const list = sessions.length ? sessions.map(s => `
+            <div class="card" style="padding:1rem;margin-bottom:0.5rem">
+                <strong>${s.title}</strong> — ${s.author}<br>
+                <small style="color:var(--muted)">📅 ${formatDate(s.start_date)} → ${formatDate(s.end_date)}</small>
+                <span style="margin-left:1rem;color:${s.status === 'completed' ? 'green' : 'orange'}">${s.status}</span>
+                ${s.status === 'active' && isMember ? `<button class="btn btn-outline" style="margin-left:1rem;font-size:0.8rem" onclick="completeSession(${s.session_id})">Concluir</button>` : ''}
+            </div>
+        `).join('') : '<div style="color:var(--muted);text-align:center;padding:2rem">Ainda não há sessões.</div>';
+
+        container.innerHTML = createForm + list;
+    } catch (err) {
+        container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem">Erro ao carregar sessões.</div>';
+    }
+}
+
+async function createSession() {
+    const bookId = document.getElementById('sessionBookId').value;
+    const startDate = document.getElementById('sessionStart').value;
+    const endDate = document.getElementById('sessionEnd').value;
+
+    if (!bookId || !startDate || !endDate) {
+        showToast('Preenche todos os campos.', 'error');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API}/api/clubs/${currentClubId}/sessions`, {
+            method: 'POST',
+            headers: authHeader(),
+            body: JSON.stringify({ book_id: parseInt(bookId), start_date: startDate, end_date: endDate })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast('Sessão criada!', 'success');
+            renderSessions();
+        } else {
+            showToast(data.error || 'Erro ao criar sessão.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
+}
+
+async function completeSession(sessionId) {
+    try {
+        const res = await fetch(`${API}/api/clubs/sessions/${sessionId}/complete`, {
+            method: 'POST',
+            headers: authHeader()
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast('Sessão concluída!', 'success');
+            renderSessions();
+        } else {
+            showToast(data.error || 'Erro.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
 }
 
 // ── VOTAÇÕES ──────────────────────────────────────────────
-function renderVoting() {
+async function renderVoting() {
     const locked = document.getElementById('votingLocked');
     const list = document.getElementById('votingList');
 
@@ -324,43 +409,213 @@ function renderVoting() {
 
     locked.style.display = 'none';
     list.style.display = 'block';
-    list.innerHTML = `
-        <div style="color:var(--muted);text-align:center;padding:3rem;font-size:0.875rem">
-            Ainda não há votações ativas.
-        </div>`;
+    list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem">A carregar...</div>';
+
+    try {
+        const res = await fetch(`${API}/api/clubs/${currentClubId}/votes`, { headers: authHeader() });
+        const data = await res.json();
+
+        const votes = (data.success && data.data.votes) || [];
+
+        const createForm = `
+            <div class="card" style="margin-bottom:1rem;padding:1rem">
+                <h4 style="margin-bottom:0.75rem">Nova Votação</h4>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
+                    <input type="text" id="voteTitle" placeholder="Título" style="flex:1;min-width:200px;padding:0.5rem;border:1px solid var(--border);border-radius:8px">
+                    <input type="date" id="voteStart" style="padding:0.5rem;border:1px solid var(--border);border-radius:8px">
+                    <input type="date" id="voteEnd" style="padding:0.5rem;border:1px solid var(--border);border-radius:8px">
+                    <button class="btn btn-primary" onclick="createVote()">Criar</button>
+                </div>
+            </div>
+        `;
+
+        const votesList = votes.length ? votes.map(v => `
+            <div class="card" style="padding:1rem;margin-bottom:0.75rem">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+                    <strong>${v.title}</strong>
+                    <span style="color:${v.status === 'open' ? 'green' : 'gray'};font-size:0.8rem">${v.status === 'open' ? '🟢 Aberta' : '🔴 Fechada'}</span>
+                </div>
+                <small style="color:var(--muted)">📅 ${formatDate(v.start_date)} → ${formatDate(v.end_date)} · ${v.total_votes} votos</small>
+                <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap">
+                    ${v.options.map(o => `
+                        <div style="border:2px solid ${v.user_voted_option === o.option_id ? 'var(--accent)' : 'var(--border)'};border-radius:10px;padding:0.75rem;width:140px;text-align:center;cursor:${v.status === 'open' && !v.user_voted_option ? 'pointer' : 'default'}"
+                             onclick="${v.status === 'open' && !v.user_voted_option ? `castVote(${v.vote_id}, ${o.option_id})` : ''}">
+                            ${o.cover ? `<img src="${o.cover}" style="width:80px;height:110px;object-fit:cover;border-radius:6px;margin-bottom:0.5rem">` : '<div style="width:80px;height:110px;background:var(--surface2);border-radius:6px;margin:0 auto 0.5rem;display:flex;align-items:center;justify-content:center">📖</div>'}
+                            <div style="font-size:0.75rem;font-weight:500">${o.title}</div>
+                            <div style="font-size:0.7rem;color:var(--muted)">${o.author}</div>
+                            <div style="font-size:0.75rem;margin-top:0.4rem;color:var(--accent);font-weight:600">${o.total_votes} votos</div>
+                            ${v.user_voted_option === o.option_id ? '<div style="font-size:0.7rem;color:var(--accent)">✓ O teu voto</div>' : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('') : '<div style="color:var(--muted);text-align:center;padding:2rem">Ainda não há votações.</div>';
+
+        list.innerHTML = createForm + votesList;
+    } catch (err) {
+        list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem">Erro ao carregar votações.</div>';
+    }
+}
+
+async function createVote() {
+    const title = document.getElementById('voteTitle').value.trim();
+    const startDate = document.getElementById('voteStart').value;
+    const endDate = document.getElementById('voteEnd').value;
+
+    if (!title || !startDate || !endDate) {
+        showToast('Preenche todos os campos.', 'error');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API}/api/clubs/${currentClubId}/votes`, {
+            method: 'POST',
+            headers: authHeader(),
+            body: JSON.stringify({ title, start_date: startDate, end_date: endDate })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast('Votação criada!', 'success');
+            renderVoting();
+        } else {
+            showToast(data.error || 'Erro ao criar votação.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
+}
+
+async function castVote(voteId, optionId) {
+    try {
+        const res = await fetch(`${API}/api/clubs/votes/${voteId}/cast`, {
+            method: 'POST',
+            headers: authHeader(),
+            body: JSON.stringify({ option_id: optionId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast('Voto registado!', 'success');
+            renderVoting();
+        } else {
+            showToast(data.error || 'Erro ao votar.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
 }
 
 // ── BIBLIOTECA ────────────────────────────────────────────
-function renderLibrary() {
-    document.getElementById('libraryGrid').innerHTML = `
-        <div style="color:var(--muted);text-align:center;padding:3rem;font-size:0.875rem;grid-column:1/-1">
-            Ainda não há livros na biblioteca do clube.
-        </div>`;
+async function renderLibrary() {
+    const container = document.getElementById('libraryGrid');
+    container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem;grid-column:1/-1">A carregar...</div>';
+
+    try {
+        const res = await fetch(`${API}/api/clubs/${currentClubId}/library`, { headers: authHeader() });
+        const data = await res.json();
+
+        const books = (data.success && data.data.books) || [];
+
+        const addForm = isMember ? `
+            <div class="card" style="grid-column:1/-1;padding:1rem;margin-bottom:0.5rem">
+                <h4 style="margin-bottom:0.75rem">Adicionar Livro</h4>
+                <div style="display:flex;gap:0.5rem;align-items:center">
+                    <input type="number" id="libraryBookId" placeholder="Book ID" style="width:110px;padding:0.5rem;border:1px solid var(--border);border-radius:8px">
+                    <button class="btn btn-primary" onclick="addBookToClub()">Adicionar</button>
+                </div>
+            </div>
+        ` : '';
+
+        const list = books.length ? books.map(b => `
+            <div class="card" style="padding:1rem">
+                <strong>${b.title}</strong><br>
+                <small style="color:var(--muted)">${b.author}</small><br>
+                <small style="color:var(--muted)">Adicionado por ${b.added_by_name}</small>
+                ${isMember ? `<button class="btn btn-outline" style="margin-top:0.5rem;font-size:0.8rem" onclick="removeBookFromClub(${b.club_library_id})">Remover</button>` : ''}
+            </div>
+        `).join('') : '<div style="color:var(--muted);text-align:center;padding:2rem;grid-column:1/-1">A biblioteca está vazia.</div>';
+
+        container.innerHTML = addForm + list;
+    } catch (err) {
+        container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem;grid-column:1/-1">Erro ao carregar biblioteca.</div>';
+    }
+}
+
+async function addBookToClub() {
+    const bookId = document.getElementById('libraryBookId').value;
+    if (!bookId) {
+        showToast('Introduz um Book ID.', 'error');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API}/api/clubs/${currentClubId}/library`, {
+            method: 'POST',
+            headers: authHeader(),
+            body: JSON.stringify({ book_id: parseInt(bookId) })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast('Livro adicionado!', 'success');
+            renderLibrary();
+        } else {
+            showToast(data.error || 'Erro ao adicionar livro.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
+}
+
+async function removeBookFromClub(clubLibraryId) {
+    if (!confirm('Remover este livro?')) return;
+
+    try {
+        const res = await fetch(`${API}/api/clubs/library/${clubLibraryId}`, {
+            method: 'DELETE',
+            headers: authHeader(),
+            body: JSON.stringify({ club_id: currentClubId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast('Livro removido.', 'success');
+            renderLibrary();
+        } else {
+            showToast(data.error || 'Erro.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
 }
 
 // ── RANKING ───────────────────────────────────────────────
 async function loadRanking() {
     try {
-        const res = await fetch(`${API}/api/clubs/ranking`, { headers: authHeader() });
+        const res = await fetch(`${API}/api/clubs/ranking/global`, { headers: authHeader() });
         const data = await res.json();
 
-        if (!data.success) return;
+        if (!data.success || !data.data.ranking || !data.data.ranking.length) {
+            document.getElementById('rankingList').innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem">Ainda não há pontos nesta season.</div>';
+            return;
+        }
 
         const colors = ['#FFD700', '#C0C0C0', '#CD7F32'];
-        const list = data.data.clubs || [];
+        const ranking = data.data.ranking;
 
-        document.getElementById('rankingList').innerHTML = list.map((club, i) => `
+        document.getElementById('rankingList').innerHTML = ranking.map((r, i) => `
             <div class="rank-card">
                 <div class="rank-position" style="background:${colors[i] || 'var(--surface2)'}">
                     ${i + 1}
                 </div>
-                <div class="rank-avatar">${club.name.charAt(0)}</div>
+                <div class="rank-avatar">${r.name.charAt(0)}</div>
                 <div class="rank-info">
-                    <div class="rank-name">${club.name}</div>
+                    <div class="rank-name">${r.name}</div>
                     <div class="rank-type">Clube de leitura</div>
                 </div>
                 <div class="rank-points">
-                    ${club.points || club.total_members}
+                    ${r.total_points}
                     <span>pontos</span>
                 </div>
             </div>
@@ -406,7 +661,6 @@ function initMainMap(clubs) {
             zoomControl: true,
         });
 
-        // marcador da posição do utilizador
         new google.maps.Marker({
             position: { lat, lng },
             map: mainMap,
@@ -421,7 +675,6 @@ function initMainMap(clubs) {
             title: 'A tua localização'
         });
 
-        // marcadores dos clubes
         const colors = ['#E91E63', '#9C27B0', '#2196F3', '#FF9800', '#4CAF50', '#795548'];
         clubs.forEach((club, i) => {
             if (!club.latitude || !club.longitude) return;
