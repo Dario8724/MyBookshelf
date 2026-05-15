@@ -106,6 +106,20 @@ class ClubModel
         return (int) $stmt->fetchColumn();
     }
 
+    // testing this method 
+    public function getMembers(int $clubId): array
+{
+    $stmt = $this->db->prepare("
+        SELECT u.user_id, u.name, u.profile_image, cm.role
+        FROM club_member cm
+        JOIN user u ON cm.user_id = u.user_id
+        WHERE cm.club_id = :club_id
+        ORDER BY cm.role DESC, u.name ASC
+    ");
+    $stmt->execute([':club_id' => $clubId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
     public function findAll(): array
     {
         $stmt = $this->db->prepare("

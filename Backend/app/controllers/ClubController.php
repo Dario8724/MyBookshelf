@@ -71,23 +71,17 @@ class ClubController extends Controller
 
         $this->success(null, 'Entraste no clube com sucesso.', 201);
     }
-
-    public function leave(int $clubId): void
+// testing this method 
+   public function leave(int $clubId): void
     {
         $payload = AuthMiddleware::requireAuth();
         $userId = $payload['user_id'];
 
         $club = $this->clubModel->findById($clubId);
-
-        if (!$club) {
-            $this->error('Clube não encontrado.', 404);
-        }
+        if (!$club) $this->error('Clube não encontrado.', 404);
 
         $left = $this->clubModel->leave($clubId, $userId);
-
-        if (!$left) {
-            $this->error('Não és membro deste clube ou és o admin.', 403);
-        }
+        if (!$left) $this->error('Não és membro deste clube.', 403);
 
         $this->success(null, 'Saíste do clube com sucesso.');
     }
@@ -107,6 +101,18 @@ class ClubController extends Controller
 
         $this->success(['club' => $club]);
     }
+// new method 
+    public function members(int $clubId): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+
+        $club = $this->clubModel->findById($clubId);
+        if (!$club) $this->error('Clube não encontrado.', 404);
+
+        $members = $this->clubModel->getMembers($clubId);
+        $this->success(['total' => count($members), 'members' => $members]);
+    }
+}
 
     public function index(): void
     {

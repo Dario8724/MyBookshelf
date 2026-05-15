@@ -5,6 +5,7 @@ let allClubs = [];
 let map = null;
 let marker = null;
 let autocomplete = null;
+let mainMap = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken()) {
@@ -45,11 +46,13 @@ async function loadClubs() {
 
         if (!data.success || !data.data.clubs.length) {
             document.getElementById('clubsEmpty').style.display = 'flex';
+            loadGoogleMapsMain();
             return;
         }
 
         allClubs = data.data.clubs;
         renderClubs(allClubs);
+        loadGoogleMapsMain();
 
     } catch (err) {
         document.getElementById('clubsLoading').style.display = 'none';
@@ -178,6 +181,12 @@ async function toggleMembership() {
             updateMemberBtn();
             showToast(isMember ? 'Entraste no clube!' : 'Saíste do clube.', 'success');
             switchTab(currentTab);
+
+            const res2 = await fetch(`${API}/api/clubs/${currentClubId}`, { headers: authHeader() });
+            const data2 = await res2.json();
+            if (data2.success) {
+                document.getElementById('detailMembers').textContent = `${data2.data.club.member_count} membros`;
+            }
         } else {
             showToast(data.error || 'Erro.', 'error');
         }
@@ -272,13 +281,13 @@ async function loadMembers() {
         if (!data.success) return;
 
         const members = data.data.members;
+        document.getElementById('detailMembers').textContent = `${members.length} membros`;
         document.getElementById('membersCount').textContent = `${members.length} membros ativos`;
 
-        document.getElementById('membersList').innerHTML = members.map(m => {
+        document.getElementById('membersList').innerHTML = members.length ? members.map(m => {
             const avatar = m.profile_image
                 ? `<img src="${API}/${m.profile_image}" alt="${m.name}">`
                 : `<span>${m.name.charAt(0).toUpperCase()}</span>`;
-
             return `
             <div class="member-card">
                 <div class="member-avatar">${avatar}</div>
@@ -286,9 +295,8 @@ async function loadMembers() {
                     <div class="member-name">${m.name}</div>
                     <div class="member-role">${m.role === 'admin' ? 'Administrador' : 'Membro'}</div>
                 </div>
-            </div>
-            `;
-        }).join('');
+            </div>`;
+        }).join('') : '<div style="color:var(--muted);text-align:center;padding:2rem;grid-column:1/-1">Ainda não há membros.</div>';
 
     } catch (err) {
         showToast('Erro ao carregar membros.', 'error');
@@ -297,27 +305,10 @@ async function loadMembers() {
 
 // ── SESSÕES ───────────────────────────────────────────────
 function renderSessions() {
-    const sessions = [
-        { month: 'Mai', day: '15', title: 'Discussão: capítulos 1-10', attendees: 18 },
-        { month: 'Mai', day: '20', title: 'Discussão: capítulos 11-20', attendees: 24 },
-        { month: 'Jun', day: '12', title: 'Sessão final', attendees: 22 },
-    ];
-
-    document.getElementById('sessionsList').innerHTML = sessions.map(s => `
-        <div class="session-card">
-            <div style="display:flex;align-items:center;gap:1.5rem">
-                <div class="session-date">
-                    <div class="session-month">${s.month}</div>
-                    <div class="session-day">${s.day}</div>
-                </div>
-                <div class="session-info">
-                    <h3>${s.title}</h3>
-                    <p>${s.attendees} confirmados</p>
-                </div>
-            </div>
-            ${isMember ? `<button class="btn btn-outline">Confirmar presença</button>` : ''}
-        </div>
-    `).join('');
+    document.getElementById('sessionsList').innerHTML = `
+        <div style="color:var(--muted);text-align:center;padding:3rem;font-size:0.875rem">
+            Ainda não há sessões agendadas.
+        </div>`;
 }
 
 // ── VOTAÇÕES ──────────────────────────────────────────────
@@ -333,52 +324,18 @@ function renderVoting() {
 
     locked.style.display = 'none';
     list.style.display = 'block';
-
-    const books = [
-        { id: 1, title: 'Os Maias', author: 'Eça de Queirós', votes: 18, percentage: 33 },
-        { id: 2, title: 'Dom Casmurro', author: 'Machado de Assis', votes: 16, percentage: 29 },
-        { id: 3, title: 'Memorial do Convento', author: 'José Saramago', votes: 10, percentage: 18 },
-    ];
-
-    list.innerHTML = books.map(b => `
-        <div class="vote-card" onclick="castVote(${b.id}, this)">
-            <div class="vote-book">
-                <div class="vote-cover" style="display:flex;align-items:center;justify-content:center;font-size:1.5rem">📖</div>
-                <div>
-                    <div class="vote-title">${b.title}</div>
-                    <div class="vote-author">${b.author}</div>
-                </div>
-            </div>
-            <div class="vote-stats">
-                <div class="vote-percent">${b.percentage}%</div>
-                <div class="vote-count">${b.votes} votos</div>
-            </div>
-        </div>
-    `).join('');
-}
-
-function castVote(bookId, el) {
-    document.querySelectorAll('.vote-card').forEach(c => c.classList.remove('voted'));
-    el.classList.add('voted');
-    showToast('Voto registado!', 'success');
+    list.innerHTML = `
+        <div style="color:var(--muted);text-align:center;padding:3rem;font-size:0.875rem">
+            Ainda não há votações ativas.
+        </div>`;
 }
 
 // ── BIBLIOTECA ────────────────────────────────────────────
 function renderLibrary() {
-    const books = [
-        { title: 'Orgulho e Preconceito', author: 'Jane Austen' },
-        { title: 'Cem Anos de Solidão', author: 'García Márquez' },
-        { title: 'A Revolução dos Bichos', author: 'George Orwell' },
-        { title: '1984', author: 'George Orwell' },
-    ];
-
-    document.getElementById('libraryGrid').innerHTML = books.map(b => `
-        <div class="library-book">
-            <div class="library-cover" style="display:flex;align-items:center;justify-content:center;font-size:2rem">📚</div>
-            <div class="library-title">${b.title}</div>
-            <div class="library-author">${b.author}</div>
-        </div>
-    `).join('');
+    document.getElementById('libraryGrid').innerHTML = `
+        <div style="color:var(--muted);text-align:center;padding:3rem;font-size:0.875rem;grid-column:1/-1">
+            Ainda não há livros na biblioteca do clube.
+        </div>`;
 }
 
 // ── RANKING ───────────────────────────────────────────────
@@ -422,11 +379,104 @@ function renderSidebar(club) {
         <div class="sidebar-book-author">A definir pelos membros</div>
         <div class="stars">★★★★☆</div>
     `;
-    document.getElementById('progressFill').style.width = '45%';
-    document.getElementById('progressText').textContent = '45% dos membros já terminaram';
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progressText').textContent = '0% dos membros já terminaram';
 }
 
-// ── GOOGLE MAPS ───────────────────────────────────────────
+// ── MAPA PRINCIPAL ────────────────────────────────────────
+function initMainMap(clubs) {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        document.getElementById('mapPlaceholder').style.display = 'none';
+
+        mainMap = new google.maps.Map(document.getElementById('mapMarkers'), {
+            center: { lat, lng },
+            zoom: 13,
+            styles: [
+                { featureType: 'all', elementType: 'geometry', stylers: [{ color: '#EDE8DC' }] },
+                { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#D4CBBA' }] },
+                { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#F5F0E8' }] },
+                { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+            ],
+            disableDefaultUI: true,
+            zoomControl: true,
+        });
+
+        // marcador da posição do utilizador
+        new google.maps.Marker({
+            position: { lat, lng },
+            map: mainMap,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 8,
+                fillColor: '#2196F3',
+                fillOpacity: 1,
+                strokeColor: '#fff',
+                strokeWeight: 2,
+            },
+            title: 'A tua localização'
+        });
+
+        // marcadores dos clubes
+        const colors = ['#E91E63', '#9C27B0', '#2196F3', '#FF9800', '#4CAF50', '#795548'];
+        clubs.forEach((club, i) => {
+            if (!club.latitude || !club.longitude) return;
+
+            const clubMarker = new google.maps.Marker({
+                position: { lat: parseFloat(club.latitude), lng: parseFloat(club.longitude) },
+                map: mainMap,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: colors[i % colors.length],
+                    fillOpacity: 1,
+                    strokeColor: '#fff',
+                    strokeWeight: 2,
+                },
+                title: club.name
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: `
+                    <div style="font-family:Inter,sans-serif;padding:0.5rem">
+                        <strong style="font-family:'Playfair Display',serif">${club.name}</strong>
+                        <p style="font-size:0.8rem;color:#8A8070;margin-top:0.2rem">${club.total_members} membros</p>
+                    </div>`
+            });
+
+            clubMarker.addListener('click', () => {
+                infoWindow.open(mainMap, clubMarker);
+                showClubDetail(club.club_id);
+            });
+        });
+    });
+}
+
+async function loadGoogleMapsMain() {
+    try {
+        const res = await fetch(`${API}/api/config/maps`, { headers: authHeader() });
+        const data = await res.json();
+        if (!data.success || !data.data.key) return;
+
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${data.data.key}&libraries=places&callback=mapsReady`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    } catch (err) {
+        console.error('Erro ao carregar Maps:', err);
+    }
+}
+
+window.mapsReady = function () {
+    initMainMap(allClubs);
+};
+
+// ── GOOGLE MAPS (modal criar clube) ───────────────────────
 async function loadGoogleMaps() {
     try {
         const res = await fetch(`${API}/api/config/maps`, { headers: authHeader() });
@@ -554,7 +604,11 @@ function useMyLocation() {
 function openCreateModal() {
     document.getElementById('createOverlay').classList.add('open');
     if (!map) {
-        loadGoogleMaps();
+        if (typeof google !== 'undefined') {
+            initMap();
+        } else {
+            loadGoogleMaps();
+        }
     } else {
         setTimeout(() => google.maps.event.trigger(map, 'resize'), 100);
     }
