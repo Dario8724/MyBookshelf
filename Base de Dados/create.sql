@@ -106,6 +106,7 @@ CREATE TABLE reading_goal (
     start_date DATE,
     end_date DATE,
     rewarded TINYINT(1) DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
