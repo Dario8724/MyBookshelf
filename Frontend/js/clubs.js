@@ -325,7 +325,8 @@ async function renderSessions() {
             <div class="card" style="margin-bottom:1rem;padding:1rem">
                 <h4 style="margin-bottom:0.75rem">Nova Sessão</h4>
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
-                    <input type="number" id="sessionBookId" placeholder="Book ID" style="width:110px;padding:0.5rem;border:1px solid var(--border);border-radius:8px">
+                    <input type="text" id="sessionTitle" placeholder="Título da sessão" style="flex:1;min-width:180px;padding:0.5rem;border:1px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif">
+                    <input type="text" id="sessionBookName" placeholder="Nome do livro" style="flex:1;min-width:180px;padding:0.5rem;border:1px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif">
                     <input type="date" id="sessionStart" style="padding:0.5rem;border:1px solid var(--border);border-radius:8px">
                     <input type="date" id="sessionEnd" style="padding:0.5rem;border:1px solid var(--border);border-radius:8px">
                     <button class="btn btn-primary" onclick="createSession()">Criar</button>
@@ -333,14 +334,30 @@ async function renderSessions() {
             </div>
         ` : '';
 
-        const list = sessions.length ? sessions.map(s => `
-            <div class="card" style="padding:1rem;margin-bottom:0.5rem">
-                <strong>${s.title}</strong> — ${s.author}<br>
-                <small style="color:var(--muted)">📅 ${formatDate(s.start_date)} → ${formatDate(s.end_date)}</small>
-                <span style="margin-left:1rem;color:${s.status === 'completed' ? 'green' : 'orange'}">${s.status}</span>
-                ${s.status === 'active' && isMember ? `<button class="btn btn-outline" style="margin-left:1rem;font-size:0.8rem" onclick="completeSession(${s.session_id})">Concluir</button>` : ''}
+        const list = sessions.length ? sessions.map(s => {
+            const startDate = new Date(s.start_date);
+            const month = startDate.toLocaleString('pt-PT', { month: 'short' }).toUpperCase();
+            const day = startDate.getDate();
+            const isAttending = parseInt(s.user_attending) === 1;
+
+            return `
+            <div class="session-card">
+                <div class="session-date">
+                    <div class="session-month">${month}</div>
+                    <div class="session-day">${day}</div>
+                </div>
+                <div class="session-info" style="flex:1">
+                    <h3>${s.title}</h3>
+                    ${s.book_name ? `<p>📖 ${s.book_name}</p>` : ''}
+                    <p>${s.attendee_count} confirmado${s.attendee_count != 1 ? 's' : ''}</p>
+                </div>
+                ${isMember ? `
+                <button class="btn ${isAttending ? 'btn-primary' : 'btn-outline'}" 
+                    onclick="toggleAttendance(${s.session_id}, this)">
+                    ${isAttending ? '✓ Confirmado' : 'Confirmar presença'}
+                </button>` : ''}
             </div>
-        `).join('') : '<div style="color:var(--muted);text-align:center;padding:2rem">Ainda não há sessões.</div>';
+        `}).join('') : '<div style="color:var(--muted);text-align:center;padding:2rem">Ainda não há sessões.</div>';
 
         container.innerHTML = createForm + list;
     } catch (err) {
@@ -349,12 +366,13 @@ async function renderSessions() {
 }
 
 async function createSession() {
-    const bookId = document.getElementById('sessionBookId').value;
+    const title    = document.getElementById('sessionTitle').value.trim();
+    const bookName = document.getElementById('sessionBookName').value.trim();
     const startDate = document.getElementById('sessionStart').value;
-    const endDate = document.getElementById('sessionEnd').value;
+    const endDate   = document.getElementById('sessionEnd').value;
 
-    if (!bookId || !startDate || !endDate) {
-        showToast('Preenche todos os campos.', 'error');
+    if (!title || !startDate || !endDate) {
+        showToast('O título e as datas são obrigatórios.', 'error');
         return;
     }
 
@@ -362,7 +380,7 @@ async function createSession() {
         const res = await fetch(`${API}/api/clubs/${currentClubId}/sessions`, {
             method: 'POST',
             headers: authHeader(),
-            body: JSON.stringify({ book_id: parseInt(bookId), start_date: startDate, end_date: endDate })
+            body: JSON.stringify({ title, book_name: bookName, start_date: startDate, end_date: endDate })
         });
         const data = await res.json();
 
@@ -377,16 +395,19 @@ async function createSession() {
     }
 }
 
-async function completeSession(sessionId) {
+async function toggleAttendance(sessionId, btn) {
     try {
-        const res = await fetch(`${API}/api/clubs/sessions/${sessionId}/complete`, {
+        const res = await fetch(`${API}/api/clubs/sessions/${sessionId}/attendance`, {
             method: 'POST',
             headers: authHeader()
         });
         const data = await res.json();
 
         if (data.success) {
-            showToast('Sessão concluída!', 'success');
+            const attending = data.data.attending;
+            btn.textContent = attending ? '✓ Confirmado' : 'Confirmar presença';
+            btn.className = `btn ${attending ? 'btn-primary' : 'btn-outline'}`;
+            showToast(attending ? 'Presença confirmada!' : 'Presença cancelada.', 'success');
             renderSessions();
         } else {
             showToast(data.error || 'Erro.', 'error');

@@ -52,7 +52,6 @@ $router->get('/api/clubs/{id}/messages',  'ClubMessageController@index');
 // reading sessions 
 $router->post('/api/clubs/{id}/sessions',              'ClubReadingSessionController@create');
 $router->get('/api/clubs/{id}/sessions',               'ClubReadingSessionController@index');
-$router->post('/api/clubs/sessions/{id}/complete',     'ClubReadingSessionController@complete');
 $router->post('/api/clubs/sessions/{id}/attendance',   'ClubReadingSessionController@toggleAttendance');
 $router->get('/api/clubs/sessions/{id}/attendees',     'ClubReadingSessionController@attendees');
 // Ranking
