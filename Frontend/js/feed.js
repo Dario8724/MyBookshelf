@@ -98,7 +98,6 @@ function renderFeed(posts) {
             day: '2-digit', month: '2-digit', year: 'numeric'
         });
 
-        //Bloco de livro
         const bookBlock = p.book_id ? `
             <div class="post-book">
                 <div class="post-book-cover">
@@ -131,10 +130,17 @@ function renderFeed(posts) {
                     <svg viewBox="0 0 24 24" fill="${p.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                     <span id="likes-${p.post_id}">${p.total_likes}</span>
                 </button>
-                <button class="post-action" onclick="openComments(${p.post_id})">
+                <button class="post-action" onclick="toggleComments(${p.post_id}, this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     <span>${p.total_comments}</span>
                 </button>
+            </div>
+            <div class="post-comments" id="comments-${p.post_id}" style="display:none">
+                <div class="comments-list-inline" id="comments-list-${p.post_id}"></div>
+                <div class="comment-input-inline">
+                    <textarea id="comment-input-${p.post_id}" placeholder="Escreve um comentário..." rows="1"></textarea>
+                    <button class="btn btn-primary" onclick="submitCommentInline(${p.post_id})">Enviar</button>
+                </div>
             </div>
         </div>
         `;
@@ -143,6 +149,81 @@ function renderFeed(posts) {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = '1.25rem';
+}
+
+async function toggleComments(postId, btn) {
+    const section = document.getElementById(`comments-${postId}`);
+    const isOpen = section.style.display !== 'none';
+
+    if (isOpen) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    await loadCommentsInline(postId);
+}
+
+async function loadCommentsInline(postId) {
+    const list = document.getElementById(`comments-list-${postId}`);
+    list.innerHTML = '<div style="color:var(--muted);font-size:0.875rem;padding:0.5rem 0">A carregar...</div>';
+
+    try {
+        const res = await fetch(`${API}/api/posts/${postId}/comments`, { headers: authHeader() });
+        const data = await res.json();
+
+        if (!data.success || !data.data.comments.length) {
+            list.innerHTML = '<div style="color:var(--muted);font-size:0.875rem;padding:0.5rem 0">Ainda não há comentários. Sê o primeiro!</div>';
+            return;
+        }
+
+        list.innerHTML = data.data.comments.map(c => {
+            const avatar = c.profile_image
+                ? `<img src="${API}/${c.profile_image}" alt="${c.name}">`
+                : `<span>${c.name.charAt(0).toUpperCase()}</span>`;
+
+            const date = new Date(c.created_at).toLocaleDateString('pt-PT', {
+                day: 'numeric', month: 'short'
+            });
+
+            return `
+            <div class="comment-item-inline">
+                <div class="comment-avatar">${avatar}</div>
+                <div class="comment-body">
+                    <div class="comment-name">${c.name}</div>
+                    <div class="comment-text">${c.comment}</div>
+                    <div class="comment-date">${date}</div>
+                </div>
+            </div>`;
+        }).join('');
+    } catch (err) {
+        list.innerHTML = '<div style="color:var(--muted);font-size:0.875rem;padding:0.5rem 0">Erro ao carregar comentários.</div>';
+    }
+}
+
+async function submitCommentInline(postId) {
+    const input = document.getElementById(`comment-input-${postId}`);
+    const comment = input.value.trim();
+    if (!comment) return;
+
+    try {
+        const res = await fetch(`${API}/api/posts/${postId}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeader() },
+            body: JSON.stringify({ comment })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            input.value = '';
+            await loadCommentsInline(postId);
+            showToast('Comentário adicionado!', 'success');
+        } else {
+            showToast(data.error || 'Erro ao comentar.', 'error');
+        }
+    } catch (err) {
+        showToast('Não foi possível ligar ao servidor.', 'error');
+    }
 }
 
 function renderStars(rating) {
@@ -232,83 +313,6 @@ async function toggleLike(postId, btn) {
         }
     } catch (err) {
         showToast('Erro ao dar like.', 'error');
-    }
-}
-
-//––––COMENTÁRIOS–––––
-async function openComments(postId) {
-    currentPostId = postId;
-    document.getElementById('commentsList').innerHTML = '<div class="comments-empty">A carregar...</div>';
-    document.getElementById('commentContent').value = '';
-    document.getElementById('commentsOverlay').classList.add('open');
-
-    try {
-        const res  = await fetch(`${API}/api/posts/${postId}/comments`, { headers: authHeader() });
-        const data = await res.json();
-
-        const list = document.getElementById('commentsList');
-
-        if (!data.success || !data.data.comments.length) {
-            list.innerHTML = '<div class="comments-empty">Ainda não há comentários. Sê o primeiro!</div>';
-            return;
-        }
-
-        list.innerHTML = data.data.comments.map(c => {
-            const avatar = c.profile_image
-                ? `<img src="${API}/${c.profile_image}" alt="${c.name}">`
-                : `<span>${c.name.charAt(0).toUpperCase()}</span>`;
-
-            const date = new Date(c.created_at).toLocaleDateString('pt-PT', {
-                day: 'numeric', month: 'short'
-            });
-
-            return `
-            <div class="comment-item">
-                <div class="comment-avatar">${avatar}</div>
-                <div class="comment-body">
-                    <div class="comment-name">${c.name}</div>
-                    <div class="comment-text">${c.comment}</div>
-                    <div class="comment-date">${date}</div>
-                </div>
-            </div>
-            `;
-        }).join('');
-
-        } catch (err) {
-        document.getElementById('commentsList').innerHTML = '<div class="comments-empty">Erro ao carregar comentários.</div>';
-    }
-}
-
-function closeComments() {
-    document.getElementById('commentsOverlay').classList.remove('open');
-    currentPostId = null;
-}
-
-async function submitComment() {
-    const comment = document.getElementById('commentContent').value.trim();
-    if (!comment) return;
-    if (!currentPostId) return;
-
-    try {
-        const res  = await fetch(`${API}/api/posts/${currentPostId}/comments`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + getToken()
-            },
-            body: JSON.stringify({ comment }),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            document.getElementById('commentContent').value = '';
-            await openComments(currentPostId);
-            showToast('Comentário adicionado!', 'success');
-        } else {
-            showToast(data.error || 'Erro ao comentar.', 'error');
-        }
-    } catch (err) {
-        showToast('Não foi possível ligar ao servidor.', 'error');
     }
 }
 
