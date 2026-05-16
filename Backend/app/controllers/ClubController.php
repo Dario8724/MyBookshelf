@@ -37,6 +37,7 @@ class ClubController extends Controller
 
         $this->success(['club' => $club], 'Clube criado com sucesso.', 201);
     }
+
     public function join(int $clubId): void
     {
         $payload = AuthMiddleware::requireAuth();
@@ -57,8 +58,8 @@ class ClubController extends Controller
         // +50 pontos se o clube atingir 10 membros
         $memberCount = $this->clubModel->getMemberCount($clubId);
         if ($memberCount === 10) {
-            require_once __DIR__ .'/../models/ClubRankingModel.php';
-            require_once __DIR__ -'/../models/ClubSeasonModel.php';
+            require_once __DIR__ . '/../models/ClubRankingModel.php';
+            require_once __DIR__ . '/../models/ClubSeasonModel.php';
 
             $seasonModel = new ClubSeasonModel();
             $rankingsModel = new ClubRankingModel();
@@ -78,19 +79,14 @@ class ClubController extends Controller
         $userId = $payload['user_id'];
 
         $club = $this->clubModel->findById($clubId);
-
-        if (!$club) {
-            $this->error('Clube não encontrado.', 404);
-        }
+        if (!$club) $this->error('Clube não encontrado.', 404);
 
         $left = $this->clubModel->leave($clubId, $userId);
-
-        if (!$left) {
-            $this->error('Não és membro deste clube ou és o admin.', 403);
-        }
+        if (!$left) $this->error('Não és membro deste clube.', 403);
 
         $this->success(null, 'Saíste do clube com sucesso.');
     }
+
     public function show(int $clubId): void
     {
         $payload = AuthMiddleware::requireAuth();
@@ -102,10 +98,21 @@ class ClubController extends Controller
             $this->error('Clube não encontrado.', 404);
         }
 
-        $club['is_member']     = $this->clubModel->isMember($clubId, $userId);
-        $club['member_count']  = $this->clubModel->getMemberCount($clubId);
+        $club['is_member']    = $this->clubModel->isMember($clubId, $userId);
+        $club['member_count'] = $this->clubModel->getMemberCount($clubId);
 
         $this->success(['club' => $club]);
+    }
+
+    public function members(int $clubId): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+
+        $club = $this->clubModel->findById($clubId);
+        if (!$club) $this->error('Clube não encontrado.', 404);
+
+        $members = $this->clubModel->getMembers($clubId);
+        $this->success(['total' => count($members), 'members' => $members]);
     }
 
     public function index(): void

@@ -70,8 +70,12 @@ $router->get('/api/clubs/{id}/library',    'ClubLibraryController@index');
 $router->post('/api/clubs/{id}/library',   'ClubLibraryController@addBook');
 $router->delete('/api/clubs/library/{id}', 'ClubLibraryController@removeBook');
 // club seasons
-$router->post('/api/seasons',                  'ClubSeasonController@create');
-$router->get('/api/seasons',                   'ClubSeasonController@index');
-$router->get('/api/seasons/current',           'ClubSeasonController@current');
-$router->get('/api/seasons/{id}/ranking',      'ClubSeasonController@ranking');
-$router->get('/api/clubs/ranking/global', 'ClubRankingController@globalRanking');
+$router->post('/api/clubs',                'ClubController@create');
+$router->get('/api/clubs',                 'ClubController@index');
+$router->get('/api/clubs/{id}',            'ClubController@show');
+$router->post('/api/clubs/{id}/join',      'ClubController@join');
+$router->post('/api/clubs/{id}/leave',     'ClubController@leave');
+$router->get('/api/clubs/{id}/members',    'ClubController@members');
+$router->get('/api/config/maps',           'ConfigController@mapsKey');
+// new router 
+$router->get('/api/config/maps', 'ConfigController@mapsKey');
