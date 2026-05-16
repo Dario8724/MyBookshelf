@@ -35,17 +35,17 @@ class ReadingGoalController extends Controller
         }
 
         if ($goalType === 'annual') {
-            $startDate = "$year-01-01";
+            $startDate = date('Y-m-d');
             $endDate   = "$year-12-31";
         } else {
             if (!in_array($semester, [1, 2])) {
                 $this->error('O semestre deve ser 1 ou 2.', 422);
             }
             if ($semester === 1) {
-                $startDate = "$year-01-01";
+                $startDate = date('Y-m-d');
                 $endDate   = "$year-06-30";
             } else {
-                $startDate = "$year-07-01";
+                $startDate = date('Y-m-d');
                 $endDate   = "$year-12-31";
             }
         }

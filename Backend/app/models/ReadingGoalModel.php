@@ -44,7 +44,7 @@ class ReadingGoalModel
             LEFT JOIN user_book ub
                 ON ub.user_id = rg.user_id
                 AND ub.status = 'completed'
-                AND ub.updated_at BETWEEN rg.start_date AND rg.end_date
+                AND ub.updated_at >= rg.created_at AND ub.updated_at <= rg.end_date
             WHERE rg.user_id = :user_id
             GROUP BY rg.reading_goal_id
             ORDER BY rg.start_date DESC
