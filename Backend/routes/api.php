@@ -56,6 +56,7 @@ $router->post('/api/clubs/sessions/{id}/attendance',   'ClubReadingSessionContro
 $router->get('/api/clubs/sessions/{id}/attendees',     'ClubReadingSessionController@attendees');
 // Ranking
 $router->get('/api/clubs/{id}/ranking', 'ClubRankingController@index');
+$router->get('/api/clubs/ranking/global', 'ClubRankingController@globalRanking');
 
 // Top Book
 $router->get('/api/clubs/{id}/topbook',  'ClubTopBookController@index');

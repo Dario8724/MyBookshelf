@@ -771,7 +771,7 @@ async function loadRanking() {
         const res = await fetch(`${API}/api/clubs/ranking/global`, { headers: authHeader() });
         const data = await res.json();
 
-        if (!data.success || !data.data.ranking || !data.data.ranking.length) {
+        if (!data.success || !data.data.ranking.length) {
             document.getElementById('rankingList').innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem">Ainda não há pontos nesta season.</div>';
             return;
         }
@@ -780,14 +780,14 @@ async function loadRanking() {
         const ranking = data.data.ranking;
 
         document.getElementById('rankingList').innerHTML = ranking.map((r, i) => `
-            <div class="rank-card">
+            <div class="rank-card" style="${r.club_id === currentClubId ? 'border-color:var(--accent)' : ''}">
                 <div class="rank-position" style="background:${colors[i] || 'var(--surface2)'}">
                     ${i + 1}
                 </div>
                 <div class="rank-avatar">${r.name.charAt(0)}</div>
                 <div class="rank-info">
-                    <div class="rank-name">${r.name}</div>
-                    <div class="rank-type">Clube de leitura</div>
+                    <div class="rank-name" style="${r.club_id === currentClubId ? 'color:var(--accent)' : ''}">${r.name}</div>
+                    <div class="rank-type">Season ${data.data.season.season_id} · ${formatDate(data.data.season.start_date)} → ${formatDate(data.data.season.end_date)}</div>
                 </div>
                 <div class="rank-points">
                     ${r.total_points}
