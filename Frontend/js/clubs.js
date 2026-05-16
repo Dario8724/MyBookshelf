@@ -471,9 +471,15 @@ async function renderVoting() {
             <div class="card" style="padding:1rem;margin-bottom:0.75rem">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
                     <strong>${v.title}</strong>
-                    <span style="color:${v.status === 'open' && new Date(v.end_date) >= new Date() ? 'green' : 'gray'};font-size:0.8rem">
-                        ${v.status === 'open' && new Date(v.end_date) >= new Date() ? '🟢 Aberta' : '🔴 Fechada'}
-                    </span>
+                    <div style="display:flex;align-items:center;gap:0.75rem">
+                        <span style="color:${v.status === 'open' && new Date(v.end_date) >= new Date() ? 'green' : 'gray'};font-size:0.8rem">
+                            ${v.status === 'open' && new Date(v.end_date) >= new Date() ? '🟢 Aberta' : '🔴 Fechada'}
+                        </span>
+                        ${v.status === 'open' && new Date(v.end_date) >= new Date() ? `
+                        <button class="btn btn-outline" style="font-size:0.75rem;padding:0.3rem 0.7rem" 
+                            onclick="openAddBookToVote(${v.vote_id})">+ Livro</button>
+                        ` : ''}
+                    </div>
                 </div>
                 <small style="color:var(--muted)">📅 ${formatDate(v.start_date)} → ${formatDate(v.end_date)} · ${v.total_votes} votos</small>
                 <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap">
@@ -499,6 +505,12 @@ async function renderVoting() {
     } catch (err) {
         list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem">Erro ao carregar votações.</div>';
     }
+}
+
+function openAddBookToVote(voteId) {
+    currentVoteId = voteId;
+    document.getElementById('voteBookSearch').style.display = 'block';
+    document.getElementById('voteBookSearch').scrollIntoView({ behavior: 'smooth' });
 }
 
 async function createVote() {
