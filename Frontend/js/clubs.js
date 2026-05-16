@@ -340,18 +340,24 @@ async function renderSessions() {
             const day = startDate.getDate();
             const isAttending = parseInt(s.user_attending) === 1;
 
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const endDate = new Date(s.end_date);
+            const isExpired = endDate < today;
+
             return `
-            <div class="session-card">
+            <div class="session-card" style="${isExpired ? 'opacity:0.5' : ''}">
                 <div class="session-date">
                     <div class="session-month">${month}</div>
                     <div class="session-day">${day}</div>
                 </div>
                 <div class="session-info" style="flex:1">
                     <h3>${s.title}</h3>
+                    ${isExpired ? '<span style="font-size:0.75rem;color:var(--muted);background:var(--surface2);padding:0.15rem 0.5rem;border-radius:20px">Terminada</span>' : ''}
                     ${s.book_name ? `<p>📖 ${s.book_name}</p>` : ''}
                     <p>${s.attendee_count} confirmado${s.attendee_count != 1 ? 's' : ''}</p>
                 </div>
-                ${isMember ? `
+                ${isMember && !isExpired ? `
                 <button class="btn ${isAttending ? 'btn-primary' : 'btn-outline'}" 
                     onclick="toggleAttendance(${s.session_id}, this)">
                     ${isAttending ? '✓ Confirmado' : 'Confirmar presença'}
