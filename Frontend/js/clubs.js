@@ -471,7 +471,9 @@ async function renderVoting() {
             <div class="card" style="padding:1rem;margin-bottom:0.75rem">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
                     <strong>${v.title}</strong>
-                    <span style="color:${v.status === 'open' ? 'green' : 'gray'};font-size:0.8rem">${v.status === 'open' ? '🟢 Aberta' : '🔴 Fechada'}</span>
+                    <span style="color:${v.status === 'open' && new Date(v.end_date) >= new Date() ? 'green' : 'gray'};font-size:0.8rem">
+                        ${v.status === 'open' && new Date(v.end_date) >= new Date() ? '🟢 Aberta' : '🔴 Fechada'}
+                    </span>
                 </div>
                 <small style="color:var(--muted)">📅 ${formatDate(v.start_date)} → ${formatDate(v.end_date)} · ${v.total_votes} votos</small>
                 <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap">
@@ -483,7 +485,7 @@ async function renderVoting() {
                             <div style="font-size:0.75rem;margin-top:0.4rem;color:var(--accent);font-weight:600">${o.total_votes} votos</div>
                             ${v.user_voted_option === o.option_id
                                 ? '<div style="font-size:0.7rem;color:var(--accent);margin-top:0.3rem">✓ O teu voto</div>'
-                                : v.status === 'open' && !v.user_voted_option
+                                : v.status === 'open' && !v.user_voted_option && new Date(v.end_date) >= new Date()
                                     ? `<button class="btn btn-primary" style="margin-top:0.5rem;font-size:0.75rem;padding:0.35rem 0.75rem" onclick="castVote(${v.vote_id}, ${o.option_id})">Votar</button>`
                                     : ''
                             }
@@ -520,6 +522,7 @@ async function createVote() {
         if (data.success) {
             showToast('Votação criada! Agora adiciona livros como opções.', 'success');
             currentVoteId = data.data.vote_id;
+            await renderVoting();
             document.getElementById('voteBookSearch').style.display = 'block';
         } else {
             showToast(data.error || 'Erro ao criar votação.', 'error');
@@ -606,6 +609,9 @@ async function addVoteOption(googleId, title) {
         const data = await res.json();
 
         if (data.success) {
+            await renderVoting();
+            // reabrir o search após re-render
+            document.getElementById('voteBookSearch').style.display = 'block';
             showToast(`"${title}" adicionado como opção!`, 'success');
             document.getElementById('voteBookInput').value = '';
             document.getElementById('voteBookResults').innerHTML = '';
@@ -744,7 +750,7 @@ async function renderSidebar(club) {
         const res = await fetch(`${API}/api/clubs/${club.club_id}/votes`, { headers: authHeader() });
         const data = await res.json();
 
-        const closed = data.success ? data.data.votes.filter(v => v.status === 'closed') : [];
+        const closed = data.success ? data.data.votes.filter(v => new Date(v.end_date) < new Date()) : [];
         const sidebar = document.getElementById('sidebarBook');
         const progressSection = document.querySelector('.progress-section');
 
