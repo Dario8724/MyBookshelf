@@ -56,13 +56,22 @@
                 </div>
             </div>
 
-            <!--Conquistas-->
-            <div class="card" id="achievementsCard" style="display:none">
-                <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleAchievements()">
-                    <span>🏆 Conquistas</span>
-                    <span id="achievementsArrow" style="margin-right:1.5em;font-size:1rem;transition:transform 0.3s;display:inline-block;">▼</span>
+            <!--Biblioteca com tabs-->
+            <div class="tabs" id="librarySection" style="display:none;">
+                <div class="tab list">
+                    <button class="tab-btn" data-tab="all">Todos <span id="cntAll">(0)</span></button>
+                    <button class="tab-btn active" data-tab="reading">A ler <span id="cntReading">(0)</span></button>
+                    <button class="tab-btn" data-tab="completed">Lidos <span id="cntCompleted">(0)</span></button>
+                    <button class="tab-btn" data-tab="want_to_read">Quero ler <span id="cntWant">(0)</span></button>
+                    <button class="tab-btn" data-tab="favorites">Favoritos <span id="cntFav">(0)</span></button>
                 </div>
-                <div class="achievements-grid" id="achievementsGrid"></div>
+
+                <div class="tab-panel" id="tab-all"></div>
+                <div class="tab-panel active" id="tab-reading"></div>
+                <div class="tab-panel" id="tab-completed"></div>
+                <div class="tab-panel" id="tab-want_to_read"></div>
+                <div class="tab-panel" id="tab-favorites">
+            </div>
             </div>
 
             <!--Metas de leitura-->
@@ -74,23 +83,14 @@
                 <div class="goals-list" id="goalsList"></div>
             </div>
 
-            <!--Biblioteca com tabs-->
-            <div class="tabs" id="librarySection" style="display:none;">
-                <div class="tab list">
-                    <button class="tab-btn active" data-tab="all">Todos <span id="cntAll">(0)</span></button>
-                    <button class="tab-btn" data-tab="reading">A ler <span id="cntReading">(0)</span></button>
-                    <button class="tab-btn" data-tab="completed">Lidos <span id="cntCompleted">(0)</span></button>
-                    <button class="tab-btn" data-tab="want_to_read">Quero ler <span id="cntWant">(0)</span></button>
-                    <button class="tab-btn" data-tab="favorites">Favoritos <span id="cntFav">(0)</span></button>
+            <!--Conquistas-->
+            <div class="card" id="achievementsCard" style="display:none">
+                <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleAchievements()">
+                    <span>🏆 Conquistas</span>
+                    <span id="achievementsArrow" style="margin-right:1.5em;font-size:1rem;transition:transform 0.3s;display:inline-block;">▼</span>
                 </div>
-
-                <div class="tab-panel active" id="tab-all"></div>
-                <div class="tab-panel" id="tab-reading"></div>
-                <div class="tab-panel" id="tab-completed"></div>
-                <div class="tab-panel" id="tab-want_to_read"></div>
-                <div class="tab-panel" id="tab-favorites">
+                <div class="achievements-grid" id="achievementsGrid"></div>
             </div>
-
         </div>
 
         <!-- Editar perfil-->
