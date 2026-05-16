@@ -31,13 +31,18 @@ class PostModel
     {
         $stmt = $this->db->prepare("
             SELECT p.post_id, p.content, p.created_at,
-                   u.user_id, u.name, u.profile_image,
-                   r.review_text, r.has_spoiler,
-                   COUNT(DISTINCT pl.user_id) AS total_likes,
-                   COUNT(DISTINCT pc.comment_id) AS total_comments
+                u.user_id, u.name, u.profile_image,
+                r.review_id, r.review_text, r.has_spoiler,
+                b.book_id, b.title AS book_title, b.author AS book_author, b.cover AS book_cover,
+                ra.score AS rating,
+                COUNT(DISTINCT pl.user_id) AS total_likes,
+                COUNT(DISTINCT pc.comment_id) AS total_comments,
+                MAX(CASE WHEN pl.user_id = :user_id3 THEN 1 ELSE 0 END) AS liked
             FROM post p
             JOIN user u ON p.user_id = u.user_id
             LEFT JOIN review r ON p.review_id = r.review_id
+            LEFT JOIN book b ON r.book_id = b.book_id
+            LEFT JOIN rating ra ON ra.user_id = p.user_id AND ra.book_id = b.book_id
             LEFT JOIN post_like pl ON p.post_id = pl.post_id
             LEFT JOIN post_comment pc ON p.post_id = pc.post_id
             WHERE p.user_id IN(
@@ -50,10 +55,10 @@ class PostModel
         ");
 
         $stmt->execute([
-            ':user_id' => $userId,
+            ':user_id'  => $userId,
             ':user_id2' => $userId,
+            ':user_id3' => $userId,
         ]);
-
         return $stmt->fetchAll();
     }
 

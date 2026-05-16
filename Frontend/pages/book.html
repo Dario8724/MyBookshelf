@@ -138,10 +138,16 @@
                         <textarea id="reviewContent" class="review-textarea" placeholder="Escreve a tua review..." rows="4" maxlength="2000"></textarea>
 
                         <div class="review-footer">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="spoilerCheck">
-                                <span>Contém spoilers</span>
-                            </label>
+                            <div style="display:flex;flex-direction:column;gap:0.5rem">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="spoilerCheck">
+                                    <span>Contém spoilers</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="shareOnFeed">
+                                    <span>Partilhar no feed</span>
+                                </label>
+                            </div>
                             <button class="btn btn-primary" id="publishReviewBtn" onclick="submitReview()">Publicar review</button>
                         </div>
                     </section>

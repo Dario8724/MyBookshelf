@@ -100,16 +100,20 @@ function renderFeed(posts) {
 
         const bookBlock = p.book_id ? `
             <div class="post-book">
-                <div class="post-book-cover">
+                <a href="book.html?id=${p.book_id}" class="post-book-cover">
                     ${p.book_cover
                         ? `<img src="${p.book_cover}" alt="${p.book_title}">`
                         : `<div class="book-placeholder"></div>`
                     }
-                </div>
+                </a>
                 <div class="post-book-info">
                     <h4 class="post-book-title">${p.book_title}</h4>
                     <p class="post-book-author">${p.book_author || ''}</p>
                     ${p.rating ? `<div class="post-rating">${renderStars(p.rating)}</div>` : ''}
+                    ${p.has_spoiler == 1 ? `
+                        <div style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.72rem;color:#b07020;background:rgba(176,112,32,0.1);padding:0.2rem 0.6rem;border-radius:20px;margin-top:0.4rem">
+                            ⚠️ Contém spoilers
+                        </div>` : ''}
                 </div>
             </div>
         ` : '';
@@ -124,7 +128,16 @@ function renderFeed(posts) {
                 <span class="post-date">${date}</span>
             </div>
             ${bookBlock}
-            <div class="post-content">${p.content}</div>
+            ${p.has_spoiler == 1
+                ? `<div>
+                    <div id="spoiler-hidden-${p.post_id}" style="background:var(--surface2);border-radius:10px;padding:0.75rem;color:var(--muted);font-size:0.875rem;display:flex;align-items:center;justify-content:space-between">
+                        <span>🚫 Esta review contém spoilers.</span>
+                        <button class="btn btn-outline" style="font-size:0.75rem;padding:0.3rem 0.7rem" onclick="revealSpoiler(${p.post_id})">Ver mesmo assim</button>
+                    </div>
+                    <div id="spoiler-content-${p.post_id}" class="post-content" style="display:none">${p.content}</div>
+                    </div>`
+                : `<div class="post-content">${p.content}</div>`
+            }
             <div class="post-actions">
                 <button class="post-action ${p.liked ? 'liked' : ''}" onclick="toggleLike(${p.post_id}, this)">
                     <svg viewBox="0 0 24 24" fill="${p.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -149,6 +162,11 @@ function renderFeed(posts) {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = '1.25rem';
+}
+
+function revealSpoiler(postId) {
+    document.getElementById(`spoiler-hidden-${postId}`).style.display = 'none';
+    document.getElementById(`spoiler-content-${postId}`).style.display = 'block';
 }
 
 async function toggleComments(postId, btn) {
@@ -230,9 +248,9 @@ function renderStars(rating) {
     let html = '';
     for (let i = 1; i <= 5; i++) {
         const filled = i <= rating;
-        html += `<svg class="star ${filled ? 'filled' : ''}" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+        html += `<svg class="star ${filled ? 'filled' : ''}" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'var(--surface2)'}" stroke="${filled ? 'var(--accent)' : 'var(--border)'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
     }
-    return html;
+    return html + `<span style="font-size:0.8rem;color:var(--muted);margin-left:0.3rem">${rating}/5</span>`;
 }
 
 // ––––TABS–––

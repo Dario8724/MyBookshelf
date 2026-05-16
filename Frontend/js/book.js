@@ -695,11 +695,25 @@ async function submitReview() {
     const data = await res.json();
 
     if (data.success) {
-      document.getElementById("reviewContent").value = "";
-      document.getElementById("spoilerCheck").checked = false;
-      showToast("Review publicada!", "success");
-      await loadReviews();
-      await loadRatingAndReviews(); // refresh count no hero
+      const shareOnFeed = document.getElementById('shareOnFeed').checked;
+
+      if (shareOnFeed) {
+        await fetch(`${API}/api/posts`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeader() },
+          body: JSON.stringify({
+            content,
+            review_id: data.data.review_id
+            })
+        });
+    }
+
+    document.getElementById('reviewContent').value = '';
+    document.getElementById('spoilerCheck').checked = false;
+    document.getElementById('shareOnFeed').checked = false;
+    showToast(shareOnFeed ? 'Review publicada e partilhada no feed!' : 'Review publicada!', 'success');
+    await loadReviews();
+    await loadRatingAndReviews();
     } else {
       showToast(data.error || "Erro ao publicar.", "error");
     }
