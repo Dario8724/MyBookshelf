@@ -97,7 +97,7 @@ function renderProfile(user, followersCount, followingCount) {
                     <button class="btn btn-outline" onclick="openEditModal()">Editar Perfil</button>
                 </div>
             </div>
-            <div id="profileGoalSummary" style="width:360px;flex-shrink:0;margin-right:1rem"></div>
+            <div id="profileCurrentBook" style="width:360px;flex-shrink:0;margin-right:1rem"></div>
         </div>
     `;
 }
@@ -128,7 +128,8 @@ async function loadLibrary() {
         renderGrid('tab-reading',       reading);
         renderGrid('tab-completed',     completed);
         renderGrid('tab-want_to_read',  want);
-        renderGrid('tab-favorites',     favs)
+        renderGrid('tab-favorites',     favs);
+        await renderCurrentlyReading();
         
         document.getElementById('librarySection').style.display = 'block';
 
@@ -227,12 +228,14 @@ async function loadGoals() {
         if (!data.success) return;
         
         const goals = data.data.goals;
+        goals.sort((a, b) => a.completed - b.completed);
+        const visibleGoals = goals.slice(0, 4);
         const list = document.getElementById('goalsList');
 
         if (!goals.length) {
             list.innerHTML = `<div class="goal-empty">Ainda não tens metas de leitura. Cria uma!</div>`;
         } else {
-            list.innerHTML = goals.map(g => `
+            list.innerHTML = visibleGoals.map(g => `
                 <div class="goal-item">
                     <div class="goal-header">
                         <div class="goal-title">${g.start_date.substring(0, 4)} - ${g.label}</div>
@@ -247,37 +250,58 @@ async function loadGoals() {
                         </div>
                     </div>
             `).join('');
-        }
-
-        //Resumo da meta activa no banner do perfil
-        const activeGoals = goals.filter(g => !g.completed).slice(0, 2);
-        const summaryEl   = document.getElementById('profileGoalSummary');
-
-        if (summaryEl && activeGoals.length > 0) {
-            summaryEl.innerHTML = `
-                <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;">
-                    <div style="font-size:0.75rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem">Metas actuais</div>
-                    ${activeGoals.map(g => `
-                        <div style="margin-bottom:${activeGoals.length > 1 ? '0.75rem' : '0'}">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">
-                                <span style="font-size:0.8rem;font-weight:500;color:var(--text)">🎯 ${g.label}</span>
-                                <span style="font-size:0.75rem;color:var(--muted)">${g.percentage}%</span>
-                            </div>
-                            <div style="width:100%;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden">
-                                <div style="width:${g.percentage}%;height:100%;background:var(--accent);border-radius:99px"></div>
-                            </div>
-                            <div style="font-size:0.75rem;color:var(--muted);margin-top:0.3rem">${g.progress} de ${g.target_value} livros</div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }        
+        }  
 
         document.getElementById('goalsCard').style.display = 'block';
 
     } catch (err) {
         console.error('Erro ao carregar metas:', err);
     }
+}
+
+async function renderCurrentlyReading() {
+    const el = document.getElementById('profileCurrentBook');
+    if (!el) return;
+
+    const reading = allBooks.filter(b => b.status === 'reading');
+    if (!reading.length) {
+        el.innerHTML = '';
+        return;
+    }
+
+    const book = reading[0];
+
+    // buscar progresso
+    const res = await fetch(`${API}/api/library/${book.book_id}/status`, { headers: authHeader() });
+    const data = await res.json();
+
+    const current = data.success ? (data.data.current_page || 0) : 0;
+    const total   = data.success ? (data.data.total_pages  || 0) : 0;
+    const percent = total ? Math.round((current / total) * 100) : 0;
+
+    const cover = book.cover
+        ? `<img src="${book.cover}" alt="${book.title}" style="width:48px;height:72px;object-fit:cover;border-radius:6px;flex-shrink:0">`
+        : `<div style="width:48px;height:72px;background:var(--surface2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">📖</div>`;
+
+    el.innerHTML = `
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;">
+            <div style="font-size:0.75rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem">A ler agora</div>
+            <div style="display:flex;gap:0.75rem;align-items:center">
+                ${cover}
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:0.85rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${book.title}</div>
+                    <div style="font-size:0.75rem;color:var(--muted);margin-top:0.1rem">${book.author || ''}</div>
+                    ${total ? `
+                    <div style="margin-top:0.6rem">
+                        <div style="width:100%;height:5px;background:var(--surface2);border-radius:99px;overflow:hidden">
+                            <div style="width:${percent}%;height:100%;background:var(--accent);border-radius:99px"></div>
+                        </div>
+                        <div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem">${current} de ${total} páginas · ${percent}%</div>
+                    </div>` : `<div style="font-size:0.72rem;color:var(--muted);margin-top:0.5rem">Sem progresso registado</div>`}
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 // ── MODAL EDITAR PERFIL ───────────────────────────────────
