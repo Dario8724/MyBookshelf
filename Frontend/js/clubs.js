@@ -6,6 +6,7 @@ let map = null;
 let marker = null;
 let autocomplete = null;
 let mainMap = null;
+let currentVoteId = null
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken()) {
@@ -447,11 +448,21 @@ async function renderVoting() {
         const createForm = `
             <div class="card" style="margin-bottom:1rem;padding:1rem">
                 <h4 style="margin-bottom:0.75rem">Nova Votação</h4>
-                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
-                    <input type="text" id="voteTitle" placeholder="Título" style="flex:1;min-width:200px;padding:0.5rem;border:1px solid var(--border);border-radius:8px">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-bottom:0.75rem">
+                    <input type="text" id="voteTitle" placeholder="Título da votação" style="flex:1;min-width:200px;padding:0.5rem;border:1px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif">
                     <input type="date" id="voteStart" style="padding:0.5rem;border:1px solid var(--border);border-radius:8px">
                     <input type="date" id="voteEnd" style="padding:0.5rem;border:1px solid var(--border);border-radius:8px">
                     <button class="btn btn-primary" onclick="createVote()">Criar</button>
+                </div>
+                <div id="voteBookSearch" style="display:none">
+                    <h4 style="margin-bottom:0.75rem">Adicionar livro à votação</h4>
+                    <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem">
+                        <input type="text" id="voteBookInput" placeholder="Pesquisar livro..." 
+                            style="flex:1;padding:0.5rem;border:1px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif"
+                            onkeydown="if(event.key==='Enter') searchVoteBook()">
+                        <button class="btn btn-outline" onclick="searchVoteBook()">Pesquisar</button>
+                    </div>
+                    <div id="voteBookResults" style="display:flex;gap:0.75rem;flex-wrap:wrap"></div>
                 </div>
             </div>
         `;
@@ -465,13 +476,17 @@ async function renderVoting() {
                 <small style="color:var(--muted)">📅 ${formatDate(v.start_date)} → ${formatDate(v.end_date)} · ${v.total_votes} votos</small>
                 <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap">
                     ${v.options.map(o => `
-                        <div style="border:2px solid ${v.user_voted_option === o.option_id ? 'var(--accent)' : 'var(--border)'};border-radius:10px;padding:0.75rem;width:140px;text-align:center;cursor:${v.status === 'open' && !v.user_voted_option ? 'pointer' : 'default'}"
-                             onclick="${v.status === 'open' && !v.user_voted_option ? `castVote(${v.vote_id}, ${o.option_id})` : ''}">
+                        <div style="border:2px solid ${v.user_voted_option === o.option_id ? 'var(--accent)' : 'var(--border)'};border-radius:10px;padding:0.75rem;width:140px;text-align:center">
                             ${o.cover ? `<img src="${o.cover}" style="width:80px;height:110px;object-fit:cover;border-radius:6px;margin-bottom:0.5rem">` : '<div style="width:80px;height:110px;background:var(--surface2);border-radius:6px;margin:0 auto 0.5rem;display:flex;align-items:center;justify-content:center">📖</div>'}
                             <div style="font-size:0.75rem;font-weight:500">${o.title}</div>
                             <div style="font-size:0.7rem;color:var(--muted)">${o.author}</div>
                             <div style="font-size:0.75rem;margin-top:0.4rem;color:var(--accent);font-weight:600">${o.total_votes} votos</div>
-                            ${v.user_voted_option === o.option_id ? '<div style="font-size:0.7rem;color:var(--accent)">✓ O teu voto</div>' : ''}
+                            ${v.user_voted_option === o.option_id
+                                ? '<div style="font-size:0.7rem;color:var(--accent);margin-top:0.3rem">✓ O teu voto</div>'
+                                : v.status === 'open' && !v.user_voted_option
+                                    ? `<button class="btn btn-primary" style="margin-top:0.5rem;font-size:0.75rem;padding:0.35rem 0.75rem" onclick="castVote(${v.vote_id}, ${o.option_id})">Votar</button>`
+                                    : ''
+                            }
                         </div>
                     `).join('')}
                 </div>
@@ -503,8 +518,9 @@ async function createVote() {
         const data = await res.json();
 
         if (data.success) {
-            showToast('Votação criada!', 'success');
-            renderVoting();
+            showToast('Votação criada! Agora adiciona livros como opções.', 'success');
+            currentVoteId = data.data.vote_id;
+            document.getElementById('voteBookSearch').style.display = 'block';
         } else {
             showToast(data.error || 'Erro ao criar votação.', 'error');
         }
@@ -527,6 +543,74 @@ async function castVote(voteId, optionId) {
             renderVoting();
         } else {
             showToast(data.error || 'Erro ao votar.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
+}
+
+async function searchVoteBook() {
+    const query = document.getElementById('voteBookInput').value.trim();
+    if (!query) return;
+
+    const resultsEl = document.getElementById('voteBookResults');
+    resultsEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">A pesquisar...</div>';
+
+    try {
+        const res = await fetch(`${API}/api/books/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        if (!data.success || !data.data.books.length) {
+            resultsEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">Nenhum livro encontrado.</div>';
+            return;
+        }
+
+        resultsEl.innerHTML = data.data.books.slice(0, 5).map(b => `
+            <div style="width:100px;cursor:pointer;text-align:center" onclick="addVoteOption('${b.google_id}', '${b.title.replace(/'/g, "\\'")}')">
+                ${b.cover
+                    ? `<img src="${b.cover}" style="width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:8px;border:2px solid var(--border)">`
+                    : `<div style="width:100%;aspect-ratio:2/3;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">📖</div>`
+                }
+                <div style="font-size:0.72rem;margin-top:0.3rem;color:var(--text);line-height:1.3">${b.title}</div>
+                <div style="font-size:0.68rem;color:var(--muted)">${b.author || ''}</div>
+            </div>
+        `).join('');
+    } catch (err) {
+        resultsEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">Erro ao pesquisar.</div>';
+    }
+}
+
+async function addVoteOption(googleId, title) {
+    try {
+        // Guardar livro na BD primeiro
+        const saveRes = await fetch(`${API}/api/books/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeader() },
+            body: JSON.stringify({ google_id: googleId })
+        });
+        const saveData = await saveRes.json();
+
+        if (!saveData.success) {
+            showToast('Erro ao guardar livro.', 'error');
+            return;
+        }
+
+        const bookId = saveData.data.book_id;
+
+        // Adicionar como opção
+        const res = await fetch(`${API}/api/clubs/votes/${currentVoteId}/options`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeader() },
+            body: JSON.stringify({ book_id: bookId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast(`"${title}" adicionado como opção!`, 'success');
+            document.getElementById('voteBookInput').value = '';
+            document.getElementById('voteBookResults').innerHTML = '';
+        } else {
+            showToast(data.error || 'Erro ao adicionar opção.', 'error');
         }
     } catch (err) {
         showToast('Erro de ligação.', 'error');
@@ -654,15 +738,45 @@ async function loadRanking() {
 }
 
 // ── SIDEBAR ───────────────────────────────────────────────
-function renderSidebar(club) {
-    document.getElementById('sidebarBook').innerHTML = `
-        <div class="sidebar-book-cover" style="display:flex;align-items:center;justify-content:center;font-size:3rem">📖</div>
-        <div class="sidebar-book-title">Livro do mês</div>
-        <div class="sidebar-book-author">A definir pelos membros</div>
-        <div class="stars">★★★★☆</div>
-    `;
-    document.getElementById('progressFill').style.width = '0%';
-    document.getElementById('progressText').textContent = '0% dos membros já terminaram';
+async function renderSidebar(club) {
+    // buscar votação mais recente fechada com vencedor
+    try {
+        const res = await fetch(`${API}/api/clubs/${club.club_id}/votes`, { headers: authHeader() });
+        const data = await res.json();
+
+        const closed = data.success ? data.data.votes.filter(v => v.status === 'closed') : [];
+        const sidebar = document.getElementById('sidebarBook');
+        const progressSection = document.querySelector('.progress-section');
+
+        // remover estrelas e progresso
+        if (progressSection) progressSection.style.display = 'none';
+
+        if (!closed.length || !closed[0].options || !closed[0].options.length) {
+            sidebar.innerHTML = `
+                <div style="text-align:center;padding:1.5rem 0;color:var(--muted);font-size:0.875rem">
+                    Ainda não há votações concluídas.
+                </div>
+            `;
+            return;
+        }
+
+        // livro com mais votos da votação mais recente fechada
+        const winner = closed[0].options.reduce((a, b) => 
+            parseInt(a.total_votes) >= parseInt(b.total_votes) ? a : b
+        );
+
+        sidebar.innerHTML = `
+            ${winner.cover
+                ? `<img src="${winner.cover}" style="width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:10px;margin-bottom:0.75rem">`
+                : `<div style="width:100%;aspect-ratio:2/3;background:var(--surface2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:0.75rem">📖</div>`
+            }
+            <div class="sidebar-book-title">${winner.title}</div>
+            <div class="sidebar-book-author">${winner.author}</div>
+            <div style="font-size:0.75rem;color:var(--accent);margin-top:0.3rem">🏆 ${winner.total_votes} votos</div>
+        `;
+    } catch (err) {
+        console.error('Erro ao carregar sidebar:', err);
+    }
 }
 
 // ── MAPA PRINCIPAL ────────────────────────────────────────
