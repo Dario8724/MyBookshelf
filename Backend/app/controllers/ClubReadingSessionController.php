@@ -31,19 +31,20 @@ class ClubReadingSessionController extends Controller
         }
 
         $body = $this->getBody();
-        $bookId = (int) ($body['book_id'] ?? 0);
+        $title     = trim($body['title'] ?? '');
+        $bookName  = trim($body['book_name'] ?? '');
         $startDate = trim($body['start_date'] ?? '');
-        $endDate = trim($body['end_date'] ?? '');
+        $endDate   = trim($body['end_date'] ?? '');
 
-        if (empty($bookId)) {
-            $this->error('O book_id é obrigatório.', 422);
+        if (empty($title)) {
+            $this->error('O título da sessão é obrigatório.', 422);
         }
 
         if (empty($startDate) || empty($endDate)) {
             $this->error('As datas de início e fim são obrigatórias.', 422);
         }
 
-        $sessionId = $this->sessionModel->create($clubId, $bookId, $startDate, $endDate);
+        $sessionId = $this->sessionModel->create($clubId, $title, $bookName, $startDate, $endDate);
 
         $this->success(['session_id' => $sessionId], 'Sessão de leitura criada com sucesso.', 201);
     }
@@ -62,7 +63,7 @@ class ClubReadingSessionController extends Controller
             $this->error('Tens de ser membro do clube.', 403);
         }
 
-        $sessions = $this->sessionModel->getByClub($clubId);
+        $sessions = $this->sessionModel->getByClub($clubId, $userId);
 
         $this->success([
             'total' => count($sessions),
@@ -106,5 +107,30 @@ class ClubReadingSessionController extends Controller
         }
 
         $this->success(null, 'Sessão marcada como concluída.');
+    }
+
+    public function toggleAttendance(int $sessionId): void
+    {
+        $payload = AuthMiddleware::requireAuth();
+        $userId  = $payload['user_id'];
+
+        $attending = $this->sessionModel->toggleAttendance($sessionId, $userId);
+
+        $this->success(
+            ['attending' => $attending],
+            $attending ? 'Presença confirmada.' : 'Presença cancelada.'
+        );
+    }
+
+    public function attendees(int $sessionId): void
+    {
+        AuthMiddleware::requireAuth();
+
+        $attendees = $this->sessionModel->getAttendees($sessionId);
+
+        $this->success([
+            'total'     => count($attendees),
+            'attendees' => $attendees,
+        ]);
     }
 }

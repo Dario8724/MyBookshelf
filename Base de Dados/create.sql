@@ -294,6 +294,8 @@ CREATE TABLE club_reading_vote_user (
 CREATE TABLE club_reading_session (
     session_id INT AUTO_INCREMENT PRIMARY KEY,
     club_id INT,
+    title VARCHAR(255) NOT NULL DEFAULT '',
+    book_name VARCHAR(255) NULL,
     book_id INT,
     start_date DATE,
     end_date DATE,
@@ -301,6 +303,16 @@ CREATE TABLE club_reading_session (
 
     FOREIGN KEY (club_id) REFERENCES club(club_id) ON DELETE CASCADE,
     FOREIGN KEY (book_id) REFERENCES book(book_id) ON DELETE CASCADE
+);
+
+CREATE TABLE club_session_attendance (
+    attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+    session_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_attendance (session_id, user_id),
+    FOREIGN KEY (session_id) REFERENCES club_reading_session(session_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
 
 -- =========================

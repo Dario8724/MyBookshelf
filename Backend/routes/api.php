@@ -8,7 +8,7 @@ $router->post('/api/users/profile',         'UserController@updateProfile');
 $router->get('/api/books/search',           'BookController@search');
 $router->get('/api/books/google/{id}',      'BookController@showByGoogleId');
 $router->post('/api/books/save',            'BookController@saveFromGoogle');
-$router->get('/api/books/by-author', 'BookController@searchByAuthor');
+$router->get('/api/books/by-author',        'BookController@searchByAuthor');
 $router->get('/api/books/{id}',             'BookController@show');
 $router->post('/api/library',               'UserBookController@addBook');
 $router->delete('/api/library/{id}',        'UserBookController@removeBook');
@@ -50,9 +50,11 @@ $router->delete('/api/clubs/{id}/leave', 'ClubController@leave');
 $router->post('/api/clubs/{id}/messages', 'ClubMessageController@send');
 $router->get('/api/clubs/{id}/messages',  'ClubMessageController@index');
 // reading sessions 
-$router->post('/api/clubs/{id}/sessions',          'ClubReadingSessionController@create');
-$router->get('/api/clubs/{id}/sessions',           'ClubReadingSessionController@index');
-$router->post('/api/clubs/sessions/{id}/complete', 'ClubReadingSessionController@complete');
+$router->post('/api/clubs/{id}/sessions',              'ClubReadingSessionController@create');
+$router->get('/api/clubs/{id}/sessions',               'ClubReadingSessionController@index');
+$router->post('/api/clubs/sessions/{id}/complete',     'ClubReadingSessionController@complete');
+$router->post('/api/clubs/sessions/{id}/attendance',   'ClubReadingSessionController@toggleAttendance');
+$router->get('/api/clubs/sessions/{id}/attendees',     'ClubReadingSessionController@attendees');
 // Ranking
 $router->get('/api/clubs/{id}/ranking', 'ClubRankingController@index');
 
