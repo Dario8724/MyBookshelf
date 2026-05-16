@@ -649,51 +649,34 @@ async function renderLibrary() {
         const addForm = isMember ? `
             <div class="card" style="grid-column:1/-1;padding:1rem;margin-bottom:0.5rem">
                 <h4 style="margin-bottom:0.75rem">Adicionar Livro</h4>
-                <div style="display:flex;gap:0.5rem;align-items:center">
-                    <input type="number" id="libraryBookId" placeholder="Book ID" style="width:110px;padding:0.5rem;border:1px solid var(--border);border-radius:8px">
-                    <button class="btn btn-primary" onclick="addBookToClub()">Adicionar</button>
+                <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem">
+                    <input type="text" id="libraryBookInput" placeholder="Pesquisar livro..."
+                        style="flex:1;padding:0.5rem;border:1px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif"
+                        onkeydown="if(event.key==='Enter') searchLibraryBook()">
+                    <button class="btn btn-outline" onclick="searchLibraryBook()">Pesquisar</button>
                 </div>
+                <div id="libraryBookResults" style="display:flex;gap:0.75rem;flex-wrap:wrap"></div>
             </div>
         ` : '';
 
         const list = books.length ? books.map(b => `
-            <div class="card" style="padding:1rem">
-                <strong>${b.title}</strong><br>
-                <small style="color:var(--muted)">${b.author}</small><br>
-                <small style="color:var(--muted)">Adicionado por ${b.added_by_name}</small>
-                ${isMember ? `<button class="btn btn-outline" style="margin-top:0.5rem;font-size:0.8rem" onclick="removeBookFromClub(${b.club_library_id})">Remover</button>` : ''}
+            <div style="display:flex;flex-direction:column;gap:0.4rem">
+                <a href="book.html?id=${b.book_id}" style="text-decoration:none;color:inherit">
+                    ${b.cover
+                        ? `<img src="${b.cover}" alt="${b.title}" style="width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:10px;transition:box-shadow 0.2s" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'" onmouseout="this.style.boxShadow='none'">`
+                        : `<div style="width:100%;aspect-ratio:2/3;background:var(--surface2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:2rem">📖</div>`
+                    }
+                    <div style="font-size:0.85rem;font-weight:500;color:var(--text);line-height:1.3">${b.title}</div>
+                    <div style="font-size:0.75rem;color:var(--muted)">${b.author}</div>
+                </a>
+                <div style="font-size:0.7rem;color:var(--faint)">por ${b.added_by_name}</div>
+                ${isMember ? `<button class="btn btn-outline" style="font-size:0.75rem;padding:0.3rem 0.6rem;margin-top:0.2rem" onclick="removeBookFromClub(${b.club_library_id})">Remover</button>` : ''}
             </div>
         `).join('') : '<div style="color:var(--muted);text-align:center;padding:2rem;grid-column:1/-1">A biblioteca está vazia.</div>';
 
         container.innerHTML = addForm + list;
     } catch (err) {
         container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem;grid-column:1/-1">Erro ao carregar biblioteca.</div>';
-    }
-}
-
-async function addBookToClub() {
-    const bookId = document.getElementById('libraryBookId').value;
-    if (!bookId) {
-        showToast('Introduz um Book ID.', 'error');
-        return;
-    }
-
-    try {
-        const res = await fetch(`${API}/api/clubs/${currentClubId}/library`, {
-            method: 'POST',
-            headers: authHeader(),
-            body: JSON.stringify({ book_id: parseInt(bookId) })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            showToast('Livro adicionado!', 'success');
-            renderLibrary();
-        } else {
-            showToast(data.error || 'Erro ao adicionar livro.', 'error');
-        }
-    } catch (err) {
-        showToast('Erro de ligação.', 'error');
     }
 }
 
@@ -713,6 +696,69 @@ async function removeBookFromClub(clubLibraryId) {
             renderLibrary();
         } else {
             showToast(data.error || 'Erro.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de ligação.', 'error');
+    }
+}
+
+async function searchLibraryBook() {
+    const query = document.getElementById('libraryBookInput').value.trim();
+    if (!query) return;
+
+    const resultsEl = document.getElementById('libraryBookResults');
+    resultsEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">A pesquisar...</div>';
+
+    try {
+        const res = await fetch(`${API}/api/books/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        if (!data.success || !data.data.books.length) {
+            resultsEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">Nenhum livro encontrado.</div>';
+            return;
+        }
+
+        resultsEl.innerHTML = data.data.books.slice(0, 5).map(b => `
+            <div style="width:100px;cursor:pointer;text-align:center" onclick="addBookToClubByGoogle('${b.google_id}')">
+                ${b.cover
+                    ? `<img src="${b.cover}" style="width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:8px;border:2px solid var(--border)">`
+                    : `<div style="width:100%;aspect-ratio:2/3;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">📖</div>`
+                }
+                <div style="font-size:0.72rem;margin-top:0.3rem;color:var(--text);line-height:1.3">${b.title}</div>
+                <div style="font-size:0.68rem;color:var(--muted)">${b.author || ''}</div>
+            </div>
+        `).join('');
+    } catch (err) {
+        resultsEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">Erro ao pesquisar.</div>';
+    }
+}
+
+async function addBookToClubByGoogle(googleId) {
+    try {
+        const saveRes = await fetch(`${API}/api/books/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeader() },
+            body: JSON.stringify({ google_id: googleId })
+        });
+        const saveData = await saveRes.json();
+
+        if (!saveData.success) {
+            showToast('Erro ao guardar livro.', 'error');
+            return;
+        }
+
+        const res = await fetch(`${API}/api/clubs/${currentClubId}/library`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeader() },
+            body: JSON.stringify({ book_id: saveData.data.book_id })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast('Livro adicionado!', 'success');
+            renderLibrary();
+        } else {
+            showToast(data.error || 'Erro ao adicionar livro.', 'error');
         }
     } catch (err) {
         showToast('Erro de ligação.', 'error');
