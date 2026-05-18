@@ -34,7 +34,6 @@ $router->get('/api/goals',                  'ReadingGoalController@index');
 $router->delete('/api/goals/{id}',           'ReadingGoalController@delete');
 $router->get('/api/achievements',           'AchievementController@index');
 $router->post('/api/achievements/check',    'AchievementController@check');
-// new router for clubs 
 // Clubes
 $router->post('/api/clubs', 'ClubController@create');
 $router->get('/api/clubs',       'ClubController@index');
