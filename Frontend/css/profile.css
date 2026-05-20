@@ -116,6 +116,7 @@ nav {
     display: flex;
     align-items: center;
     background: none;
+    border: none;
     cursor: pointer;
     color: var(--muted);
     padding: 0.4rem;
@@ -659,6 +660,19 @@ nav {
 
 .skel-avatar { width: 110px; height: 110px; border-radius: 50%; }
 .skel-line   { height: 14px; margin-bottom: 8px; }
+
+/* DARK MODE */
+[data-theme="dark"] {
+    --bg:       #1C1A16;
+    --surface:  #242118;
+    --surface2: #2C2920;
+    --border:   #3A3628;
+    --text:     #E8E4DC;
+    --muted:    #9A9080;
+    --faint:    #6A6058;
+    --accent:   #D4894A;
+    --accent-dk:#C07B3A;
+}
 
 /* RESPONSIVE */
 @media (max-width: 600px) {

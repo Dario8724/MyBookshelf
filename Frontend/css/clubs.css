@@ -311,6 +311,7 @@ nav {
     line-height: 1.5;
     margin-bottom: 0.75rem;
     display: -webkit-box;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -929,6 +930,25 @@ nav {
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.error { background: #a83a3a; }
 .toast.success { background: #3a7a50; }
+
+/* DARK MODE */
+[data-theme="dark"] {
+    --bg:       #1C1A16;
+    --surface:  #242118;
+    --surface2: #2C2920;
+    --border:   #3A3628;
+    --text:     #E8E4DC;
+    --muted:    #9A9080;
+    --faint:    #6A6058;
+    --accent:   #D4894A;
+    --accent-dk:#C07B3A;
+    --green:    #4a9a60;
+    --green-bg: rgba(74, 154, 96, 0.15);
+    --blue:     #5a7aaa;
+    --blue-bg:  rgba(90, 122, 170, 0.15);
+    --amber:    #d08030;
+    --amber-bg: rgba(208, 128, 48, 0.15);
+}
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
