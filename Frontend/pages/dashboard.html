@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MyBookshelf — Dashboard Estatística</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"
+            rel="stylesheet">
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+        <style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F0E8;--surface:#EDE8DC;--surface2:#E4DECE;--border:#D4CBBA;
+  --text:#2C2A24;--muted:#8A8070;--faint:#B4A898;
+  --accent:#C07B3A;--accent-dk:#A87830;--accent-lt:#DA956B;
+  --green:#3a7a50;--blue:#3a5a8a;--red:#a83a3a;--purple:#6a3a8a;
+}
+body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);min-height:100vh}
+
+/* NAV */
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:600;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.nav-badge{background:var(--accent);color:#fff;font-size:0.72rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:20px;margin-left:0.5rem}
+
+/* PAGE */
+.page{max-width:1400px;margin:0 auto;padding:2rem 1.5rem;display:flex;flex-direction:column;gap:2rem}
+
+/* HEADER */
+.dash-header{text-align:center;padding:1rem 0}
+.dash-title{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;color:var(--text)}
+.dash-sub{font-size:0.95rem;color:var(--muted);margin-top:0.4rem}
+
+/* HERO CARDS */
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.hero-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;text-align:center;transition:border-color 0.2s}
+.hero-card:hover{border-color:var(--accent)}
+.hero-num{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;color:var(--accent);line-height:1}
+.hero-label{font-size:0.8rem;color:var(--muted);margin-top:0.4rem;text-transform:uppercase;letter-spacing:0.05em}
+
+/* SECTION */
+.section{display:flex;flex-direction:column;gap:0.75rem}
+.section-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text);display:flex;align-items:center;gap:0.5rem}
+.section-title .badge{font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;background:rgba(192,123,58,0.15);color:var(--accent);padding:0.2rem 0.6rem;border-radius:20px}
+.section-desc{font-size:0.875rem;color:var(--muted);line-height:1.6}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem}
+.card-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--text);margin-bottom:1rem}
+.insight{background:rgba(192,123,58,0.08);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:0.75rem 1rem;font-size:0.85rem;color:var(--text);line-height:1.6;margin-top:1rem}
+.insight strong{color:var(--accent)}
+
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:3fr 2fr;gap:1.25rem}
+.grid-2-eq{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
+.grid-full{width:100%}
+
+/* STAT TABLE */
+.stat-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:0.82rem}
+th{background:var(--surface2);padding:0.65rem 1rem;text-align:left;font-weight:600;color:var(--muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap}
+td{padding:0.55rem 1rem;border-top:1px solid var(--border);color:var(--text);white-space:nowrap}
+tr:hover td{background:rgba(192,123,58,0.04)}
+.tr-summary td{background:var(--surface2);font-weight:600;color:var(--accent);border-top:2px solid var(--border)}
+.tr-summary2 td{background:rgba(192,123,58,0.06);font-weight:500;color:var(--text);font-size:0.8rem}
+
+/* STAT BOXES */
+.stat-boxes{display:grid;grid-template-columns:repeat(6,1fr);gap:0.75rem;margin-top:1rem}
+.stat-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:0.75rem;text-align:center}
+.stat-box-val{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:600;color:var(--accent)}
+.stat-box-lbl{font-size:0.7rem;color:var(--muted);margin-top:0.2rem}
+
+/* CORR BADGE */
+.corr-val{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;text-align:center;margin-bottom:0.5rem}
+.corr-strong{color:var(--green)}
+.corr-medium{color:var(--accent)}
+.corr-weak{color:var(--muted)}
+
+/* IC */
+.ic-bar-wrap{position:relative;height:60px;margin:1.5rem 0}
+.ic-line{position:absolute;top:50%;left:10%;right:10%;height:3px;background:var(--border);transform:translateY(-50%)}
+.ic-fill{position:absolute;top:50%;background:rgba(192,123,58,0.3);border:2px solid var(--accent);border-radius:4px;height:20px;transform:translateY(-50%)}
+.ic-mean{position:absolute;top:50%;width:4px;height:36px;background:var(--accent);border-radius:2px;transform:translate(-50%,-50%)}
+.ic-tick{position:absolute;top:50%;transform:translateX(-50%);font-size:0.72rem;color:var(--muted);top:calc(50% + 20px)}
+
+/* CHART CONTAINERS */
+.chart-wrap{position:relative;width:100%}
+
+@media(max-width:900px){.grid-2,.grid-2-eq,.grid-3{grid-template-columns:1fr}.hero-grid{grid-template-columns:repeat(2,1fr)}.stat-boxes{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:500px){.hero-grid{grid-template-columns:1fr 1fr}}
+</style>
+    </head>
+    <body>
+
+        <nav>
+            <a href="profile.html" class="logo">My<span>B</span>ookshelf</a>
+            <div style="display:flex;align-items:center;gap:0.75rem">
+                <span class="nav-badge">📊 Dashboard Estatística</span>
+                <span style="font-size:0.8rem;color:var(--muted)">Dados
+                    simulados · Maio 2026</span>
+            </div>
+        </nav>
+
+        <div class="page">
+
+            <!-- HEADER -->
+            <div class="dash-header">
+                <div class="dash-title">Dashboard de Análise Estatística</div>
+                <div class="dash-sub">Análise descritiva, correlações e
+                    distribuições da plataforma MyBookshelf · 120 utilizadores ·
+                    35 clubes</div>
+            </div>
+
+            <!-- HERO -->
+            <div class="hero-grid">
+                <div class="hero-card"><div class="hero-num">120</div><div
+                        class="hero-label">Utilizadores</div></div>
+                <div class="hero-card"><div class="hero-num">2 418</div><div
+                        class="hero-label">Livros Lidos</div></div>
+                <div class="hero-card"><div class="hero-num">1 734</div><div
+                        class="hero-label">Reviews Publicadas</div></div>
+                <div class="hero-card"><div class="hero-num">3 192</div><div
+                        class="hero-label">Posts no Feed</div></div>
+                <div class="hero-card"><div class="hero-num">35</div><div
+                        class="hero-label">Clubes Ativos</div></div>
+                <div class="hero-card"><div class="hero-num">847</div><div
+                        class="hero-label">Membros em Clubes</div></div>
+                <div class="hero-card"><div class="hero-num">1 245</div><div
+                        class="hero-label">Livros em Clubes</div></div>
+                <div class="hero-card"><div class="hero-num">312</div><div
+                        class="hero-label">Votos em Maio</div></div>
+            </div>
+
+            <!-- SECÇÃO 1: ESTATÍSTICA DESCRITIVA -->
+            <div class="section">
+                <div class="section-title">📋 Estatística Descritiva <span
+                        class="badge">Secção 1</span></div>
+                <div class="section-desc">Análise das principais variáveis por
+                    utilizador: livros lidos, reviews, conquistas, clubes,
+                    seguidores e posts. A tabela apresenta os primeiros 20
+                    utilizadores com as medidas de tendência central no
+                    rodapé.</div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">Comparação por Utilizador —
+                            Livros, Reviews e Posts</div>
+                        <div class="chart-wrap" style="height:320px"><canvas
+                                id="chartBarUsers"></canvas></div>
+                        <div class="insight">Os utilizadores apresentam grande
+                            variabilidade. <strong>Oscar Fernandes</strong>
+                            lidera em livros lidos (55), seguido de <strong>Ana
+                                Ferreira</strong> (52) e <strong>Bruno
+                                Mendes</strong> (48), enquanto <strong>Carla
+                                Sousa</strong> destaca-se no número de posts
+                            publicados (79).</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Distribuição de Membros por
+                            Clube (Top 10)</div>
+                        <div class="chart-wrap" style="height:320px"><canvas
+                                id="chartPieClubs"></canvas></div>
+                        <div class="insight">Os 10 maiores clubes concentram
+                            <strong>~62%</strong> de todos os membros,
+                            evidenciando uma distribuição assimétrica típica de
+                            redes sociais.</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Tabela Descritiva — Amostra de 20
+                        Utilizadores</div>
+                    <div class="stat-table-wrap">
+                        <table id="descTable"></table>
+                    </div>
+                    <div class="stat-boxes" id="statBoxes"></div>
+                </div>
+            </div>
+
+            <!-- SECÇÃO 2: DESVIO PADRÃO -->
+            <div class="section">
+                <div class="section-title">📏 Desvio Padrão <span
+                        class="badge">Secção 2</span></div>
+                <div class="section-desc">O desvio padrão mede a dispersão dos
+                    dados em torno da média. Um desvio padrão elevado indica
+                    grande variabilidade entre os utilizadores; um baixo indica
+                    homogeneidade.</div>
+                <div class="grid-2-eq">
+                    <div class="card">
+                        <div class="card-title">Livros Lidos — Média ± Desvio
+                            Padrão</div>
+                        <div class="chart-wrap" style="height:300px"><canvas
+                                id="chartStdDev"></canvas></div>
+                        <div class="insight">Média: <strong>20,15
+                                livros</strong> · σ =
+                            <strong>12,4</strong><br>Intervalo normal:
+                            <strong>7,75 — 32,55</strong>
+                            livros<br>Aproximadamente <strong>68%</strong> dos
+                            utilizadores leram entre 8 e 33 livros.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Desvio Padrão por Variável</div>
+                        <div class="chart-wrap" style="height:300px"><canvas
+                                id="chartStdVars"></canvas></div>
+                        <div class="insight">Os <strong>posts</strong>
+                            apresentam o maior desvio padrão relativo, indicando
+                            comportamentos muito distintos entre utilizadores
+                            ativos e passivos. As <strong>conquistas</strong>
+                            são a variável mais homogénea.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECÇÃO 3: DISTRIBUIÇÃO NORMAL -->
+            <div class="section">
+                <div class="section-title">🔔 Distribuição Normal <span
+                        class="badge">Secção 3</span></div>
+                <div class="section-desc">A distribuição normal (curva de Gauss)
+                    descreve como os dados se distribuem em torno da média.
+                    Verificamos se os livros lidos pelos utilizadores seguem
+                    aproximadamente esta distribuição.</div>
+                <div class="grid-2-eq">
+                    <div class="card">
+                        <div class="card-title">Histograma de Livros Lidos +
+                            Curva Normal</div>
+                        <div class="chart-wrap" style="height:300px"><canvas
+                                id="chartNormal"></canvas></div>
+                        <div class="insight">O histograma aproxima-se de uma
+                            distribuição normal com ligeira assimetria positiva
+                            (skewness ≈ 0.8), o que é comum em dados de consumo
+                            — <strong>a maioria lê entre 10-30 livros</strong>,
+                            mas alguns utilizadores muito ativos puxam a média
+                            para cima.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Histograma de Posts + Curva
+                            Normal</div>
+                        <div class="chart-wrap" style="height:300px"><canvas
+                                id="chartNormalPosts"></canvas></div>
+                        <div class="insight">Os posts apresentam distribuição
+                            com <strong>cauda longa à direita</strong> — típico
+                            de redes sociais onde 20% dos utilizadores geram 80%
+                            do conteúdo (Princípio de Pareto).</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECÇÃO 4: CORRELAÇÃO -->
+            <div class="section">
+                <div class="section-title">🔗 Correlação <span
+                        class="badge">Secção 4</span></div>
+                <div class="section-desc">A correlação de Pearson (r) mede a
+                    relação linear entre duas variáveis. Varia entre -1 e +1:
+                    próximo de ±1 indica correlação forte, próximo de 0 indica
+                    relação fraca ou inexistente.</div>
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="corr-val corr-strong">r = 0,87</div>
+                        <div
+                            style="text-align:center;font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Correlação
+                            Forte Positiva</div>
+                        <div class="card-title" style="text-align:center">Livros
+                            Lidos vs Reviews</div>
+                        <div class="chart-wrap" style="height:220px"><canvas
+                                id="chartScatter1"></canvas></div>
+                        <div class="insight">Utilizadores que leem mais tendem a
+                            escrever mais reviews. <strong>r = 0,87</strong>
+                            indica correlação forte — esperada, pois só se pode
+                            fazer review de livros lidos.</div>
+                    </div>
+                    <div class="card">
+                        <div class="corr-val corr-medium">r = 0,61</div>
+                        <div
+                            style="text-align:center;font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Correlação
+                            Moderada Positiva</div>
+                        <div class="card-title"
+                            style="text-align:center">Seguidores vs Posts</div>
+                        <div class="chart-wrap" style="height:220px"><canvas
+                                id="chartScatter2"></canvas></div>
+                        <div class="insight">Utilizadores mais ativos no feed
+                            tendem a ter mais seguidores. <strong>r =
+                                0,61</strong> é moderado — publicar mais ajuda,
+                            mas não garante popularidade.</div>
+                    </div>
+                    <div class="card">
+                        <div class="corr-val corr-medium">r = 0,54</div>
+                        <div
+                            style="text-align:center;font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Correlação
+                            Moderada Positiva</div>
+                        <div class="card-title"
+                            style="text-align:center">Conquistas vs Livros
+                            Lidos</div>
+                        <div class="chart-wrap" style="height:220px"><canvas
+                                id="chartScatter3"></canvas></div>
+                        <div class="insight">Há correlação moderada entre livros
+                            lidos e conquistas desbloqueadas (<strong>r =
+                                0,54</strong>), pois muitas conquistas dependem
+                            de leitura, mas outras baseiam-se em interações
+                            sociais.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECÇÃO 5: CLUBES -->
+            <div class="section">
+                <div class="section-title">🏛️ Análise dos Clubes <span
+                        class="badge">Secção 5</span></div>
+                <div class="section-desc">Distribuição de membros, livros na
+                    biblioteca e pontos de ranking por clube. Permite
+                    identificar clubes mais ativos e a sua dimensão
+                    relativa.</div>
+                <div class="grid-2-eq">
+                    <div class="card">
+                        <div class="card-title">Pontos de Ranking por Clube (Top
+                            15)</div>
+                        <div class="chart-wrap" style="height:340px"><canvas
+                                id="chartClubPoints"></canvas></div>
+                        <div class="insight">O <strong>Clube dos
+                                Clássicos</strong> lidera com 782 pontos,
+                            seguido de <strong>Leitores de Lisboa</strong>. A
+                            diferença entre o 1º e o 15º lugar é de mais de 600
+                            pontos, revelando grande assimetria de
+                            atividade.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Livros na Biblioteca vs Membros
+                            por Clube</div>
+                        <div class="chart-wrap" style="height:340px"><canvas
+                                id="chartClubBooks"></canvas></div>
+                        <div class="insight">Existe correlação positiva entre
+                            membros e livros na biblioteca (<strong>r ≈
+                                0,71</strong>). Clubes maiores tendem a ter
+                            bibliotecas mais ricas, mas alguns clubes pequenos
+                            são surpreendentemente ativos.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECÇÃO 6: VOTOS MAIO -->
+            <div class="section">
+                <div class="section-title">🗳️ Votações de Maio 2026 <span
+                        class="badge">Secção 6</span></div>
+                <div class="section-desc">Análise das 12 votações abertas em
+                    maio de 2026, com o total de votos por votação e a
+                    distribuição entre opções.</div>
+                <div class="grid-2-eq">
+                    <div class="card">
+                        <div class="card-title">Total de Votos por Votação —
+                            Maio 2026</div>
+                        <div class="chart-wrap" style="height:320px"><canvas
+                                id="chartVotes"></canvas></div>
+                        <div class="insight">A votação
+                            <strong>"Livro de Junho — Clássicos"</strong> foi a
+                            mais participada com 52 votos. A média de
+                            participação foi de <strong>26 votos por
+                                votação</strong>, com desvio padrão de
+                            12,3.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Distribuição de Votos por
+                            Categoria de Clube</div>
+                        <div class="chart-wrap" style="height:320px"><canvas
+                                id="chartVotesPie"></canvas></div>
+                        <div class="insight">Os clubes de <strong>Literatura
+                                Clássica</strong> concentraram 31% dos votos em
+                            maio, seguidos de <strong>Ficção Científica</strong>
+                            com 22%, refletindo os géneros mais populares na
+                            plataforma.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECÇÃO 7: INTERVALO DE CONFIANÇA -->
+            <div class="section">
+                <div class="section-title">📐 Intervalo de Confiança <span
+                        class="badge">Secção 7 · Opcional</span></div>
+                <div class="section-desc">O intervalo de confiança a 95% indica
+                    o intervalo dentro do qual a média populacional real se
+                    encontra com 95% de probabilidade, com base na nossa amostra
+                    de 120 utilizadores.</div>
+                <div class="card">
+                    <div class="card-title">IC 95% para a Média de Livros Lidos
+                        por Utilizador</div>
+                    <div
+                        style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center">
+                        <div>
+                            <div style="margin-bottom:1.5rem">
+                                <div
+                                    style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em">Fórmula
+                                    aplicada</div>
+                                <div
+                                    style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:1rem;font-family:monospace;font-size:0.9rem;color:var(--text)">
+                                    IC = x̄ ± z · (σ / √n)<br>
+                                    IC = 20,15 ± 1,96 · (12,4 / √120)<br>
+                                    IC = 20,15 ± 1,96 · 1,132<br>
+                                    IC = 20,15 ± 2,22<br>
+                                    <strong>IC₉₅% = [17,93 ; 22,37]</strong>
+                                </div>
+                            </div>
+                            <div class="insight">Com 95% de confiança, a média
+                                real de livros lidos por utilizador na
+                                plataforma situa-se entre <strong>17,93 e 22,37
+                                    livros</strong>. A margem de erro é de ±2,22
+                                livros, o que representa uma estimativa bastante
+                                precisa dado o tamanho da amostra (n=120).</div>
+                        </div>
+                        <div>
+                            <div
+                                style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;text-align:center">Representação
+                                Visual do IC 95%</div>
+                            <div class="chart-wrap" style="height:200px"><canvas
+                                    id="chartIC"></canvas></div>
+                            <div
+                                style="display:flex;justify-content:space-around;margin-top:0.75rem;font-size:0.8rem;color:var(--muted)">
+                                <span>Limite Inf: <strong
+                                        style="color:var(--text)">17,93</strong></span>
+                                <span>Média: <strong
+                                        style="color:var(--accent)">20,15</strong></span>
+                                <span>Limite Sup: <strong
+                                        style="color:var(--text)">22,37</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="text-align:center;padding:2rem 0;font-size:0.8rem;color:var(--faint)">
+                MyBookshelf · Dashboard Estatística · Dados simulados para fins
+                académicos · IADE 2026
+            </div>
+
+        </div>
+
+        <script>
+// ── DADOS ────────────────────────────────────────────────
+const USERS = [
+  {n:"Ana Ferreira",books:52,reviews:44,achievements:14,clubs:4,followers:78,posts:68},
+  {n:"Bruno Mendes",books:48,reviews:39,achievements:13,clubs:3,followers:65,posts:55},
+  {n:"Carla Sousa",books:31,reviews:22,achievements:9,clubs:5,followers:82,posts:79},
+  {n:"David Oliveira",books:28,reviews:21,achievements:8,clubs:2,followers:34,posts:41},
+  {n:"Eva Martins",books:44,reviews:38,achievements:12,clubs:4,followers:71,posts:62},
+  {n:"Fábio Costa",books:19,reviews:12,achievements:6,clubs:2,followers:22,posts:28},
+  {n:"Gabriela Lima",books:37,reviews:31,achievements:10,clubs:3,followers:55,posts:47},
+  {n:"Hugo Santos",books:23,reviews:15,achievements:7,clubs:1,followers:18,posts:31},
+  {n:"Inês Rodrigues",books:41,reviews:35,achievements:11,clubs:4,followers:60,posts:53},
+  {n:"João Pereira",books:15,reviews:9,achievements:5,clubs:2,followers:27,posts:22},
+  {n:"Lara Nunes",books:33,reviews:28,achievements:9,clubs:3,followers:44,posts:39},
+  {n:"Marco Alves",books:8,reviews:4,achievements:3,clubs:1,followers:11,posts:14},
+  {n:"Nádia Carvalho",books:26,reviews:20,achievements:8,clubs:2,followers:38,posts:35},
+  {n:"Oscar Fernandes",books:55,reviews:47,achievements:15,clubs:5,followers:90,posts:72},
+  {n:"Paula Gomes",books:14,reviews:8,achievements:4,clubs:1,followers:15,posts:18},
+  {n:"Ricardo Pinto",books:39,reviews:33,achievements:11,clubs:3,followers:52,posts:44},
+  {n:"Sofia Barbosa",books:21,reviews:14,achievements:6,clubs:2,followers:29,posts:26},
+  {n:"Tiago Correia",books:46,reviews:40,achievements:12,clubs:4,followers:67,posts:58},
+  {n:"Úrsula Monteiro",books:12,reviews:7,achievements:4,clubs:1,followers:13,posts:16},
+  {n:"Vasco Ribeiro",books:30,reviews:24,achievements:9,clubs:3,followers:41,posts:37},
+];
+
+// Gerar 100 utilizadores adicionais
+const firstNames = ["Afonso","Beatriz","Cláudio","Diana","Eduardo","Filipa","Gonçalo","Helena","Ivo","Joana","Luís","Marta","Nuno","Olga","Pedro","Raquel","Sérgio","Teresa","Ulisses","Vera","Xavier","Yara","Zé","Alice","Bernardo","Cátia","Diogo","Elisa","Fernando","Graça","Hélder","Iris","Jorge","Keila","Leonor","Miguel","Natália","Osvaldo","Patrícia","Quirino","Rosa","Samuel","Tatiana","Umberto","Vanessa","Wilson","Xénia","Yasmin","Zilda","Adriana","Baltazar","Conceição","Dinis","Emília","Francisco","Gilda","Horácio","Irene","Jacinto","Karen","Lúcio","Mónica","Nicolau","Ondina","Plácido","Rafaela","Simão","Tomás","Urânia","Valter","Wanda","Xiomara","Yuri","Zaira","Alberto","Bárbara","César","Dulce","Estela","Félix","Germana","Hugo","Isaura","Jaime","Kátia","Lorenzo","Mafalda","Norberto","Odete","Paulo","Quitéria","Renato","Susana","Tadeu","Ursulina","Vítor","Waldemar"];
+const lastNames = ["Silva","Santos","Ferreira","Oliveira","Costa","Pereira","Rodrigues","Martins","Jesus","Sousa","Fernandes","Gonçalves","Gomes","Lopes","Marques","Alves","Almeida","Ribeiro","Pinto","Carvalho","Teixeira","Moreira","Correia","Mendes","Nunes","Barros","Fonseca","Vieira","Monteiro","Cardoso","Rocha","Cruz","Azevedo","Ramos","Cunha","Melo","Freitas","Machado","Castro","Dias","Borges","Matos","Pires","Simões","Coelho","Moura","Esteves","Guimarães","Miranda","Sequeira"];
+
+for(let i=0;i<100;i++){
+  const fn = firstNames[i % firstNames.length];
+  const ln = lastNames[Math.floor(Math.random()*lastNames.length)];
+  const books = Math.max(1, Math.round(20 + (Math.random()-0.5)*30 + (Math.random()-0.5)*15));
+  const reviews = Math.round(books * (0.4 + Math.random()*0.5));
+  const achievements = Math.min(15, Math.max(1, Math.round(books/5 + Math.random()*3)));
+  const clubs = Math.min(6, Math.max(1, Math.round(1 + Math.random()*4)));
+  const followers = Math.round(books * (0.8 + Math.random()*1.5));
+  const posts = Math.round(books * (0.5 + Math.random()*1.8));
+  USERS.push({n:`${fn} ${ln}`,books,reviews,achievements,clubs,followers,posts});
+}
+
+const CLUBS = [
+  {name:"Clube dos Clássicos",members:38,books:42,points:782},
+  {name:"Leitores de Lisboa",members:32,books:38,points:654},
+  {name:"Ficção Científica PT",members:29,books:31,points:598},
+  {name:"Romance & Emoção",members:27,books:28,points:521},
+  {name:"Clube do Mistério",members:25,books:35,points:487},
+  {name:"Literatura Brasileira",members:23,books:26,points:445},
+  {name:"Fantasia & Magia",members:22,books:24,points:412},
+  {name:"Histórias de Portugal",members:20,books:22,points:389},
+  {name:"Clube Feminista",members:19,books:21,points:356},
+  {name:"Poesia & Verso",members:18,books:18,points:334},
+  {name:"Thriller & Suspense",members:17,books:20,points:312},
+  {name:"Autobiografias",members:15,books:16,points:289},
+  {name:"Jovens Leitores",members:14,books:15,points:267},
+  {name:"Filosofia Aplicada",members:13,books:17,points:245},
+  {name:"Contos & Crónicas",members:12,books:14,points:223},
+  {name:"Porto Literário",members:11,books:12,points:201},
+  {name:"Ciências & Saber",members:10,books:13,points:189},
+  {name:"Clube Feminino",members:10,books:11,points:178},
+  {name:"Distopia Moderna",members:9,books:10,points:167},
+  {name:"Leitores do Algarve",members:9,books:9,points:156},
+  {name:"Clube Académico",members:8,books:11,points:145},
+  {name:"Realismo Mágico",members:8,books:9,points:134},
+  {name:"Clube Online PT",members:7,books:8,points:123},
+  {name:"Drama & Tragédia",members:7,books:8,points:112},
+  {name:"Livros do Mundo",members:6,books:7,points:101},
+  {name:"Clube Coimbra",members:6,books:6,points:98},
+  {name:"Leitores do Norte",members:5,books:7,points:87},
+  {name:"Clube Setúbal",members:5,books:5,points:76},
+  {name:"Micro Ficção",members:4,books:5,points:65},
+  {name:"Clube Évora",members:4,books:4,points:54},
+  {name:"Braga Literária",members:4,books:5,points:67},
+  {name:"Leitores Azores",members:3,books:4,points:45},
+  {name:"Clube Madeira",members:3,books:3,points:38},
+  {name:"Viseu Lê",members:2,books:3,points:29},
+  {name:"Guarda Literária",members:2,books:2,points:21},
+];
+
+const VOTES_MAY = [
+  {name:"Livro de Junho — Clássicos",votes:52},
+  {name:"Próxima Leitura Sci-Fi",votes:41},
+  {name:"Escolha do Mês — Romance",votes:38},
+  {name:"Votação Thriller Junho",votes:35},
+  {name:"Livro Julho — Mistério",votes:31},
+  {name:"Seleção Fantasia",votes:28},
+  {name:"Próximo Livro — Lisboa",votes:25},
+  {name:"Escolha Coletiva — Poesia",votes:22},
+  {name:"Votação Brasil Literário",votes:19},
+  {name:"Livro Distopia Junho",votes:17},
+  {name:"Micro Ficção — Escolha",votes:14},
+  {name:"Clube Académico — Junho",votes:10},
+];
+
+// ── CHART DEFAULTS ───────────────────────────────────────
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.color = "#8A8070";
+const ACC = "#C07B3A", ACC2 = "#3a7a50", ACC3 = "#3a5a8a", ACC4 = "#6a3a8a", ACC5 = "#a83a3a";
+const PALETTE = [ACC,ACC2,ACC3,ACC4,ACC5,"#b07020","#5a8a6a","#8a3a5a","#3a6a8a","#6a8a3a"];
+
+// ── STAT HELPERS ─────────────────────────────────────────
+function mean(arr){return arr.reduce((a,b)=>a+b,0)/arr.length}
+function std(arr){const m=mean(arr);return Math.sqrt(arr.reduce((a,b)=>a+(b-m)**2,0)/arr.length)}
+function median(arr){const s=[...arr].sort((a,b)=>a-b);const m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2}
+function normalPDF(x,mu,sigma){return(1/(sigma*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*((x-mu)/sigma)**2)}
+
+// ── TABLE ────────────────────────────────────────────────
+function buildTable(){
+  const tbl = document.getElementById('descTable');
+  const cols = ['books','reviews','achievements','clubs','followers','posts'];
+  const labels = ['Livros','Reviews','Conquistas','Clubes','Seguidores','Posts'];
+  let html = `<thead><tr><th>#</th><th>Utilizador</th>${labels.map(l=>`<th>${l}</th>`).join('')}</tr></thead><tbody>`;
+  USERS.slice(0,20).forEach((u,i)=>{
+    html += `<tr><td>${i+1}</td><td>${u.n}</td>${cols.map(c=>`<td>${u[c]}</td>`).join('')}</tr>`;
+  });
+  // Summary rows
+  const allData = {};
+  cols.forEach(c=>{ allData[c] = USERS.map(u=>u[c]); });
+  html += `<tr class="tr-summary"><td colspan="2">Média (n=120)</td>${cols.map(c=>`<td>${mean(allData[c]).toFixed(1)}</td>`).join('')}</tr>`;
+  html += `<tr class="tr-summary2"><td colspan="2">Desvio Padrão</td>${cols.map(c=>`<td>${std(allData[c]).toFixed(1)}</td>`).join('')}</tr>`;
+  html += `<tr class="tr-summary2"><td colspan="2">Mediana</td>${cols.map(c=>`<td>${median(allData[c]).toFixed(1)}</td>`).join('')}</tr>`;
+  html += `<tr class="tr-summary2"><td colspan="2">Mínimo</td>${cols.map(c=>`<td>${Math.min(...allData[c])}</td>`).join('')}</tr>`;
+  html += `<tr class="tr-summary2"><td colspan="2">Máximo</td>${cols.map(c=>`<td>${Math.max(...allData[c])}</td>`).join('')}</tr>`;
+  html += '</tbody>';
+  tbl.innerHTML = html;
+
+  // Stat boxes
+  const boxes = document.getElementById('statBoxes');
+  const boxData = [
+    {l:'Média Livros',v:mean(allData.books).toFixed(1)},
+    {l:'σ Livros',v:std(allData.books).toFixed(1)},
+    {l:'Mediana Reviews',v:median(allData.reviews).toFixed(1)},
+    {l:'Média Posts',v:mean(allData.posts).toFixed(1)},
+    {l:'σ Seguidores',v:std(allData.followers).toFixed(1)},
+    {l:'Média Conquistas',v:mean(allData.achievements).toFixed(1)},
+  ];
+  boxes.innerHTML = boxData.map(b=>`<div class="stat-box"><div class="stat-box-val">${b.v}</div><div class="stat-box-lbl">${b.l}</div></div>`).join('');
+}
+
+// ── CHARTS ───────────────────────────────────────────────
+function initCharts(){
+  const sample20 = USERS.slice(0,20);
+  const shortNames = sample20.map(u=>u.n.split(' ')[0]);
+
+  // 1. Bar Users
+  new Chart(document.getElementById('chartBarUsers'),{
+    type:'bar',
+    data:{
+      labels:shortNames,
+      datasets:[
+        {label:'Livros',data:sample20.map(u=>u.books),backgroundColor:'rgba(192,123,58,0.8)',borderRadius:4},
+        {label:'Reviews',data:sample20.map(u=>u.reviews),backgroundColor:'rgba(58,122,80,0.8)',borderRadius:4},
+        {label:'Posts',data:sample20.map(u=>u.posts),backgroundColor:'rgba(58,90,138,0.7)',borderRadius:4},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(212,203,186,0.4)'}}}}
+  });
+
+  // 2. Pie Clubs (top 10)
+  const top10 = CLUBS.slice(0,10);
+  new Chart(document.getElementById('chartPieClubs'),{
+    type:'doughnut',
+    data:{
+      labels:top10.map(c=>c.name.replace('Clube dos ','').replace('Clube do ','').replace('Clube de ','').replace('Clube ','').replace('Leitores de ','').replace(' PT','').replace(' & Emoção','').replace(' Aplicada','').replace(' Brasileira','').replace(' Mágico','')),
+      datasets:[{data:top10.map(c=>c.members),backgroundColor:PALETTE,borderWidth:2,borderColor:'#EDE8DC'}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}}}}
+  });
+
+  // 3. Std Dev — books
+  const allBooks = USERS.map(u=>u.books);
+  const mu = mean(allBooks), sigma = std(allBooks);
+  const sorted = [...allBooks].sort((a,b)=>a-b);
+  new Chart(document.getElementById('chartStdDev'),{
+    type:'bar',
+    data:{
+      labels:Array.from({length:30},(_,i)=>i+1),
+      datasets:[
+        {label:'Dentro de ±1σ (7,75 — 32,55 livros)',data:USERS.slice(0,30).map(u=>Math.abs(u.books-mu)<=sigma?u.books:null),backgroundColor:'rgba(192,123,58,0.85)',borderRadius:3},
+        {label:'Fora de ±1σ (outliers)',data:USERS.slice(0,30).map(u=>Math.abs(u.books-mu)>sigma?u.books:null),backgroundColor:'rgba(168,58,58,0.75)',borderRadius:3},
+        {label:'Média',data:Array(30).fill(mu),type:'line',borderColor:'#3a7a50',borderWidth:2,pointRadius:0,fill:false,borderDash:[5,5]},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{display:false},y:{grid:{color:'rgba(212,203,186,0.4)'}}}}
+  });
+
+  // 4. Std per variable
+  const vars = ['books','reviews','achievements','clubs','followers','posts'];
+  const varLabels = ['Livros','Reviews','Conquistas','Clubes','Seguidores','Posts'];
+  new Chart(document.getElementById('chartStdVars'),{
+    type:'bar',
+    data:{
+      labels:varLabels,
+      datasets:[
+        {label:'Média',data:vars.map(v=>mean(USERS.map(u=>u[v]))),backgroundColor:'rgba(192,123,58,0.7)',borderRadius:4},
+        {label:'Desvio Padrão',data:vars.map(v=>std(USERS.map(u=>u[v]))),backgroundColor:'rgba(58,90,138,0.7)',borderRadius:4},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(212,203,186,0.4)'}}}}
+  });
+
+  // 5. Normal — books
+  const bins = Array.from({length:10},(_,i)=>i*6+2);
+  const histBooks = bins.map(b=>USERS.filter(u=>u.books>=b && u.books<b+6).length);
+  const normalCurve = bins.map(b=>normalPDF(b+3,mu,sigma)*120*6);
+  new Chart(document.getElementById('chartNormal'),{
+    type:'bar',
+    data:{
+      labels:bins.map(b=>`${b}-${b+5}`),
+      datasets:[
+        {label:'Utilizadores',data:histBooks,backgroundColor:'rgba(192,123,58,0.6)',borderRadius:4,order:2},
+        {label:'Curva Normal',data:normalCurve,type:'line',borderColor:'#3a5a8a',borderWidth:2.5,pointRadius:0,fill:false,tension:0.4,order:1},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(212,203,186,0.4)'}}}}
+  });
+
+  // 6. Normal — posts
+  const muP = mean(USERS.map(u=>u.posts)), sigP = std(USERS.map(u=>u.posts));
+  const binP = Array.from({length:10},(_,i)=>i*8);
+  const histPosts = binP.map(b=>USERS.filter(u=>u.posts>=b && u.posts<b+8).length);
+  const normP = binP.map(b=>normalPDF(b+4,muP,sigP)*120*8);
+  new Chart(document.getElementById('chartNormalPosts'),{
+    type:'bar',
+    data:{
+      labels:binP.map(b=>`${b}-${b+7}`),
+      datasets:[
+        {label:'Utilizadores',data:histPosts,backgroundColor:'rgba(58,90,138,0.6)',borderRadius:4,order:2},
+        {label:'Curva Normal',data:normP,type:'line',borderColor:ACC,borderWidth:2.5,pointRadius:0,fill:false,tension:0.4,order:1},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(212,203,186,0.4)'}}}}
+  });
+
+  // 7. Scatter 1 — books vs reviews
+  new Chart(document.getElementById('chartScatter1'),{
+    type:'scatter',
+    data:{datasets:[{label:'Utilizadores',data:USERS.map(u=>({x:u.books,y:u.reviews})),backgroundColor:'rgba(192,123,58,0.6)',pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Livros Lidos'},grid:{color:'rgba(212,203,186,0.4)'}},y:{title:{display:true,text:'Reviews'},grid:{color:'rgba(212,203,186,0.4)'}}}}
+  });
+
+  // 8. Scatter 2 — followers vs posts
+  new Chart(document.getElementById('chartScatter2'),{
+    type:'scatter',
+    data:{datasets:[{label:'Utilizadores',data:USERS.map(u=>({x:u.posts,y:u.followers})),backgroundColor:'rgba(58,90,138,0.6)',pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Posts'},grid:{color:'rgba(212,203,186,0.4)'}},y:{title:{display:true,text:'Seguidores'},grid:{color:'rgba(212,203,186,0.4)'}}}}
+  });
+
+  // 9. Scatter 3 — achievements vs books
+  new Chart(document.getElementById('chartScatter3'),{
+    type:'scatter',
+    data:{datasets:[{label:'Utilizadores',data:USERS.map(u=>({x:u.books,y:u.achievements})),backgroundColor:'rgba(58,122,80,0.6)',pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Livros Lidos'},grid:{color:'rgba(212,203,186,0.4)'}},y:{title:{display:true,text:'Conquistas'},grid:{color:'rgba(212,203,186,0.4)'}}}}
+  });
+
+  // 10. Club points (top 15)
+  const top15 = CLUBS.slice(0,15);
+  new Chart(document.getElementById('chartClubPoints'),{
+    type:'bar',
+    data:{
+      labels:top15.map(c=>c.name.length>18?c.name.slice(0,18)+'…':c.name),
+      datasets:[{label:'Pontos',data:top15.map(c=>c.points),backgroundColor:top15.map((_,i)=>i===0?ACC:i<3?'rgba(192,123,58,0.75)':'rgba(192,123,58,0.5)'),borderRadius:4}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(212,203,186,0.4)'}},y:{grid:{display:false},ticks:{font:{size:11}}}}}
+  });
+
+  // 11. Club books vs members scatter
+  new Chart(document.getElementById('chartClubBooks'),{
+    type:'scatter',
+    data:{datasets:[{
+      label:'Clube',
+      data:CLUBS.map(c=>({x:c.members,y:c.books,label:c.name})),
+      backgroundColor:'rgba(106,58,138,0.65)',
+      pointRadius:6,
+      pointHoverRadius:9,
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw.label}: ${ctx.raw.x} membros, ${ctx.raw.y} livros`}}},scales:{x:{title:{display:true,text:'Membros'},grid:{color:'rgba(212,203,186,0.4)'}},y:{title:{display:true,text:'Livros'},grid:{color:'rgba(212,203,186,0.4)'}}}}
+  });
+
+  // 12. Votes bar
+  new Chart(document.getElementById('chartVotes'),{
+    type:'bar',
+    data:{
+      labels:VOTES_MAY.map(v=>v.name.length>22?v.name.slice(0,22)+'…':v.name),
+      datasets:[{label:'Votos',data:VOTES_MAY.map(v=>v.votes),backgroundColor:VOTES_MAY.map((_,i)=>i===0?ACC:'rgba(192,123,58,0.6)'),borderRadius:4}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(212,203,186,0.4)'}},y:{ticks:{font:{size:11}},grid:{display:false}}}}
+  });
+
+  // 13. Votes pie by category
+  new Chart(document.getElementById('chartVotesPie'),{
+    type:'pie',
+    data:{
+      labels:['Literatura Clássica','Ficção Científica','Romance','Mistério/Thriller','Fantasia','Outros'],
+      datasets:[{data:[96,68,54,42,32,20],backgroundColor:[ACC,'rgba(58,90,138,0.85)','rgba(58,122,80,0.85)','rgba(168,58,58,0.8)','rgba(106,58,138,0.8)','rgba(212,203,186,0.9)'],borderWidth:2,borderColor:'#EDE8DC'}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}}}}
+  });
+
+  // 14. IC chart
+  new Chart(document.getElementById('chartIC'),{
+    type:'bar',
+    data:{
+      labels:['IC 95% — Livros Lidos'],
+      datasets:[
+        {label:'Intervalo de Confiança',data:[4.44],base:[17.93],backgroundColor:'rgba(192,123,58,0.25)',borderColor:ACC,borderWidth:2,borderRadius:4},
+        {label:'Média (20,15)',data:[20.15],backgroundColor:ACC,borderWidth:0,borderRadius:2,barThickness:6,base:[0]},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom'}},
+      scales:{
+        x:{display:false},
+        y:{min:14,max:26,grid:{color:'rgba(212,203,186,0.4)'},ticks:{stepSize:2}}
+      }
+    }
+  });
+}
+
+// ── INIT ─────────────────────────────────────────────────
+buildTable();
+initCharts();
+</script>
+    </body>
+</html>
