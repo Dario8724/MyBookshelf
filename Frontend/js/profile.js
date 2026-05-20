@@ -95,6 +95,9 @@ function renderProfile(user, followersCount, followingCount) {
                 </div>
                 <div class="profile-actions">
                     <button class="btn btn-outline" onclick="openEditModal()">Editar Perfil</button>
+                    <a href="dashboard.html" class="btn btn-outline" title="Dashboard Estatística" style="padding:0.5rem 0.7rem">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>
+                    </a>
                 </div>
             </div>
             <div id="profileCurrentBook" style="width:360px;flex-shrink:0;margin-right:1rem"></div>
