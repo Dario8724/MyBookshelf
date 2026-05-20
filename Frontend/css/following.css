@@ -376,6 +376,19 @@ nav {
 .toast.error { background: #a83a3a; }
 .toast.success { background: #3a7a50; }
 
+/* DARK MODE */
+[data-theme="dark"] {
+    --bg:        #1C1A16;
+    --surface:   #242118;
+    --surface2:  #2C2920;
+    --border:    #3A3628;
+    --text:      #E8E4DC;
+    --muted:     #9A9080;
+    --faint:     #6A6058;
+    --accent:    #D4894A;
+    --accent-dk: #C07B3A;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 720px) {
     .users-grid { grid-template-columns: 1fr; }

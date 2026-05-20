@@ -541,6 +541,21 @@ nav {
     margin-bottom: 0.75rem;
 }
 
+/* DARK MODE */
+[data-theme="dark"] {
+    --bg:        #1C1A16;
+    --surface:   #242118;
+    --surface2:  #2C2920;
+    --border:    #3A3628;
+    --text:      #E8E4DC;
+    --muted:     #9A9080;
+    --faint:     #6A6058;
+    --accent:    #D4894A;
+    --accent-dk: #C07B3A;
+    --green:     #4a9a60;
+    --green-bg:  rgba(74, 154, 96, 0.15);
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1100px) {
     .results-grid { grid-template-columns: repeat(6, 1fr); }
