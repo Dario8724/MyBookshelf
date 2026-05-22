@@ -53,9 +53,7 @@ class GoogleBooksService
         return array_values($books);
     }
 
-    /**
-     * Busca um livro pelo Google ID.
-     */
+    /** Busca um livro pelo Google ID. */
     public function getById(string $googleId): ?array
     {
         $url = $this->baseUrl . '/' . $googleId . '?key=' . $this->apiKey;
@@ -69,9 +67,7 @@ class GoogleBooksService
         return $this->formatBook($response);
     }
 
-    /**
-     * Converte o formato do livro da Google para o formato interno.
-     */
+    /** Converte o formato do livro da Google para o formato interno.*/
     private function formatBook(array $item): array
     {
         $info = $item['volumeInfo'] ?? [];
@@ -90,9 +86,7 @@ class GoogleBooksService
         ];
     }
 
-    /**
-     * Devolve a melhor capa disponível, preferindo as de maior resolução.
-     */
+    /** Devolve a melhor capa disponível, preferindo as de maior resolução.*/
     private function getBestCover(array $imageLinks): ?string
     {
         // Ordem de preferência: maior resolução primeiro
@@ -108,9 +102,7 @@ class GoogleBooksService
         return null;
     }
 
-    /**
-     * Extrai o ISBN preferindo ISBN-13.
-     */
+    /** Extrai o ISBN preferindo ISBN-13.*/
     private function extractIsbn(array $info): ?string
     {
         if (!isset($info['industryIdentifiers'])) {
@@ -132,9 +124,7 @@ class GoogleBooksService
         return null;
     }
 
-    /**
-     * Faz o pedido HTTP à API com timeout e tratamento de erros.
-     */
+    /*** Faz o pedido HTTP à API com timeout e tratamento de erros.*/
     private function request(string $url): ?array
     {
         $context = stream_context_create([
