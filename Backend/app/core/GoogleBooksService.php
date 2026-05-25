@@ -75,7 +75,7 @@ class GoogleBooksService
         ];
     }
 
-    /** Devolve a melhor capa disponível, preferindo as de maior resolução.*/
+    /** Devolve a melhor capa disponível*/
     private function getBestCover(array $imageLinks): ?string
     {
         // Ordem de preferência: maior resolução primeiro
