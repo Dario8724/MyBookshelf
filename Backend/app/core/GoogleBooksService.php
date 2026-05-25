@@ -12,17 +12,6 @@ class GoogleBooksService
         $this->apiKey = GOOGLE_BOOKS_API_KEY;
     }
 
-    /**
-     * Pesquisa livros na API.
-     *
-     * @param string $query Termo de pesquisa. Pode incluir operadores:
-     *                      - "intitle:..."  procurar no título
-     *                      - "inauthor:..." procurar no autor
-     *                      - "isbn:..."     procurar por ISBN
-     *                      Se não tiver operador, faz busca geral.
-     * @param int $maxResults Máximo de resultados (1-40).
-     * @param array $options Opções extra: ['langRestrict' => 'pt', 'orderBy' => 'relevance']
-     */
     public function search(string $query, int $maxResults = 20, array $options = []): array
     {
         $params = [
