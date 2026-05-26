@@ -257,7 +257,11 @@ Rede social literária bastante popular no Brasil.
 - Montagem da apresentação  
 - Criação da base de dados  
 - Desenvolvimento do back-end  
-- Desenvolvimento do front-end  
+- Desenvolvimento do front-end
+- Revisão de código
+- Revisão da versão final relatório, projeto e apresentação
+- Desenvolvimento do Dark Mode
+- Desenvolvimento Link do Livro  
 
 ### Dário Bandanhe
 - Proposta inicial  
@@ -268,7 +272,8 @@ Rede social literária bastante popular no Brasil.
 - Modelo de base de dados  
 - Wireframes  
 - Front-end
-- Design System   
+- Design System
+- Desenvolvimento função Clubes   
 
 ### Edmilson Tudo
 - Proposta inicial
@@ -289,12 +294,16 @@ Rede social literária bastante popular no Brasil.
 - UML
   
 ---
-
 ## Conclusão
 
-O projeto MyBookshelf propôs-se desenvolver uma solução inovadora no domínio das plataformas literárias digitais, conjugando a organização pessoal de leituras com uma forte componente social e comunitária. Ao longo das diferentes fases do projeto, investigação, ideação, conceção, implementação e validação. Foi possível concretizar uma plataforma funcional, alinhada com os objetivos definidos nos primórdios do trabalho e fundamentada nas necessidades identificadas durante a pesquisa inicial.
-A abordagem faseada adotada revelou-se determinante para o sucesso do projeto, permitindo uma progressão lógica e metodológica desde a definição conceptual até à entrega de um produto navegável e testado com utilizadores reais. A pesquisa de mercado e o estudo das soluções existentes serviram de base à definição da proposta de valor; a fase de design permitiu estruturar uma identidade visual coesa, materializada num design system completo e em wireframes de alta fidelidade que orientaram a implementação; e o desenvolvimento técnico, suportado por uma arquitetura MVC em PHP, uma API REST documentada e autenticação via JWT, traduziu essas decisões num sistema robusto, modular e preparado para evoluir caso necessário.
-A integração da Google Books API permitiu enriquecer a experiência de pesquisa e catalogação de livros, ainda que se reconheçam limitações relativas à cobertura de obras mais recentes e em língua portuguesa. Funcionalidades distintivas como o sistema de clubes de leitura, as sessões de leitura conjuntas, o sistema de pontos e seasons, as conquistas e as metas de leitura concretizam a dimensão social e gamificada que distingue o MyBookshelf de outras plataformas do mesmo segmento.
+O projeto **MyBookshelf** propôs-se desenvolver uma solução inovadora no domínio das plataformas literárias digitais, conjugando a organização pessoal de leituras com uma forte componente social e comunitária. Ao longo das diferentes fases do projeto — investigação, ideação, conceção, implementação e validação — foi possível concretizar uma plataforma funcional, alinhada com os objetivos definidos nos primórdios do trabalho e fundamentada nas necessidades identificadas durante a pesquisa inicial.
+
+A abordagem faseada adotada revelou-se determinante para o sucesso do projeto, permitindo uma progressão lógica e metodológica desde a definição conceptual até à entrega de um produto navegável e testado com utilizadores reais. A pesquisa de mercado e o estudo das soluções existentes serviram de base à definição da proposta de valor; a fase de design permitiu estruturar uma identidade visual coesa, materializada num design system completo e em wireframes de alta fidelidade que orientaram a implementação; e o desenvolvimento técnico, suportado por uma arquitetura **MVC em PHP**, uma **API REST** documentada e autenticação via **JWT**, traduziu essas decisões num sistema robusto, modular e preparado para evoluir caso necessário.
+
+A integração da **Google Books API** permitiu enriquecer a experiência de pesquisa e catalogação de livros, ainda que se reconheçam limitações relativas à cobertura de obras mais recentes e em língua portuguesa. Funcionalidades distintivas como o sistema de clubes de leitura, as sessões de leitura conjuntas, o sistema de pontos e *seasons*, as conquistas e as metas de leitura concretizam a dimensão social e gamificada que distingue o MyBookshelf de outras plataformas do mesmo segmento.
+
 A fase final de validação, através do teste de usabilidade com utilizadores representativos, confirmou que o produto se encontra próximo dos objetivos definidos no arranque do projeto, com taxas de sucesso elevadas nas tarefas principais e um feedback qualitativo globalmente positivo. Os pontos de melhoria identificados, como a marcação de livros como "lidos" e questões de acessibilidade visual, ficam registados como prioridades para iterações futuras.
-Em termos pessoais e enquanto equipa, o desenvolvimento do MyBookshelf representou uma oportunidade de consolidar conhecimentos adquiridos ao longo do percurso académico, nomeadamente o padrão arquitetural MVC, a construção de APIs REST, a integração de serviços externos, o trabalho colaborativo com controlo de versões, bem como a aplicação prática de metodologias de UX research e usability testing. Foi também um exercício relevante de gestão de projeto, comunicação entre os elementos da equipa e tomada de decisão técnica perante restrições de tempo e recursos.
-Em síntese, o MyBookshelf alcançou os objetivos propostos para esta entrega final, apresentando-se como uma plataforma funcional, esteticamente coesa e validada junto do seu público-alvo. Mais do que um trabalho académico, o projeto deixa em aberto um caminho de evolução que poderá, num futuro contribuir efetivamente para incentivar o hábito de leitura, fortalecer comunidades literárias e integrar a dimensão cultural e territorial do livro de forma inovadora e acessível.
+
+Em termos pessoais e enquanto equipa, o desenvolvimento do MyBookshelf representou uma oportunidade de consolidar conhecimentos adquiridos ao longo do percurso académico, nomeadamente o padrão arquitetural MVC, a construção de APIs REST, a integração de serviços externos, o trabalho colaborativo com controlo de versões, bem como a aplicação prática de metodologias de *UX research* e *usability testing*. Foi também um exercício relevante de gestão de projeto, comunicação entre os elementos da equipa e tomada de decisão técnica perante restrições de tempo e recursos.
+
+Em síntese, o MyBookshelf alcançou os objetivos propostos para esta entrega final, apresentando-se como uma plataforma funcional, esteticamente coesa e validada junto do seu público-alvo. Mais do que um trabalho académico, o projeto deixa em aberto um caminho de evolução que poderá, num futuro próximo, contribuir efetivamente para incentivar o hábito de leitura, fortalecer comunidades literárias e integrar a dimensão cultural e territorial do livro de forma inovadora e acessível.
