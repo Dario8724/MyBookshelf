@@ -219,17 +219,25 @@ Rede social literária bastante popular no Brasil.
 ## Descrição da Solução a Implementar
 
 - Desenvolvimento de uma plataforma web para a gestão, organização e consulta de uma biblioteca digital pessoal de livros, integrada numa rede social literária.
-- Implementação de um sistema de registo, autenticação e gestão de utilizadores, com perfis personalizados para leitores e perfis administrativos para gestão da plataforma.
-- Criação de um sistema de pesquisa avançada de livros, permitindo filtros por título, autor, género, ano de publicação, palavras-chave e categorias literárias.
+- Criação de um sistema de pesquisa avançada de livros, permitindo filtros por título, autor e ISBN.
 - Disponibilização de uma área pessoal do utilizador, com:
   - Biblioteca digital personalizada (livros lidos, em leitura e a ler)
   - Histórico de leituras
   - Metas de leitura
   - Registo de tempo de leitura
   - Sistema de medalhas e conquistas
-- Implementação de uma componente social e comunitária.
-- Integração de um módulo de descoberta cultural.
+- Implementação de um comunitario para ver todos da plataforma e um somente para ver seus seguidores.
 - Implementação de páginas individuais de livros, com informação detalhada, avaliações, reviews, estado de leitura e recomendações relacionadas.
+- Implementação do sistema de criação de clubes com base na sua localização.
+- Implementação do sistemaa de chat de conversa, busca por membros, votação de livros, agendamento de seassão de encontro ou leitura e uma biblioteca pessoal do próprio clube.
+- Implementação o sistema de gamificação dos clubes, em cada semestre eles competem por pontos para conseguir melhores posições na tabela.
+- Resumo do sistema de como conseguir pontos para o ranking de clubes:
+* ✅ Completar sessão de leitura (+10 pts)
+* ✅ Adicionar livro à biblioteca do clube (+5 pts)
+* ✅ Participar numa votação (+3 pts)
+* ✅ Completar meta de leitura (+15 pts, apenas uma vez)
+* ✅ Completar 3 sessões seguidas (+30 pts)
+* ✅ Clube atingir 10 membros (+50 pts)
 
 **Áreas curriculares envolvidas:**
 - Programação Web: Desenvolvimento da plataforma web (frontend e backend)
